@@ -63,7 +63,7 @@ public class SecurityConfig {
                 .antMatchers(
                     "/", "/auth/**", "/resources/**", "/js/**", "/css/**", "/images/**", 
                     "/checkExistingSession", "/loginForm", "/joinForm", "/joinProc", "/mailConfirm",
-                    "/oauth2/**", "/login/oauth2/**", "/oauth/naver", "/oauth/kakao" ,"/test/**"
+                    "/oauth2/**", "/login/oauth2/**", "/oauth/naver", "/oauth/kakao" ,"/test/**","/api/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             .and()

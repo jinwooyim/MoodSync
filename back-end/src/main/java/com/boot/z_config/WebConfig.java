@@ -34,7 +34,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins(
                     "http://localhost:3000",   // React 개발 서버
                     "http://localhost:8485",   // 현재 Spring Boot 서버
-                    "http://localhost:8080"    // 기본 Spring Boot 포트
+                    "http://localhost:4000"   // React 개발 서버
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")

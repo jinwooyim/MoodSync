@@ -1,7 +1,6 @@
 package com.boot.search.service;
 
 public class SearchServiceImpl implements SearchService {
-
 	private KeyboardMapper keyboardMapper;
 	private TypoCheck typoCheck;
 

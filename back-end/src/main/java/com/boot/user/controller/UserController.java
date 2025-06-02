@@ -29,13 +29,13 @@ public class UserController {
 	@RequestMapping("/joinProc")
 	public ResponseEntity<String> join(HttpServletRequest request, @RequestParam HashMap<String, String> param) {
 
-		
 		System.out.println("@#param => " + param);
 		if (service.checkId(param) != null) {
 
 		} else {
 			int re = service.userJoin(param);
 			if (re == 1) {
+				System.out.println("hjhj");
 				return ResponseEntity.ok("available");
 			}
 		}

@@ -51,7 +51,9 @@ function normalizeData(data) {
 // Spring Boot에서 데이터 가져오기
 async function fetchTrainingData() {
     try {
-        const response = await axios.get('http://localhost:8080/api/training-data');
+        const response = await axios.get('http://localhost:8485/api/training-data');
+        console.log("sts 응답 데이터 => " + response.data);
+
         return response.data;
     } catch (error) {
         console.error('Spring Boot 서버에서 데이터 가져오기 실패:', error.message);
@@ -69,8 +71,11 @@ app.post('/train', async (req, res) => {
         if (!trainingData) {
             return res.status(500).json({ error: 'Spring Boot 서버에서 데이터를 가져올 수 없습니다' });
         }
-        
         const { features, labels } = trainingData;
+
+        console.log('가져온 features:', features);
+        console.log('가져온 labels:', labels);
+
         
         // 데이터 전처리
         const { normalized: xTrain } = normalizeData(features);
@@ -130,7 +135,7 @@ app.post('/predict', async (req, res) => {
         
         // Spring Boot에 예측 결과 저장
         try {
-            await axios.post('http://localhost:8080/api/save-prediction', result);
+            await axios.post('http://localhost:8485/api/save-prediction', result);
         } catch (error) {
             console.log('Spring Boot 저장 실패:', error.message);
         }

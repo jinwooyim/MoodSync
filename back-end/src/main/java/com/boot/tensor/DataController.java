@@ -8,7 +8,6 @@ import java.util.Arrays;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*")
 public class DataController {
     
     @GetMapping("/training-data")

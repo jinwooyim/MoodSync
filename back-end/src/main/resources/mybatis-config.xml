@@ -5,6 +5,9 @@
 <configuration>
 	<mappers>
 		<mapper resource="mybatis/mappers/userMapper.xml"/>
-
+		<mapper resource="mybatis/mappers/actingMapper.xml"/>
+		<mapper resource="mybatis/mappers/musicMapper.xml"/>
+		<mapper resource="mybatis/mappers/bookMapper.xml"/>
+		
 	</mappers>
 </configuration>

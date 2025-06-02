@@ -48,6 +48,8 @@ public class UserController {
 
 		} else {
 			int re = service.userJoin(param);
+			//테스트입니다
+			//123
 			if (re == 1) {
 				return ResponseEntity.ok("available");
 			}

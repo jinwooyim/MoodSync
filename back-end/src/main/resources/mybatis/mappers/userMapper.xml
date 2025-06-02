@@ -10,7 +10,7 @@
 </select>
 	<!-- 회원가입 -->
 	<insert id="userJoin">
-		INSERT INTO userinfo (
+		INSERT INTO user_info (
 		userNumber, userId, userPw,
 		userName, userTel,
 		userEmail, userBirth, userZipCode, userAddress,
@@ -18,7 +18,7 @@
 		)
 		VALUES (
 		(SELECT NVL(MAX(userNumber), 0) + 1 FROM
-		userinfo),
+		user_info),
 		#{userId}, #{userPw}, #{userName}, #{userTel},
 		#{userEmail},
 		#{userBirth}, #{userZipCode}, #{userAddress}, #{userDetailAddress}
@@ -38,11 +38,11 @@
 		userEmail,
 		userBirth, userZipCode, userAddress, userDetailAddress,
 		userAdmin, userRegdate from
-		userinfo where userId=#{userId}
+		user_info where userId=#{userId}
 	</select>
 
 	<!-- 유저 정보 수정 -->
-	<update id="updateUserInfo"> update userinfo set userNumber=#{userNumber},
+	<update id="updateUserInfo"> update user_info set userNumber=#{userNumber},
 		userId=#{userId}, userName=#{userName}, userTel=#{userTel} ,
 		userEmail=#{userEmail}, userZipCode=#{userZipCode},
 		userAddress=#{userAddress}, userDetailAddress=#{userDetailAddress}
@@ -51,7 +51,7 @@
 
 	<!-- 유저 비밀번호 수정 -->
 	<update id="updateUserPwInfo" parameterType="java.util.HashMap">
-	    UPDATE USERinfo
+	    UPDATE user_info
 	    SET USERPW = #{encodedPassword}
 	    WHERE USERNUMBER = #{userNumber}
 	</update>

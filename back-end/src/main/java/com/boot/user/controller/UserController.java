@@ -42,6 +42,7 @@ public class UserController {
 	@RequestMapping("/joinProc")
 	public ResponseEntity<String> join(HttpServletRequest request, @RequestParam HashMap<String, String> param) {
 
+		
 		System.out.println("@#param => " + param);
 		if (service.checkId(param) != null) {
 

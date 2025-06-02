@@ -58,12 +58,6 @@ function normalizeData(data) {
 // Spring Boot에서 데이터 가져오기 (개선된 버전)
 async function fetchTrainingData() {
     try {
-<<<<<<< HEAD
-        const response = await axios.get('http://localhost:8485/api/training-data');
-        console.log("sts 응답 데이터 => " + response.data);
-
-        return response.data;
-=======
         console.log('Spring Boot 서버에서 데이터 가져오는 중...');
         
         // 여러 포트 시도
@@ -113,7 +107,6 @@ async function fetchTrainingData() {
         console.log(`데이터 검증 완료: ${data.features.length}개의 샘플`);
         return data;
         
->>>>>>> 3bf46b26ddb6fb9248c77399e636e1dec5fdcc97
     } catch (error) {
         console.error('Spring Boot 서버에서 데이터 가져오기 실패:', error.message);
         
@@ -143,8 +136,6 @@ app.post('/train', async (req, res) => {
                 suggestion: 'Spring Boot 서버가 실행 중인지 확인해주세요'
             });
         }
-<<<<<<< HEAD
-=======
         
         console.log('훈련 데이터 확인:', {
             featuresLength: trainingData.features?.length,
@@ -152,12 +143,7 @@ app.post('/train', async (req, res) => {
             status: trainingData.status
         });
         
->>>>>>> 3bf46b26ddb6fb9248c77399e636e1dec5fdcc97
         const { features, labels } = trainingData;
-
-        console.log('가져온 features:', features);
-        console.log('가져온 labels:', labels);
-
         
         // 데이터 유효성 검사
         if (!features || !labels) {

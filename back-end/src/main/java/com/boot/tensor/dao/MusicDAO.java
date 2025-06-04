@@ -1,7 +1,9 @@
 package com.boot.tensor.dao;
 
+import java.util.ArrayList;
+
 import com.boot.tensor.dto.MusicDTO;
 
 public interface MusicDAO {
-	public MusicDTO getMusicDTO(int num);
+	public ArrayList<MusicDTO> getMusicDTO();
 }

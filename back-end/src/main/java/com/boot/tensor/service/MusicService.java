@@ -5,5 +5,5 @@ import java.util.ArrayList;
 import com.boot.tensor.dto.MusicDTO;
 
 public interface MusicService {
-	public ArrayList<MusicDTO> getMusicDTO(int num);
+	public ArrayList<MusicDTO> getMusicDTO();
 }

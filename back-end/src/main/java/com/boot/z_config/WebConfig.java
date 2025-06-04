@@ -38,6 +38,7 @@ public class WebConfig implements WebMvcConfigurer {
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
+                .exposedHeaders("Set-Cookie") // React환경 쿠키 설정
                 .allowCredentials(true)
                 .maxAge(3600);
     }

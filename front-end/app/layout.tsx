@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import AppProviders from '@/components/AppProviders';
 import './globals.css'
 
 import Header from "@/components/Header";
@@ -18,12 +19,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
+      <head>
+        {/* 다음 지도 API 스크립트  */}
+        <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" async defer></script>
+
+        {/* 비밀번호 눈 아이콘 (Ionicons) CSS */}
+        <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" />
+
+      </head>
       <body>
-        <Header />
-          <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
-            {children}
-          </div>
-        <Footer />
+        {/* 헤더 로딩 전 토큰확인 먼저 하기 위해 appProviders 컴포넌트 사용 -> 헤더,푸터 안에 포함되어있습니다*/}
+        <AppProviders>
+          {children}
+        </AppProviders>
       </body>
     </html>
   )

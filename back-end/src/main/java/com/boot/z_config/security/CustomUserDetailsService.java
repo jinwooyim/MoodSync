@@ -71,49 +71,55 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
     }
     
-    // UserDTO를 UserDetails로 변환
+//  리액트 프론트 버전 
     private UserDetails createUserDetails(UserDTO user) {
-        // 권한 목록 생성
-        Collection<GrantedAuthority> authorities = new ArrayList<>();
-        
-        // 관리자 여부에 따른 권한 부여
-        if (user.getUserAdmin() != 0 && user.getUserAdmin() == 1) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
-            log.info("관리자 권한 부여: {}", user.getUserId());
-        } else {
-            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-            log.info("일반 사용자 권한 부여: {}", user.getUserId());
-        }
-        
-        // 비밀번호 처리 (중요: 이미 암호화된 비밀번호를 그대로 사용)
-        String password = user.getUserPw();
-        
-        // 비밀번호가 BCrypt 형식이 아닌 경우 (개발 환경에서만 사용)
-        // 주의: 실제 운영 환경에서는 모든 비밀번호가 이미 암호화되어 있어야 함
-        if (password != null && !password.startsWith("$2")) {
-            log.warn("비밀번호가 암호화되어 있지 않습니다. 개발 환경에서만 사용하세요.");
-            // 실제 운영 환경에서는 이 부분을 제거하고 모든 비밀번호를 미리 암호화해야 함
-            // password = passwordEncoder.encode(password);
-        }
-        
-//        log.info("사용자 인증 정보 생성 완료: {}", user.getUserId());
-        
-        // Spring Security의 User 객체 생성
-        // 매개변수: username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities
-        return new User(
-            user.getUserId(),
-            password, // 이미 암호화된 비밀번호
-            true,     // 계정 활성화 여부
-            true,     // 계정 만료 여부
-            true,     // 자격 증명 만료 여부
-            true,     // 계정 잠금 여부
-            authorities
-        );
+        return new PrincipalDetails(user);
     }
+//    리액트 프론트 버전 바꾸기 위해 기본사용하던것 주석처리하였습니다 !!  
+//    // UserDTO를 UserDetails로 변환
+//    private UserDetails createUserDetails(UserDTO user) {
+//        // 권한 목록 생성
+//        Collection<GrantedAuthority> authorities = new ArrayList<>();
+//        
+//        // 관리자 여부에 따른 권한 부여
+//        if (user.getUserAdmin() != 0 && user.getUserAdmin() == 1) {
+//            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+//            log.info("관리자 권한 부여: {}", user.getUserId());
+//        } else {
+//            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+//            log.info("일반 사용자 권한 부여: {}", user.getUserId());
+//        }
+//        
+//        // 비밀번호 처리 (중요: 이미 암호화된 비밀번호를 그대로 사용)
+//        String password = user.getUserPw();
+//        
+//        // 비밀번호가 BCrypt 형식이 아닌 경우 (개발 환경에서만 사용)
+//        // 주의: 실제 운영 환경에서는 모든 비밀번호가 이미 암호화되어 있어야 함
+//        if (password != null && !password.startsWith("$2")) {
+//            log.warn("비밀번호가 암호화되어 있지 않습니다. 개발 환경에서만 사용하세요.");
+//            // 실제 운영 환경에서는 이 부분을 제거하고 모든 비밀번호를 미리 암호화해야 함
+//            // password = passwordEncoder.encode(password);
+//        }
+//        
+////        log.info("사용자 인증 정보 생성 완료: {}", user.getUserId());
+//        
+//        // Spring Security의 User 객체 생성
+//        // 매개변수: username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities
+//        return new User(
+//            user.getUserId(),
+//            password, // 이미 암호화된 비밀번호
+//            true,     // 계정 활성화 여부
+//            true,     // 계정 만료 여부
+//            true,     // 자격 증명 만료 여부
+//            true,     // 계정 잠금 여부
+//            authorities
+//        );
+//    }
     
     // 테스트용 메서드: 비밀번호 인코딩 확인
 //    public void checkPasswordEncoding(String rawPassword, String encodedPassword) {
 //        boolean matches = passwordEncoder.matches(rawPassword, encodedPassword);
 //        log.info("비밀번호 매칭 결과: {}", matches);
 //    }
+
 }

@@ -61,10 +61,12 @@ public class SecurityConfig {
             // 요청 권한 설정
             .authorizeRequests()
                 .antMatchers(
+                    "/user/login", "/user/register", // 프론트단 JWT 로그인/회원가입
                     "/", "/auth/**", "/resources/**", "/js/**", "/css/**", "/images/**", 
                     "/checkExistingSession", "/loginForm", "/joinForm", "/joinProc", "/mailConfirm",
                     "/oauth2/**", "/login/oauth2/**", "/oauth/naver", "/oauth/kakao" ,"/test/**","/api/**"
                 ).permitAll()
+                .antMatchers("/user/me").authenticated() // 프론트 JWT 기반 사용자 정보 반환
                 .anyRequest().authenticated()
             .and()
             // 폼 로그인 설정

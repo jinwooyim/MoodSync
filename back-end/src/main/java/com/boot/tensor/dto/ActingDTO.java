@@ -11,5 +11,10 @@ public class ActingDTO {
 	private int actingNumber;
 	private int emotionNumber;
 	private String actingName;
-
+	private int happy;
+	private int sad;
+	private int stress;
+	private int calm;
+	private int excited;
+	private int tired;
 }

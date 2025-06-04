@@ -10,5 +10,12 @@ import lombok.NoArgsConstructor;
 public class BookDTO {
 	private int bookNumber;
 	private int emotionNumber;
-	private String actingName;
+	private String bookName;
+	private String bookAuthor;
+	private int happy;
+	private int sad;
+	private int stress;
+	private int calm;
+	private int excited;
+	private int tired;
 }

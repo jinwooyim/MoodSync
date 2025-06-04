@@ -64,10 +64,6 @@ public class FrontSecurityController {
     // JWT 기반 사용자 정보 반환
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(Authentication authentication) {
-        log.info("[FrontSecurityController] authentication: {}", authentication);
-        if (authentication != null) {
-            log.info("[FrontSecurityController] principal: {}", authentication.getPrincipal());
-        }
         // 인증이 없거나, 인증이 anonymousUser이거나, PrincipalDetails가 아니면 401 반환
         if (authentication == null || !authentication.isAuthenticated() ||
             authentication.getPrincipal() == null ||
@@ -81,7 +77,6 @@ public class FrontSecurityController {
         HashMap<String, String> param = new HashMap<>();
         param.put("userId", user.getUserId());
         UserDTO fullUser = userService.getUserInfo(param);
-        log.info("[FrontSecurityController] fullUser: {}", fullUser);
         return ResponseEntity.ok(fullUser);
     }
     

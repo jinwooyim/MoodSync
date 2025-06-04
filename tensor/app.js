@@ -1,53 +1,72 @@
 const express = require('express');
 const cors = require('cors');
+// require('@tensorflow/tfjs-node');
 const tf = require('@tensorflow/tfjs');
 const axios = require('axios');
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const port = 4000;
 
-// 미들웨어
 app.use(cors());
 app.use(express.json());
 
-// 전역 모델 변수
 let model = null;
 let isModelTrained = false;
 
-// 모델 생성
-function createModel() {
-    const model = tf.sequential({
-        layers: [
-            tf.layers.dense({
-                inputShape: [2],
-                units: 4,
-                activation: 'relu'
-            }),
-            tf.layers.dense({
-                units: 1,
-                activation: 'sigmoid'
-            })
-        ]
-    });
-    
-    model.compile({
-        optimizer: tf.train.adam(0.1),
-        loss: 'binaryCrossentropy',
-        metrics: ['accuracy']
-    });
-    
-    return model;
+// ========== 모델 저장 / 불러오기 함수 ===========
+// 디렉토리가 없으면 생성
+function ensureDir(dirPath) {
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
 }
 
-// 데이터 정규화 (오류 처리 추가)
+// 순수 JS 방식으로 모델 저장 (model.json + weights.bin)
+async function saveModelPureJS(model, dirPath) {
+  ensureDir(dirPath);
+
+  await model.save(
+    tf.io.withSaveHandler(async (modelArtifacts) => {
+      // 1) 토폴로지(JSON) 저장
+      fs.writeFileSync(
+        path.join(dirPath, 'model.json'),
+        JSON.stringify(modelArtifacts.modelTopology),
+        'utf8'
+      );
+
+      // 2) weights 바이너리 저장
+      const weightsBuffer = Buffer.from(modelArtifacts.weightData);
+      fs.writeFileSync(path.join(dirPath, 'weights.bin'), weightsBuffer);
+
+      return {
+        modelArtifactsInfo: {
+          dateSaved: new Date(),
+          modelTopologyType: 'JSON',
+          weightDataBytes: modelArtifacts.weightData.byteLength,
+        },
+      };
+    })
+  );
+}
+
+// 저장된 모델 로드 (model.json + weights.bin -> tf.Model)
+async function loadModelPureJS(dirPath) {
+  // 1) model.json 로드
+  const modelJson = JSON.parse(
+    fs.readFileSync(path.join(dirPath, 'model.json'), 'utf8')
+  );
+  // 2) weights.bin 로드
+  const weightData = fs.readFileSync(path.join(dirPath, 'weights.bin'));
+  // 3) 메모리 핸들러 생성
+  const handler = tf.io.fromMemory(modelJson, weightData.buffer);
+  // 4) 모델 로드
+  return await tf.loadLayersModel(handler);
+}
+
+// 정규화 함수
 function normalizeData(data) {
-    // null 체크 추가
-    if (!data || !Array.isArray(data) || data.length === 0) {
-        throw new Error('훈련 데이터가 비어있거나 올바르지 않습니다');
-    }
-    
-    console.log('정규화할 데이터:', data);
-    
     const tensor = tf.tensor2d(data);
     const min = tensor.min(0);
     const max = tensor.max(0);
@@ -55,276 +74,159 @@ function normalizeData(data) {
     return { normalized, min, max };
 }
 
-// Spring Boot에서 데이터 가져오기 (개선된 버전)
-async function fetchTrainingData() {
-    try {
-        console.log('Spring Boot 서버에서 데이터 가져오는 중...');
-        
-        // 여러 포트 시도
-        const possibleUrls = [
-            'http://localhost:8485/api/training-data'
-        ];
-        
-        let response = null;
-        let lastError = null;
-        
-        for (const url of possibleUrls) {
-            try {
-                console.log(`시도 중: ${url}`);
-                response = await axios.get(url, { timeout: 5000 });
-                console.log(`성공: ${url}`);
-                break;
-            } catch (error) {
-                console.log(`실패: ${url} - ${error.message}`);
-                lastError = error;
-            }
-        }
-        
-        if (!response) {
-            throw lastError || new Error('모든 URL에서 데이터 가져오기 실패');
-        }
-        
-        console.log('받은 응답:', response.data);
-        
-        // 응답 데이터 검증
-        const data = response.data;
-        if (!data || !data.features || !data.labels) {
-            throw new Error('응답 데이터 구조가 올바르지 않습니다');
-        }
-        
-        if (!Array.isArray(data.features) || !Array.isArray(data.labels)) {
-            throw new Error('features와 labels가 배열이 아닙니다');
-        }
-        
-        if (data.features.length === 0 || data.labels.length === 0) {
-            throw new Error('features 또는 labels가 비어있습니다');
-        }
-        
-        if (data.features.length !== data.labels.length) {
-            throw new Error('features와 labels의 길이가 일치하지 않습니다');
-        }
-        
-        console.log(`데이터 검증 완료: ${data.features.length}개의 샘플`);
-        return data;
-        
-    } catch (error) {
-        console.error('Spring Boot 서버에서 데이터 가져오기 실패:', error.message);
-        
-        // 폴백 데이터 제공
-        console.log('폴백 데이터 사용');
-        return {
-            features: [
-                [1610, 50], [165, 55], [155, 48], [170, 65], [175, 70],
-                [162, 52], [158, 47], [180, 80], [185, 85], [172, 68]
-            ],
-            labels: [0, 0, 0, 1, 1, 0, 0, 1, 1, 1],
-            status: 'fallback'
-        };
-    }
+// ========== 모델 학습 함수 ===========
+// 훈련 API
+async function ModelTraining(response){
+    // 1. 데이터 불러오기
+    const { features, labels } = response.data;
+
+    // 2. Tensor로 변환
+    const xs = tf.tensor2d(features); // [N, 6]
+    const ys = tf.tensor1d(labels, 'int32'); // [N]
+    const ysOneHot = tf.oneHot(ys, Math.max(...labels) + 1); // [N, numClasses]
+    const numClasses = Math.max(...labels) + 1;
+
+    // 3. 모델 정의
+    const model = tf.sequential();
+    model.add(tf.layers.dense({units: 32, activation: 'relu', inputShape: [6]}));
+    model.add(tf.layers.dense({units: 16, activation: 'relu'}));
+    model.add(tf.layers.dense({units: numClasses, activation: 'softmax'}));  // 클래스 수에 맞게 units 조정
+
+    // 4. 모델 컴파일
+    model.compile({
+        optimizer: 'adam',
+        loss: 'categoricalCrossentropy',
+        metrics: ['accuracy']
+    });
+
+    // 5. 모델 훈련
+    await model.fit(xs, ysOneHot, { // xs : 모델 입력 데이터[배치 크기, 특성 개수], usOneHot[배치 크기, 클래스 개수] : 레이블 데이터
+      epochs: 600, // 데이터셋에 대해 학습을 50번 반복
+      batchSize: 16, // 한 번에 모델에 입력하는 데이터의 개수
+      shuffle: true, //  epoch마다 학습 데이터의 순서를 섞어서
+      callbacks: {
+        onEpochEnd: (epoch, logs) => { // 손실(loss), 정확도(acc)
+          console.log(`Epoch ${epoch + 1}: loss = ${logs.loss.toFixed(4)}, acc = ${logs.acc.toFixed(4)}`);
+        },
+      },
+    });
+
+    return model;
 }
+// ===================================================================================================================================================
 
-// 모델 훈련 (개선된 오류 처리)
-app.post('/train', async (req, res) => {
-    try {
-        console.log('=== 모델 훈련 시작 ===');
-        
-        // Spring Boot에서 훈련 데이터 가져오기
-        const trainingData = await fetchTrainingData();
-        if (!trainingData) {
-            return res.status(500).json({ 
-                error: 'Spring Boot 서버에서 데이터를 가져올 수 없습니다',
-                suggestion: 'Spring Boot 서버가 실행 중인지 확인해주세요'
-            });
-        }
-        
-        console.log('훈련 데이터 확인:', {
-            featuresLength: trainingData.features?.length,
-            labelsLength: trainingData.labels?.length,
-            status: trainingData.status
-        });
-        
-        const { features, labels } = trainingData;
-        
-        // 데이터 유효성 검사
-        if (!features || !labels) {
-            return res.status(500).json({ 
-                error: 'features 또는 labels가 없습니다',
-                received: { features: !!features, labels: !!labels }
-            });
-        }
-        
-        // 데이터 전처리
-        console.log('데이터 정규화 시작...');
-        const { normalized: xTrain } = normalizeData(features);
-        
-        console.log('라벨 텐서 생성...');
-        const yTrain = tf.tensor2d(labels.map(label => [label]));
-        
-        console.log('모델 생성...');
-        model = createModel();
-        
-        console.log('모델 훈련 시작...');
-        const history = await model.fit(xTrain, yTrain, {
-            epochs: 50,
-            batchSize: 5,
-            verbose: 1,
-            callbacks: {
-                onEpochEnd: (epoch, logs) => {
-                    if (epoch % 10 === 0) {
-                        console.log(`Epoch ${epoch}: loss = ${logs.loss.toFixed(4)}, accuracy = ${logs.acc.toFixed(4)}`);
-                    }
-                }
-            }
-        });
-        
-        isModelTrained = true;
-        
-        // 메모리 정리
-        xTrain.dispose();
-        yTrain.dispose();
-        
-        console.log('=== 모델 훈련 완료 ===');
-        
-        res.json({ 
-            message: '모델 훈련이 완료되었습니다',
-            status: 'success',
-            dataSource: trainingData.status || 'spring-boot',
-            trainingInfo: {
-                samples: features.length,
-                epochs: 50,
-                finalLoss: history.history.loss[history.history.loss.length - 1],
-                finalAccuracy: history.history.acc[history.history.acc.length - 1]
-            }
-        });
-        
-    } catch (error) {
-        console.error('=== 훈련 중 오류 ===');
-        console.error('오류 메시지:', error.message);
-        console.error('오류 스택:', error.stack);
-        
-        res.status(500).json({ 
-            error: '모델 훈련 중 오류가 발생했습니다',
-            details: error.message,
-            suggestion: 'Spring Boot 서버(포트 8485 또는 8080)가 실행 중인지 확인해주세요'
-        });
-    }
+// ========== 음악, 행동, 도서에 대해 학습 및 저장 =========== -> 메인
+app.get('/train', async (req, res) => {
+  try {
+    // 음악, 행동, 도서에 대해서 학습 시작
+    const act_response = await axios.get('http://localhost:8485/api/act-data');
+    console.log('🔄 [1/3] act 모델 학습 시작');
+    const act_model = await ModelTraining(act_response);
+    console.log('✅ [1/3] act 모델 학습 완료');
+
+    const music_response = await axios.get('http://localhost:8485/api/music-data');
+    console.log('🔄 [2/3] music 모델 학습 시작');
+    const music_model = await ModelTraining(music_response);
+    console.log('✅ [2/3] music 모델 학습 완료');
+
+    const book_response = await axios.get('http://localhost:8485/api/book-data');
+    console.log('🔄 [3/3] book 모델 학습 시작');
+    const book_model = await ModelTraining(book_response);
+    console.log('✅ [3/3] book 모델 학습 완료');
+    
+    // 모델 저장
+    await saveModelPureJS(act_model, path.join(__dirname, 'act_model'));
+    await saveModelPureJS(music_model, path.join(__dirname, 'music_model'));
+    await saveModelPureJS(book_model, path.join(__dirname, 'book_model'));
+    console.log('📦 순수 JS 모델 저장 완료');
+
+    res.send({ message: 'Training and saving completed successfully!' });
+
+  } catch (error) {
+    console.error('Training failed:', error);
+    res.status(500).send({ error: error.message });
+  }
 });
 
-// 예측 (기존 코드와 동일)
-app.post('/predict', async (req, res) => {
-    try {
-        if (!isModelTrained) {
-            return res.status(400).json({ error: '모델이 훈련되지 않았습니다' });
-        }
-        
-        const { height, weight } = req.body;
-        
-        if (!height || !weight) {
-            return res.status(400).json({ error: '키와 몸무게를 입력해주세요' });
-        }
-        
-        // 예측 수행
-        const input = tf.tensor2d([[height, weight]]);
-        const prediction = model.predict(input);
-        const probability = await prediction.data();
-        
-        const result = {
-            height,
-            weight,
-            probability: probability[0],
-            prediction: probability[0] > 0.5 ? '남성' : '여성',
-            confidence: probability[0] > 0.5 ? probability[0] : (1 - probability[0])
-        };
-        
-        // Spring Boot에 예측 결과 저장 시도
-        try {
-            await axios.post('http://localhost:8485/api/save-prediction', result);
-        } catch (error) {
-            console.log('Spring Boot 저장 실패:', error.message);
-        }
-        
-        // 메모리 정리
-        input.dispose();
-        prediction.dispose();
-        
-        res.json(result);
-        
-    } catch (error) {
-        console.error('예측 중 오류:', error);
-        res.status(500).json({ error: '예측 중 오류가 발생했습니다' });
+// ========== 예측 수행 =========== -> 메인
+// 예측 API (app.js)
+app.get('/predict', express.json(), async (req, res) => {
+  try {
+    const response = await axios.get('http://localhost:8485/predict?happy=0.5&sad=0.2&stress=0.1&calm=0.7&excited=0.4&tired=0.3');
+    const input_emotion = response.data;
+
+    console.log("@# input emotion =>", input_emotion);
+    
+    const { happy, sad, stress, calm, excited, tired } = input_emotion;
+    console.log("happy      =>", input_emotion.happy);
+    console.log("sad          =>", input_emotion.sad);
+    console.log("stress     =>", input_emotion.stress);
+    console.log("calm        =>", input_emotion.calm);
+    console.log("excited   =>", input_emotion.excited);
+    console.log("tired       =>", input_emotion.tired);
+
+    if (
+      [happy, sad, stress, calm, excited, tired].some((v) => v === undefined)
+    ) {
+      return res.status(400).json({ error: '6개 감정 값을 모두 입력해주세요.' });
     }
+
+    const act_model = await loadModelPureJS(path.join(__dirname, 'act_model'));
+    const music_model = await loadModelPureJS(path.join(__dirname, 'music_model'));
+    const book_model = await loadModelPureJS(path.join(__dirname, 'book_model'));
+
+    const inputTensor = tf.tensor2d([[happy, sad, stress, calm, excited, tired]]);
+
+    const act_prediction = act_model.predict(inputTensor);
+    const music_prediction = music_model.predict(inputTensor);
+    const book_prediction = book_model.predict(inputTensor);
+
+    const act_probs = await act_prediction.data();
+    const music_probs = await music_prediction.data();
+    const book_probs = await book_prediction.data();
+
+    const act_predictedClass = act_prediction.argMax(-1).dataSync()[0];
+    const music_predictedClass = music_prediction.argMax(-1).dataSync()[0];
+    const book_predictedClass = book_prediction.argMax(-1).dataSync()[0];
+
+    // 응답으로 JSON 반환
+    res.json({
+      act: {
+        predictedClass: act_predictedClass,
+        probabilities: Array.from(act_probs),
+      },
+      music: {
+        predictedClass: music_predictedClass,
+        probabilities: Array.from(music_probs),
+      },
+      book: {
+        predictedClass: book_predictedClass,
+        probabilities: Array.from(book_probs),
+      },
+    });
+  } catch (err) {
+    console.error('Predict failed:', err);
+    res.status(500).json({ error: err.message });
+  }
 });
+
 
 // 상태 확인
 app.get('/status', (req, res) => {
-    res.json({
-        status: 'running',
-        modelTrained: isModelTrained,
-        tensorflowVersion: tf.version.tfjs
-    });
+    res.json({ status: 'running', modelTrained: isModelTrained });
 });
 
-// 루트 경로
+// 기본 페이지
 app.get('/', (req, res) => {
     res.send(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>TensorFlow.js 서버</title>
-            <style>
-                body { font-family: Arial, sans-serif; margin: 40px; }
-                button { padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
-                .result { margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 5px; }
-            </style>
-        </head>
-        <body>
-            <h1>TensorFlow.js 서버</h1>
-            <button onclick="trainModel()">모델 훈련</button>
-            <button onclick="testPredict()">예측 테스트</button>
-            <div id="result" class="result"></div>
-            
-            <script>
-                async function trainModel() {
-                    const result = document.getElementById('result');
-                    result.innerHTML = '훈련 중...';
-                    
-                    try {
-                        const response = await fetch('/train', { method: 'POST' });
-                        const data = await response.json();
-                        result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
-                    } catch (error) {
-                        result.innerHTML = '오류: ' + error.message;
-                    }
-                }
-                
-                async function testPredict() {
-                    const result = document.getElementById('result');
-                    result.innerHTML = '예측 중...';
-                    
-                    try {
-                        const response = await fetch('/predict', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ height: 175, weight: 70 })
-                        });
-                        const data = await response.json();
-                        result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
-                    } catch (error) {
-                        result.innerHTML = '오류: ' + error.message;
-                    }
-                }
-            </script>
-        </body>
-        </html>
+        <h2>TensorFlow.js Emotion Server</h2>
+        <p>POST /train - 모델 훈련</p>
+        <p>POST /predict - 예측 (6개의 감정 값 필요)</p>
+        <p>GET /status - 서버 상태 확인</p>
     `);
 });
 
 // 서버 시작
 app.listen(port, () => {
-    console.log(`TensorFlow.js 서버가 http://localhost:${port} 에서 실행 중입니다`);
-    console.log('사용 가능한 엔드포인트:');
-    console.log('- GET / : 웹 인터페이스');
-    console.log('- POST /train : 모델 훈련');
-    console.log('- POST /predict : 예측 수행');
-    console.log('- GET /status : 서버 상태 확인');
+    console.log(`Emotion Prediction Server is running on http://localhost:${port}`);
 });

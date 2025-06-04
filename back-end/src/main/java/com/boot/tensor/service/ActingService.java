@@ -5,5 +5,5 @@ import java.util.ArrayList;
 import com.boot.tensor.dto.ActingDTO;
 
 public interface ActingService {
-	public ArrayList<ActingDTO> getActingDTO(int num);
+	public ArrayList<ActingDTO> getActingDTO();
 }

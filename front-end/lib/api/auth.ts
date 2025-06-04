@@ -36,3 +36,14 @@ export const getCurrentUser = async () => {
   const response = await api.get('/user/me'); // 경로에 슬래시 추가
   return response.data; // 사용자 정보를 담은 데이터를 반환한다고 가정
 };
+
+export const register = async (joinData: any) => {
+  // x-www-form-urlencoded 방식으로 전송 (qs 없이 URLSearchParams 사용)
+  const params = new URLSearchParams(joinData).toString();
+  const response = await api.post(
+    '/joinProc',
+    params,
+    { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+  );
+  return response.data;
+};

@@ -6,6 +6,8 @@ import { useState } from "react";
 import EmotionSelection from "@/components/EmotionSelection";
 import RecommendationList from "@/components/RecommendationList";
 import EmotionSliderCard from "@/components/EmotionSliderCard"; // <-- 이 컴포넌트가 이제 내부에서 전환을 담당
+import FaceEmotionDetector from '@/components/FaceEmotionDetector';
+import { CustomMoodScores } from '@/types/emotion';
 
 // 데이터 임포트 경로
 import { emotions } from "@/data/emotions";
@@ -22,6 +24,9 @@ export default function HomePage() {
   const [emotionSliderValue, setEmotionSliderValue] = useState<number>(50); // 슬라이더 값 상태
   const [sliderControlledEmotion, setSliderControlledEmotion] = useState<string | null>(null);
 
+  // 감정 분석 결과 상태 추가
+  const [latestDetectedMoods, setLatestDetectedMoods] = useState<CustomMoodScores | null>(null);
+
   const handleSliderValueChange = (value: number, emotionId: string | null) => {
     setEmotionSliderValue(value);
     if (emotionId) {
@@ -30,6 +35,12 @@ export default function HomePage() {
     } else {
       // 감정 선택이 없으면 슬라이더는 비활성화되므로 이 분기는 거의 실행되지 않음
     }
+  };
+
+  // FaceEmotionDetector에서 감정 분석 결과를 받아오는 핸들러
+  const handleEmotionDetected = (moodScores: CustomMoodScores | null) => {
+    setLatestDetectedMoods(moodScores);
+    console.log('최신 감지된 감정:', moodScores);
   };
 
   return (
@@ -67,6 +78,10 @@ export default function HomePage() {
             onEmotionValueChange={handleSliderValueChange}
             initialEmotionValue={emotionSliderValue}
           />
+
+          {/* FaceEmotionDetector 감정 분석 UI */}
+          <FaceEmotionDetector onEmotionDetected={handleEmotionDetected} />
+
 
           {/* Recommendations */}
           {selectedEmotion && selectedEmotionData && (

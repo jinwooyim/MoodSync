@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import AuthInitializer from '@/components/AuthInitializer';
 import './globals.css'
 
 import Header from "@/components/Header";
@@ -29,6 +30,7 @@ export default function RootLayout({
         {/* 기타 전역 <head> 요소들 */}
       </head>
       <body>
+        <AuthInitializer /> {/* 인증 상태 초기화 컴포넌트 */}
         <Header />
           <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
             {children}

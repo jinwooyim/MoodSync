@@ -1,38 +1,64 @@
 // app/user/login/page.tsx
-'use client'; // 클라이언트 컴포넌트로 지정
+'use client';
 
-import { useState } from 'react';
-import { login } from '@/lib/api/auth'; // auth.ts에서 로그인 함수 임포트
+import { useState, useEffect } from 'react';
+import { login } from '@/lib/api/auth'; // getCurrentUser는 이제 스토어에서 처리
 import Link from 'next/link';
-import { useRouter } from 'next/navigation'; // Next.js 13+ App Router 사용 시
+import { useRouter } from 'next/navigation';
+import useAuthStore from '@/store/authStore'; // Zustand 스토어 임포트
 
 export default function UserLoginPage() {
   const [userId, setUserId] = useState('');
   const [userPw, setUserPw] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const router = useRouter(); // 라우터 훅 사용
+  const [loading, setLoading] = useState(false); // 폼 제출 로딩
+  const router = useRouter();
+
+  const { isLoggedIn, checkAuthStatus, loginSuccess } = useAuthStore(); // Zustand 스토어에서 가져오기
+  const authLoading = useAuthStore((state) => state.loading); // 초기 인증 확인 로딩 상태
+
+  // 페이지 로드 시 로그인 상태 확인
+  useEffect(() => {
+    // 스토어의 checkAuthStatus는 앱 초기 로드 시 `AuthInitializer`에서 호출됨.
+    // 여기서는 이미 로그인 상태라면 바로 리다이렉트
+    if (isLoggedIn && !authLoading) { // authLoading이 false일 때만 리다이렉트 (초기 확인 완료 후)
+      router.replace('/record');
+    }
+  }, [isLoggedIn, authLoading, router]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); // 기본 폼 제출 동작 방지
-    setLoading(true); // 로딩 상태 시작
-    setError(''); // 이전 에러 메시지 초기화
+    e.preventDefault();
+    setLoading(true);
+    setError('');
 
     try {
-      // lib/api/auth.ts의 login 함수 호출
-      // Axios가 Content-Type: application/json으로 userId, userPw를 전송
-      await login({ userId, userPw });
-
-      // 로그인 성공 시 메인 페이지로 리디렉션
-      router.push('/');
+      const userData = await login({ userId, userPw }); // 로그인 API 호출
+      loginSuccess(userData); // 로그인 성공 시 전역 상태 업데이트
+      router.push('/'); // 메인 페이지로 리디렉션
     } catch (err: any) {
       console.error("로그인 에러:", err);
-      // 서버에서 전달된 에러 메시지가 있다면 사용, 없으면 기본 메시지
       setError(err.response?.data?.message || '아이디 또는 비밀번호가 일치하지 않습니다.');
     } finally {
-      setLoading(false); // 로딩 상태 종료
+      setLoading(false);
     }
   };
+
+  // 초기 인증 상태 확인 중일 때는 스피너 또는 아무것도 렌더링하지 않음
+  if (authLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p>로그인 상태 확인 중...</p>
+      </div>
+    );
+  }
+
+  // 이미 로그인되어 있으면 (checkAuthStatus에서 리다이렉트 되었을 것이므로)
+  // 이 부분은 사실상 도달하지 않을 것이지만, 만약을 대비하여...
+  if (isLoggedIn) {
+     return null; // 또는 다른 로딩/리다이렉트 메시지
+  }
+
 
   return (
     <div className="container max-w-md mx-auto py-10">
@@ -73,7 +99,7 @@ export default function UserLoginPage() {
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-          disabled={loading} // 로딩 중에는 버튼 비활성화
+          disabled={loading}
         >
           {loading ? '로그인 중...' : '로그인'}
         </button>

@@ -70,12 +70,12 @@ export default function HomePage() {
             {/* 현재 날짜와 요일을 한국어로 표시 */}
             <span>{new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long' })}</span>
           </div>
-          <button
+          {/* <button
             onClick={handleLogout} // 로그아웃 버튼 클릭 시 handleLogout 호출
             className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
           >
             로그아웃
-          </button>
+          </button> */}
         </div>
       ) : (
         <div className="login-section">

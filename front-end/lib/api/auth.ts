@@ -6,44 +6,60 @@ interface LoginCredentials {
   userPw: string;
 }
 
+// Define interfaces for the mailConfirm endpoint response
+export interface MailConfirmSuccessResponse {
+  success: true;
+  code: string;
+}
+
+export interface MailConfirmErrorResponse {
+  success: false;
+  message: string;
+}
+
+export type MailConfirmResponse = MailConfirmSuccessResponse | MailConfirmErrorResponse;
+
 // 로그인 함수
 export const login = async (credentials: LoginCredentials) => {
-  // 백엔드로 userId와 userPw를 JSON 형태로 전송
-  const response = await api.post('/user/login', credentials); // 경로에 슬래시 추가
-  return response.data; // 서버에서 로그인 성공 응답을 반환
+  const response = await api.post('/user/login', credentials);
+  return response.data;
 };
 
 // 로그아웃 함수
 export const logout = async () => {
   try {
-    // 백엔드 /logout 엔드포인트 호출
-    // Spring Security 설정에 따라 이 요청이 jwt_token 쿠키를 만료시킬 것입니다.
-    await api.post('/user/logout'); // 경로에 슬래시 추가
+    await api.post('/user/logout');
     console.log("서버 로그아웃 요청 성공: HttpOnly 쿠키 만료 예정.");
   } catch (error) {
     console.error("서버 로그아웃 요청 실패:", error);
-    // 실패하더라도 클라이언트 측에서 상태를 초기화하고 리디렉션하는 것이 사용자 경험에 좋습니다.
-  } finally {
-    // HttpOnly 쿠키는 클라이언트 JS에서 직접 제거할 수 없으므로,
-    // 이 코드에서는 클라이언트 측 쿠키 제거 로직이 없습니다.
-    // 브라우저가 서버의 Set-Cookie 응답을 받아 쿠키를 처리할 것입니다.
   }
 };
 
 export const getCurrentUser = async () => {
-  // 이 엔드포인트는 인증된 사용자만 접근 가능합니다.
-  // 브라우저가 자동으로 jwt_token 쿠키를 이 요청에 포함시켜 서버로 보냅니다.
-  const response = await api.get('/user/me'); // 경로에 슬래시 추가
-  return response.data; // 사용자 정보를 담은 데이터를 반환한다고 가정
+  const response = await api.get('/user/me');
+  return response.data;
 };
 
 export const register = async (joinData: any) => {
-  // x-www-form-urlencoded 방식으로 전송 (qs 없이 URLSearchParams 사용)
   const params = new URLSearchParams(joinData).toString();
   const response = await api.post(
     '/joinProc',
     params,
     { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
   );
+  return response.data;
+};
+
+/**
+ * 이메일 인증 코드를 요청하는 함수.
+ * @param email 인증을 요청할 이메일 주소
+ * @returns Promise<MailConfirmResponse> 서버 응답 (성공 또는 실패 메시지/코드)
+ */
+export const sendVerificationEmail = async (email: string): Promise<MailConfirmResponse> => {
+  const response = await api.get<MailConfirmResponse>('/mailConfirm', {
+    params: {
+      email: email,
+    },
+  });
   return response.data;
 };

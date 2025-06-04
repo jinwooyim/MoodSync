@@ -26,6 +26,9 @@ export default function Header() {
             <Link href="/record" className="text-gray-600 hover:text-gray-900 transition-colors">
               내 기록
             </Link>
+            <Link href="/login" className="text-gray-600 hover:text-gray-900 transition-colors">
+              로그인
+            </Link>
             <Link href="/settings" className="text-gray-600 hover:text-gray-900 transition-colors">
               설정
             </Link>

@@ -189,6 +189,9 @@ export default function FaceEmotionDetector({ onEmotionDetected }: FaceEmotionDe
                 className="file:text-blue-600 file:font-semibold file:bg-blue-100 file:border-none file:rounded-md file:py-2 file:px-4 hover:file:bg-blue-200"
               />
 
+            <p className="text-md text-gray-500 text-center">
+              감정 분석 결과는 얼굴 인식 기술을 기반으로 하며, 정확도는 이미지 품질과 조명에 따라 달라질 수 있습니다.
+            </p>
               {imageSrc && (
                 <div className="relative border-2 border-purple-300 rounded-lg overflow-hidden shadow-md">
                   <img
@@ -256,8 +259,8 @@ export default function FaceEmotionDetector({ onEmotionDetected }: FaceEmotionDe
             )}
           </div>
         )}
-     </CardContent>
-           </Card>
+        </CardContent>
+      </Card>
     </div>
   );
 }

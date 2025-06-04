@@ -1,6 +1,6 @@
 // components/ProductForm.tsx
 'use client'; // <-- 이 지시어를 추가하여 클라이언트 컴포넌트임을 명시합니다.
-
+import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 
 // Product 인터페이스는 기존과 동일하게 유지
@@ -71,22 +71,20 @@ export default function ProductForm() {
     <div style={{ marginTop: '40px', borderTop: '1px solid #eee', paddingTop: '20px' }}>
       <h2>새로운 상품 추가 (클라이언트 컴포넌트)</h2>
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', maxWidth: '300px', gap: '10px' }}>
-        <input
+        <Input
           type="text"
           placeholder="상품 이름"
           value={productName}
           onChange={(e) => setProductName(e.target.value)}
           required
-          style={{ padding: '8px', border: '1px solid #ccc' }}
         />
-        <input
+        <Input
           type="number" // 숫자를 입력받도록 타입 설정
           placeholder="가격"
           value={productPrice}
           onChange={(e) => setProductPrice(e.target.value)}
           required
           step="0.01" // 소수점 두 자리까지 허용
-          style={{ padding: '8px', border: '1px solid #ccc' }}
         />
         <textarea
           placeholder="상품 설명"
@@ -94,7 +92,6 @@ export default function ProductForm() {
           onChange={(e) => setProductDescription(e.target.value)}
           required
           rows={3}
-          style={{ padding: '8px', border: '1px solid #ccc' }}
         />
         <button type="submit" style={{ padding: '10px 15px', backgroundColor: '#0070f3', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
           상품 정보 전송

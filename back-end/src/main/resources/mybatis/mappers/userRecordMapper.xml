@@ -1,0 +1,35 @@
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.boot.userRecord.dao.UserRecordDAO">
+
+ 	<select id="findById" parameterType="long" resultType="com.boot.userRecord.dto.UserRecordDTO">
+        SELECT
+            id,
+            happy,
+            sad,
+            stress,
+            calm,
+            excited,
+            tired,
+            music_ids,
+            action_ids,
+            book_ids,
+            created_at
+        FROM userRecord
+        WHERE id = #{id}
+    </select>
+    
+    <select id="findLatestRecords" resultType="com.boot.userRecord.dto.UserRecordDTO">
+    	<![CDATA[
+        SELECT *
+        FROM (
+            SELECT * FROM userRecord ORDER BY created_at DESC
+        )
+        WHERE ROWNUM <= 7
+    	]]>
+    </select>
+</mapper>
+

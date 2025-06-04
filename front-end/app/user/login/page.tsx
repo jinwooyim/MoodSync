@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { login } from '@/lib/api/auth'; // getCurrentUser는 이제 스토어에서 처리
+import { login } from '@/lib/api/auth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import useAuthStore from '@/store/authStore'; // Zustand 스토어 임포트
@@ -11,18 +11,24 @@ export default function UserLoginPage() {
   const [userId, setUserId] = useState('');
   const [userPw, setUserPw] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false); // 폼 제출 로딩
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const { isLoggedIn, checkAuthStatus, loginSuccess } = useAuthStore(); // Zustand 스토어에서 가져오기
-  const authLoading = useAuthStore((state) => state.loading); // 초기 인증 확인 로딩 상태
+  // ⭐️ 수정: useAuthStore 셀렉터 함수를 최적화하여 getSnapshot 경고를 피합니다.
+  // 필요한 상태만 구조분해 할당으로 가져오되, 셀렉터 함수는 useCallback으로 메모이제이션하거나
+  // 아예 분리된 useStore를 사용하거나, 단순히 필요한 상태만 나열하는 방식으로 작성합니다.
+  // 여기서는 명확성을 위해 각 상태를 개별적으로 가져오는 방식을 사용합니다.
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const authLoading = useAuthStore((state) => state.loading);
+  const loginSuccess = useAuthStore((state) => state.loginSuccess); // loginSuccess도 가져옵니다.
 
-  // 페이지 로드 시 로그인 상태 확인
+  // ⭐️ 수정: useEffect 로직 개선
   useEffect(() => {
-    // 스토어의 checkAuthStatus는 앱 초기 로드 시 `AuthInitializer`에서 호출됨.
-    // 여기서는 이미 로그인 상태라면 바로 리다이렉트
-    if (isLoggedIn && !authLoading) { // authLoading이 false일 때만 리다이렉트 (초기 확인 완료 후)
-      router.replace('/record');
+    // authLoading이 false (초기 인증 확인 완료)이고, isLoggedIn이 true이면 리다이렉트
+    // 로그인 페이지는 로그인이 되어있지 않을 때만 보여져야 합니다.
+    // 따라서, 로그인 성공 후에는 이 페이지가 아니라 다른 페이지로 보내야 합니다.
+    if (!authLoading && isLoggedIn) {
+      router.replace('/record'); // 이미 로그인된 상태이므로 /record로 이동
     }
   }, [isLoggedIn, authLoading, router]);
 
@@ -33,18 +39,27 @@ export default function UserLoginPage() {
     setError('');
 
     try {
-      const userData = await login({ userId, userPw }); // 로그인 API 호출
+      const userData = await login({ userId, userPw });
+      // ⭐️ loginSuccess 함수 호출 누락된 부분 수정 (주석 해제 또는 추가)
       loginSuccess(userData); // 로그인 성공 시 전역 상태 업데이트
-      router.push('/'); // 메인 페이지로 리디렉션
+
+      // ⭐️ 로그인 성공 후 즉시 리다이렉트
+      router.push('/'); // 메인 페이지 또는 적절한 로그인 후 페이지로 리디렉션
     } catch (err: any) {
       console.error("로그인 에러:", err);
-      setError(err.response?.data?.message || '아이디 또는 비밀번호가 일치하지 않습니다.');
+      if (err.response && err.response.data && err.response.data.message) {
+        setError(err.response.data.message);
+      } else if (err.message) {
+        setError(err.message);
+      } else {
+        setError('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // 초기 인증 상태 확인 중일 때는 스피너 또는 아무것도 렌더링하지 않음
+  // ⭐️ 수정: authLoading이 true이면 로딩 메시지를 보여주고, 그 외에는 isLoggedIn 상태에 따라 렌더링
   if (authLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -53,13 +68,13 @@ export default function UserLoginPage() {
     );
   }
 
-  // 이미 로그인되어 있으면 (checkAuthStatus에서 리다이렉트 되었을 것이므로)
-  // 이 부분은 사실상 도달하지 않을 것이지만, 만약을 대비하여...
+  // ⭐️ 수정: authLoading이 false인데 isLoggedIn이 true인 경우, 이미 useEffect에서 리다이렉트되었을 것이므로
+  // 이 페이지는 렌더링할 필요가 없습니다. (혹시 모를 경우를 대비한 방어 코드)
   if (isLoggedIn) {
-     return null; // 또는 다른 로딩/리다이렉트 메시지
+      return null;
   }
 
-
+  // isLoggedIn이 false일 때만 로그인 폼을 렌더링
   return (
     <div className="container max-w-md mx-auto py-10">
       <div className="text-center mb-8">
@@ -95,7 +110,7 @@ export default function UserLoginPage() {
             placeholder="비밀번호를 입력하세요"
           />
         </div>
-        {error && <div className="mb-4 text-red-500">{error}</div>}
+        {error && <div className="mb-4 text-red-500 text-sm font-medium">{error}</div>}
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
@@ -106,7 +121,7 @@ export default function UserLoginPage() {
       </form>
       <div className="text-center mt-6">
         <p>
-          메트로하우스 회원이 아니신가요?{' '}
+          MoodSync 회원이 아니신가요?{' '}
           <Link href="/user/join" className="text-blue-700 underline">
             회원가입
           </Link>

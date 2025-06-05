@@ -160,7 +160,7 @@ app.post('/predict', express.json(), async (req, res) => {
   try {
     if (
       [happy, sad, stress, calm, excited, tired].some((v) => v === undefined)
-    ) {
+    ) { 
       return res.status(400).json({ error: '6개 감정 값을 모두 입력해주세요.' });
     }
 

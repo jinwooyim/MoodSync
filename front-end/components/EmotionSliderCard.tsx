@@ -107,7 +107,7 @@ export default function EmotionSliderCard({
           </h3>
           
           <Slider
-            defaultValue={[emotionValue]}
+            value={[emotionValue]}
             max={100}
             step={1}
             onValueChange={handleSliderChange}

@@ -14,13 +14,13 @@ import { emotions } from "@/data/emotions";
 import { musicRecommendations } from "@/data/musicRecommendations";
 import { activityRecommendations } from "@/data/activityRecommendations";
 
-import { Input } from "@/components/ui/input"; // 헤더로 옮김 (일단 살렸음다)
+import { Input } from "@/components/ui/input"; // 헤더로 옮김 (일단 살렸습니다!)
 
 export default function HomePage() {
   const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null);
   const selectedEmotionData = emotions.find((e) => e.id === selectedEmotion);
 
-  const [searchValue, setSearchValue] = useState<string>(""); // 헤더로 옮김 (일단 살렸음다)
+  const [searchValue, setSearchValue] = useState<string>(""); // 헤더로 옮김 (일단 살렸습니다!)
 
   // 감정별 슬라이더 값 상태 (예: { happy: 50, sad: 30, ... })
   const [emotionSliderValues, setEmotionSliderValues] = useState<Record<string, number>>({});
@@ -82,7 +82,7 @@ export default function HomePage() {
 
       // // 필수 감정 값이 모두 있는지 확인
       const hasAllValues = emotionKeys.every(
-        (key) => typeof dummyEmotionData[key] === 'number'
+        (key) => typeof dummyEmotionData[key] === 'number' // <== 입력값 들어가면 dummyEmotionData도 바꿔주세요~(유효성 검사)
       );
 
       if (!hasAllValues) {

@@ -80,7 +80,7 @@ export default function Header() {
             <Link href="/recommendations" className="text-gray-600 hover:text-gray-900 transition-colors">
               추천
             </Link>
-            <Link href="/recordTest" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <Link href="/recordTest2" className="text-gray-600 hover:text-gray-900 transition-colors">
               내 기록
             </Link>
 

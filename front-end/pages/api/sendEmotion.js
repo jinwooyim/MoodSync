@@ -1,5 +1,3 @@
-// FRONT-END/pages/api/sendEmotion.js
-
 export default async function emotion_data_handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'POST 메서드만 허용됩니다.' });
@@ -35,15 +33,3 @@ export default async function emotion_data_handler(req, res) {
   console.log("@# 결과값 =>",springResult);
   res.status(200).json(springResult);
 }
-
-// 프론트에서 호출 app/page.tsx
-// const handleEmotionSubmit = async (valueArray: number[]) => {
-//   const res = await fetch('/api/sendEmotion', {
-//     method: 'POST',
-//     headers: { 'Content-Type': 'application/json' },
-//     body: JSON.stringify({ value: valueArray }),
-//   });
-
-//   const result = await res.json();
-//   console.log('최종 감정 결과:', result);
-// };

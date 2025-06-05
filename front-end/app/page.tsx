@@ -39,29 +39,70 @@ export default function HomePage() {
 
   // 감정 분석 결과를 받아오면, 각 감정별 슬라이더 값에 반영
   const handleEmotionDetected = (moodScores: CustomMoodScores | null) => {
-    setLatestDetectedMoods(moodScores);
-    if (moodScores) {
-      // CustomMoodScores의 key(한글)와 emotions의 id(영문) 매핑 필요
-      const moodKeyToId: Record<string, string> = {
-        행복: 'happy',
-        슬픔: 'sad',
-        스트레스: 'stressed',
-        평온: 'calm',
-        신남: 'excited',
-        피곤함: 'tired',
-      };
-      const newSliderValues: Record<string, number> = { ...emotionSliderValues };
-      Object.entries(moodScores).forEach(([moodKey, score]) => {
-        const id = moodKeyToId[moodKey];
-        if (id) newSliderValues[id] = Math.round(score); // 0~100 정수로 반영
-      });
-      setEmotionSliderValues(newSliderValues);
-      // 가장 높은 감정 자동 선택
-      const maxEntry = Object.entries(moodScores).reduce((max, cur) => cur[1] > max[1] ? cur : max, ["", 0]);
-      if (moodKeyToId[maxEntry[0]]) {
-        setSelectedEmotion(moodKeyToId[maxEntry[0]]);
-        setSliderControlledEmotion(moodKeyToId[maxEntry[0]]);
+      setLatestDetectedMoods(moodScores);
+      if (moodScores) {
+        // CustomMoodScores의 key(한글)와 emotions의 id(영문) 매핑 필요
+        const moodKeyToId: Record<string, string> = {
+          행복: 'happy',
+          슬픔: 'sad',
+          스트레스: 'stressed',
+          평온: 'calm',
+          신남: 'excited',
+          피곤함: 'tired',
+        };
+        const newSliderValues: Record<string, number> = { ...emotionSliderValues };
+        Object.entries(moodScores).forEach(([moodKey, score]) => {
+          const id = moodKeyToId[moodKey];
+          if (id) newSliderValues[id] = Math.round(score); // 0~100 정수로 반영
+        });
+        setEmotionSliderValues(newSliderValues);
+        // 가장 높은 감정 자동 선택
+        const maxEntry = Object.entries(moodScores).reduce((max, cur) => cur[1] > max[1] ? cur : max, ["", 0]);
+        if (moodKeyToId[maxEntry[0]]) {
+          setSelectedEmotion(moodKeyToId[maxEntry[0]]);
+          setSliderControlledEmotion(moodKeyToId[maxEntry[0]]);
+        }
       }
+  };
+
+    const handleSendEmotion = async () => {
+
+      const emotionKeys = ['happy', 'sad', 'stress', 'calm', 'excited', 'tired'] as const;
+      type EmotionKey = typeof emotionKeys[number];
+
+      const dummyEmotionData: Record<EmotionKey, number> = { // <== 이자리에 입력 값들이 들어가면 됩니다!!!! 팀원분들~~
+        happy: 0.12,
+        sad: 0.14,
+        stress: 0.35,
+        calm: 0.65,
+        excited: 0.75,
+        tired: 0.0
+      };
+
+      // // 필수 감정 값이 모두 있는지 확인
+      const hasAllValues = emotionKeys.every(
+        (key) => typeof dummyEmotionData[key] === 'number'
+      );
+
+      if (!hasAllValues) {
+        alert("모든 감정의 값을 입력해주세요.");
+        return;
+      }
+  
+    try {
+      const res = await fetch('/api/sendEmotion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        // body: JSON.stringify({ value: valueArray }),
+        body: JSON.stringify(dummyEmotionData),
+      });
+
+      const result = await res.json();
+      console.log('🎯 추천 결과:', result);
+
+      // TODO: 추천 결과를 상태로 저장해서 UI에 표시하거나, 다른 컴포넌트에 넘기기
+    } catch (err) {
+      console.error('추천 요청 실패:', err);
     }
   };
 
@@ -107,6 +148,15 @@ export default function HomePage() {
           {/* FaceEmotionDetector 감정 분석 UI */}
           <FaceEmotionDetector onEmotionDetected={handleEmotionDetected} />
 
+          {/* 입력된 감정들로 출력 결과 도출(버튼 클릭시) */}
+          <div className="text-center mt-6">
+          <button
+            onClick={handleSendEmotion}
+            className="bg-indigo-600 text-white px-6 py-2 rounded-lg shadow hover:bg-indigo-700 transition"
+          >
+            감정 기반 추천 요청하기
+          </button>
+          </div>
 
           {/* Recommendations */}
           {selectedEmotion && selectedEmotionData && (

@@ -28,7 +28,7 @@ public class ActingServiceImpl implements ActingService {
 		int[] random_num_array = new int[3];
 
 		for (int i = 0; i < random_num_array.length; i++) {
-			int random_num = (int) ((Math.random() * 100) + (emotionNumber - 1) * 100);
+			int random_num = (int) ((Math.random() * 100) + (emotionNumber - 1) * 100) + 1;
 			random_num_array[i] = random_num;
 		}
 

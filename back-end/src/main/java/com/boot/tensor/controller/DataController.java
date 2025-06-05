@@ -6,14 +6,14 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 import com.boot.tensor.dto.ActingDTO;
+import com.boot.tensor.dto.BookDTO;
+import com.boot.tensor.dto.MusicDTO;
 import com.boot.tensor.service.ActingService;
 import com.boot.tensor.service.BookService;
 import com.boot.tensor.service.MusicService;
@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
+@RequestMapping("/api")
 public class DataController {
 
 	@Autowired
@@ -33,43 +34,54 @@ public class DataController {
 	@Autowired
 	private BookService bookService;
 
-	@PostMapping("/predict")
-	public ResponseEntity<?> executePredict(@RequestParam double happy, @RequestParam double sad,
-			@RequestParam double stress, @RequestParam double calm, @RequestParam double excited,
-			@RequestParam double tired) {
+	@PostMapping("/emotion-result")
+	public ResponseEntity<?> executePredict(@RequestBody Map<String, Object> payload) {
+		log.info("@# 실행 emotion-result");
+		log.info("@# payload =>" + payload);
+		Map<String, Object> actMap = (Map<String, Object>) payload.get("act");
+		int actPredictedClass = (int) actMap.get("predictedClass");
+		log.info("@# actPredictedClass =>" + actPredictedClass);
 
-		Map<String, Double> emotionMap = new HashMap<>();
-		emotionMap.put("happy", happy);
-		emotionMap.put("sad", sad);
-		emotionMap.put("stress", stress);
-		emotionMap.put("calm", calm);
-		emotionMap.put("excited", excited);
-		emotionMap.put("tired", tired);
+		Map<String, Object> musicMap = (Map<String, Object>) payload.get("music");
+		int musicPredictedClass = (int) musicMap.get("predictedClass");
+		log.info("@# musicPredictedClass =>" + musicPredictedClass);
 
-		RestTemplate restTemplate = new RestTemplate();
-		String nodeUrl = "http://localhost:4000/predict"; // Node 서버 주소
+		Map<String, Object> bookMap = (Map<String, Object>) payload.get("book");
+		int bookPredictedClass = (int) bookMap.get("predictedClass");
+		log.info("@# bookPredictedClass =>" + bookPredictedClass);
 
-		log.info("@# emotionMap =>" + emotionMap);
+		ArrayList<ActingDTO> act_dtos = getListActing(actPredictedClass + 1);
+		ArrayList<MusicDTO> music_dtos = getListMusic(musicPredictedClass + 1);
+		ArrayList<BookDTO> book_dtos = getListBook(bookPredictedClass + 1);
 
-		try {
-			// POST 요청
-			ResponseEntity<String> response = restTemplate.postForEntity(nodeUrl, emotionMap, String.class);
+		Map<String, Object> result = new HashMap<>();
 
-			// 3. Node.js 응답 그대로 반환
-			return ResponseEntity.ok(response.getBody());
+		result.put("act_dtos", act_dtos);
+		result.put("music_dtos", music_dtos);
+		result.put("book_dtos", book_dtos);
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.status(500).body("Node 예측 요청 실패: " + e.getMessage());
-		}
+		log.info("@# result =>" + result);
+
+		return ResponseEntity.ok(result);
 	}
 
-	@RequestMapping("/getList")
-//	public ResponseEntity<?> getList(@RequestParam("emotionNumber") int emotionNumber, Model model) {
-	public ResponseEntity<?> getList(Model model) {
-		ArrayList<ActingDTO> acting_dtos = actingService.getRandomActing(3);
-		model.addAttribute("actingList", acting_dtos);
+	// 해당 감정 통해서 랜덤 3개의 음악, 행동, 도서 추출
+	// 행동
+	public ArrayList<ActingDTO> getListActing(int emotionNumber) {
+		ArrayList<ActingDTO> acting_dtos = actingService.getRandomActing(emotionNumber);
+		return acting_dtos;
+	}
 
-		return null;
+	// 음악
+	public ArrayList<MusicDTO> getListMusic(int emotionNumber) {
+		ArrayList<MusicDTO> music_dtos = musicService.getRandomMusic(emotionNumber);
+		return music_dtos;
+	}
+
+	// 도서
+	public ArrayList<BookDTO> getListBook(int emotionNumber) {
+
+		ArrayList<BookDTO> book_dtos = bookService.getRandomBook(emotionNumber);
+		return book_dtos;
 	}
 }

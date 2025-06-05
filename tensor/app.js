@@ -12,7 +12,6 @@ const port = 4000;
 app.use(cors());
 app.use(express.json());
 
-let model = null;
 let isModelTrained = false;
 
 // ========== 모델 저장 / 불러오기 함수 ===========
@@ -65,14 +64,6 @@ async function loadModelPureJS(dirPath) {
   return await tf.loadLayersModel(handler);
 }
 
-// 정규화 함수
-function normalizeData(data) {
-    const tensor = tf.tensor2d(data);
-    const min = tensor.min(0);
-    const max = tensor.max(0);
-    const normalized = tensor.sub(min).div(max.sub(min));
-    return { normalized, min, max };
-}
 
 // ========== 모델 학습 함수 ===========
 // 훈련 API
@@ -150,23 +141,23 @@ app.get('/train', async (req, res) => {
 
 // ========== 예측 수행 =========== -> 메인
 // 예측 API (app.js)
-app.get('/predict', express.json(), async (req, res) => {
+app.post('/predict', express.json(), async (req, res) => {
     console.log("predict 실행됨!!");
+    
+    const inputData = req.body; // 예시 : [0.12, 0.14, 0.35, 0. 65, 0.75, 0.00]
+    console.log("predict inputData =>" , inputData);
+    const { happy, sad, stress, calm, excited, tired } = inputData;
+    console.log("predict happy =>" , happy);
+    console.log("predict sad =>" , sad);
+    console.log("predict stress =>" , stress);
+    console.log("predict calm =>" , calm);
+    console.log("predict excited =>" , excited);
+    console.log("predict tired =>" , tired);
+    
+    const inputTensor = tf.tensor2d([[happy, sad, stress, calm, excited, tired]]);
+    console.log("predict 실행됨!! 2222");
 
   try {
-    const response = await axios.get('http://localhost:8485/predict');
-    const input_emotion = response.data
-    console.log("@# input_emotion =>" , input_emotion);
-
-    const { happy, sad, stress, calm, excited, tired } = input_emotion;
-
-    console.log("happy      =>", happy);
-    console.log("sad        =>", sad);
-    console.log("stress     =>", stress);
-    console.log("calm       =>", calm);
-    console.log("excited    =>", excited);
-    console.log("tired      =>", tired);
-
     if (
       [happy, sad, stress, calm, excited, tired].some((v) => v === undefined)
     ) {
@@ -177,7 +168,6 @@ app.get('/predict', express.json(), async (req, res) => {
     const music_model = await loadModelPureJS(path.join(__dirname, 'music_model'));
     const book_model = await loadModelPureJS(path.join(__dirname, 'book_model'));
 
-    const inputTensor = tf.tensor2d([[happy, sad, stress, calm, excited, tired]]);
 
     const act_prediction = act_model.predict(inputTensor);
     const music_prediction = music_model.predict(inputTensor);
@@ -192,7 +182,9 @@ app.get('/predict', express.json(), async (req, res) => {
     const book_predictedClass = book_prediction.argMax(-1).dataSync()[0];
 
     // 응답으로 JSON 반환
-    res.json({
+    console.log("@# predict : res =>",res);
+
+    const responseData ={
       act: {
         predictedClass: act_predictedClass,
         probabilities: Array.from(act_probs),
@@ -205,13 +197,17 @@ app.get('/predict', express.json(), async (req, res) => {
         predictedClass: book_predictedClass,
         probabilities: Array.from(book_probs),
       },
-    });
+    };
+
+    console.log("🎯 예측 결과 응답 데이터 =>", JSON.stringify(responseData, null, 2)); // 보기 좋게 출력
+
+    res.json(responseData);
+
   } catch (err) {
     console.error('Predict failed:', err);
     res.status(500).json({ error: err.message });
   }
 });
-
 
 // 상태 확인
 app.get('/status', (req, res) => {

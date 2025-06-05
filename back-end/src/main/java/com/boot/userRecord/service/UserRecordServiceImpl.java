@@ -74,34 +74,34 @@ public class UserRecordServiceImpl implements UserRecordService {
     	dto.setRecommendedActions(userRecordDAO.findInfoByActingNumbers(actionIds));
     	dto.setRecommendedBooks(userRecordDAO.findInfoByBookNumbers(bookIds));
     	dto.setRecommendedMusics(userRecordDAO.findInfoByMusicNumbers(musicIds));
-    	
-    	List<YoutubeVideoDTO> youtubeVideoDTOs = new ArrayList<>();
-        
-        for (int i = 0; i < dto.getRecommendedMusics().size(); i++) {
-            String videoName = dto.getRecommendedMusics().get(i).getMusicName();
-            List<Map<String, String>> videos = null;
-
-            try {
-                videos = new ArrayList<>();
-                videos.add(youtubeService.searchVideo(videoName));
-            } catch (IOException e) {
-                e.printStackTrace();
-                videos = Collections.emptyList();
-            }
-
-            if (!videos.isEmpty()) {
-                Map<String, String> videoData = videos.get(0);
-                YoutubeVideoDTO videoDTO = new YoutubeVideoDTO(
-                    videoData.get("title"),
-                    videoData.get("channel"),
-                    videoData.get("thumbnail"),
-                    videoData.get("videoUrl")
-                );
-                youtubeVideoDTOs.add(videoDTO);
-            }
-        }
-    	
-        dto.setYoutubeSearchResults(youtubeVideoDTOs);
+    	// Youtube API 할당량 초과...
+//    	List<YoutubeVideoDTO> youtubeVideoDTOs = new ArrayList<>();
+//        
+//        for (int i = 0; i < dto.getRecommendedMusics().size(); i++) {
+//            String videoName = dto.getRecommendedMusics().get(i).getMusicName();
+//            List<Map<String, String>> videos = null;
+//
+//            try {
+//                videos = new ArrayList<>();
+//                videos.add(youtubeService.searchVideo(videoName));
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                videos = Collections.emptyList();
+//            }
+//
+//            if (!videos.isEmpty()) {
+//                Map<String, String> videoData = videos.get(0);
+//                YoutubeVideoDTO videoDTO = new YoutubeVideoDTO(
+//                    videoData.get("title"),
+//                    videoData.get("channel"),
+//                    videoData.get("thumbnail"),
+//                    videoData.get("videoUrl")
+//                );
+//                youtubeVideoDTOs.add(videoDTO);
+//            }
+//        }
+//    	
+//        dto.setYoutubeSearchResults(youtubeVideoDTOs);
 
         log.info("UserRecordServiceImpl : " + dto);
     	

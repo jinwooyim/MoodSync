@@ -162,20 +162,21 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10 w-full">
             {/* 왼쪽: Face 감정 분석 */}
-            <div className="w-full h-full p-6 bg-blue-50 rounded-2xl shadow-md flex items-center justify-center">
+            <div className="w-full h-full p-6 bg-white rounded-2xl shadow-md flex items-center justify-center">
               <FaceEmotionDetector onEmotionDetected={handleEmotionDetected} />
             </div>
 
             {/* 오른쪽: 슬라이더 + 감정값 */}
             <div className="flex flex-col justify-between h-full space-y-6 w-full">
-              <div className="w-full p-6 bg-sky-50 rounded-2xl shadow-md">
+              <div className="w-full p-6 bg-white rounded-2xl shadow-md">
+              {/* <div className="w-full p-6 bg-sky-50 rounded-2xl shadow-md"> */}
                 <EmotionSliderCard
                   selectedEmotionData={selectedEmotionData}
                   onEmotionValueChange={handleSliderValueChange}
                   initialEmotionValue={currentSliderValue}
                 />
               </div>
-              <div className="w-full p-6 bg-indigo-50 rounded-2xl shadow-md">
+              <div className="w-full p-6 bg-white rounded-2xl shadow-md">
                 <EmotionValuesDisplay
                   emotions={emotions}
                   emotionValues={emotionSliderValues}

@@ -108,9 +108,25 @@ public class UserRecordServiceImpl implements UserRecordService {
     	return dto;
     }
     
+//    @Override
+//    public List<UserRecordDTO> getLatestRecords() {
+//    	return userRecordDAO.findLatestRecords();
+//    }
     @Override
     public List<UserRecordDTO> getLatestRecords() {
-        return userRecordDAO.findLatestRecords();
+        List<UserRecordDTO> list = userRecordDAO.findLatestRecords();
+        
+        for (int i = 0; i < list.size(); i++) {
+        	UserRecordDTO record = list.get(i);
+        	if (record != null) { // findLatestRecords()에서 가져온 레코드가 null일 가능성은 낮지만, 방어적으로 체크
+                UserRecordDTO fullRecord = findById(record.getId()); // findById 호출하여 모든 정보를 채움
+                if (fullRecord != null) {
+                    list.set(i, fullRecord); // 채워진 DTO로 리스트의 요소를 업데이트
+                    log.info("list {}: {}", i, list.get(i));
+                }
+            }
+        }
+        return list;
     }
     
     public List<Long> parseIds(String ids) {

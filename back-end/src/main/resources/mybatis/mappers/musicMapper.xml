@@ -7,5 +7,9 @@
 <select id="getMusicDTO" resultType="com.boot.tensor.dto.MusicDTO">
 select * from EMOTIONMUSIC
 </select>
+
+<select id="getRandomMusic" resultType="com.boot.tensor.dto.MusicDTO">
+select * from emotionMusic where emotionNumber=#{emotionNumber} and (musicNumber in(#{num_one}, #{num_two}, #{num_three}))
+</select>
 </mapper>
 

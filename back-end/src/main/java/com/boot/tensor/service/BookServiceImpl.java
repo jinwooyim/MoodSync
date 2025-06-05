@@ -23,4 +23,23 @@ public class BookServiceImpl implements BookService {
 		return resultList;
 	}
 
+	@Override
+	public ArrayList<BookDTO> getRandomBook(int emotionNumber) {
+		BookDAO dao = session.getMapper(BookDAO.class);
+		int[] random_num_array = new int[3];
+
+		for (int i = 0; i < random_num_array.length; i++) {
+			int random_num = (int) ((Math.random() * 100) + (emotionNumber - 1) * 100) + 1;
+			random_num_array[i] = random_num;
+		}
+
+		int num_one = random_num_array[0];
+		int num_two = random_num_array[1];
+		int num_three = random_num_array[2];
+
+		ArrayList<BookDTO> dtos = dao.getRandomBook(emotionNumber, num_one, num_two, num_three);
+
+		return dtos;
+	}
+
 }

@@ -1,16 +1,37 @@
 package com.boot.tensor.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import com.boot.tensor.dto.ActingDTO;
+import com.boot.tensor.service.ActingService;
+import com.boot.tensor.service.BookService;
+import com.boot.tensor.service.MusicService;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 public class DataController {
+
+	@Autowired
+	private ActingService actingService;
+
+	@Autowired
+	private MusicService musicService;
+
+	@Autowired
+	private BookService bookService;
 
 	@PostMapping("/predict")
 	public ResponseEntity<?> executePredict(@RequestParam double happy, @RequestParam double sad,
@@ -26,7 +47,9 @@ public class DataController {
 		emotionMap.put("tired", tired);
 
 		RestTemplate restTemplate = new RestTemplate();
-		String nodeUrl = "http://localhost:3000/predict"; // Node 서버 주소
+		String nodeUrl = "http://localhost:4000/predict"; // Node 서버 주소
+
+		log.info("@# emotionMap =>" + emotionMap);
 
 		try {
 			// POST 요청
@@ -41,4 +64,12 @@ public class DataController {
 		}
 	}
 
+	@RequestMapping("/getList")
+//	public ResponseEntity<?> getList(@RequestParam("emotionNumber") int emotionNumber, Model model) {
+	public ResponseEntity<?> getList(Model model) {
+		ArrayList<ActingDTO> acting_dtos = actingService.getRandomActing(3);
+		model.addAttribute("actingList", acting_dtos);
+
+		return null;
+	}
 }

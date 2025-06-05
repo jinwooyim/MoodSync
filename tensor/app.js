@@ -151,19 +151,21 @@ app.get('/train', async (req, res) => {
 // ========== 예측 수행 =========== -> 메인
 // 예측 API (app.js)
 app.get('/predict', express.json(), async (req, res) => {
-  try {
-    const response = await axios.get('http://localhost:8485/predict?happy=0.5&sad=0.2&stress=0.1&calm=0.7&excited=0.4&tired=0.3');
-    const input_emotion = response.data;
+    console.log("predict 실행됨!!");
 
-    console.log("@# input emotion =>", input_emotion);
-    
+  try {
+    const response = await axios.get('http://localhost:8485/predict');
+    const input_emotion = response.data
+    console.log("@# input_emotion =>" , input_emotion);
+
     const { happy, sad, stress, calm, excited, tired } = input_emotion;
-    console.log("happy      =>", input_emotion.happy);
-    console.log("sad          =>", input_emotion.sad);
-    console.log("stress     =>", input_emotion.stress);
-    console.log("calm        =>", input_emotion.calm);
-    console.log("excited   =>", input_emotion.excited);
-    console.log("tired       =>", input_emotion.tired);
+
+    console.log("happy      =>", happy);
+    console.log("sad        =>", sad);
+    console.log("stress     =>", stress);
+    console.log("calm       =>", calm);
+    console.log("excited    =>", excited);
+    console.log("tired      =>", tired);
 
     if (
       [happy, sad, stress, calm, excited, tired].some((v) => v === undefined)

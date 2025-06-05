@@ -57,6 +57,7 @@ public class UserRecordServiceImpl implements UserRecordService {
 //    	
 //    	return dto;
 //    }
+<<<<<<< HEAD
 	@Override
 	public UserRecordDTO findById(Long id) {
 		UserRecordDTO dto = userRecordDAO.findById(id);
@@ -72,6 +73,21 @@ public class UserRecordServiceImpl implements UserRecordService {
 		dto.setRecommendedBooks(userRecordDAO.findInfoByBookNumbers(bookIds));
 		dto.setRecommendedMusics(userRecordDAO.findInfoByMusicNumbers(musicIds));
 
+=======
+    @Override
+    public UserRecordDTO findById(Long id) {
+    	UserRecordDTO dto = userRecordDAO.findById(id);
+    	if(dto == null) return null;
+    	
+    	List<Long> actionIds = parseIds(dto.getAction_ids());
+    	List<Long> bookIds = parseIds(dto.getBook_ids());
+    	List<Long> musicIds = parseIds(dto.getMusic_ids());
+    	
+    	dto.setRecommendedActions(userRecordDAO.findInfoByActingNumbers(actionIds));
+    	dto.setRecommendedBooks(userRecordDAO.findInfoByBookNumbers(bookIds));
+    	dto.setRecommendedMusics(userRecordDAO.findInfoByMusicNumbers(musicIds));
+    	// Youtube API 할당량 초과...
+>>>>>>> b3054e265e23a20714f9cf78202e02bab54a7e75
 //    	List<YoutubeVideoDTO> youtubeVideoDTOs = new ArrayList<>();
 //        
 //        for (int i = 0; i < dto.getRecommendedMusics().size(); i++) {
@@ -99,11 +115,14 @@ public class UserRecordServiceImpl implements UserRecordService {
 //        }
 //    	
 //        dto.setYoutubeSearchResults(youtubeVideoDTOs);
+<<<<<<< HEAD
 
 		log.info("UserRecordServiceImpl : " + dto);
 
 		return dto;
 	}
+=======
+>>>>>>> b3054e265e23a20714f9cf78202e02bab54a7e75
 
 //    @Override
 //    public List<UserRecordDTO> getLatestRecords() {

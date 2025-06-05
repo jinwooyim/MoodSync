@@ -72,7 +72,7 @@ export default function HomePage() {
       const emotionKeys = ['happy', 'sad', 'stress', 'calm', 'excited', 'tired'] as const;
       type EmotionKey = typeof emotionKeys[number];
 
-      const dummyEmotionData: Record<EmotionKey, number> = {
+      const dummyEmotionData: Record<EmotionKey, number> = { // <== 입력값으로 수정해주세요~!
         happy: 0.12,
         sad: 0.14,
         stress: 0.35,
@@ -112,6 +112,14 @@ export default function HomePage() {
               activity: a.actingName,
               type: "일상",
               duration: "30분"
+            }))
+          },
+          bookRecommendations: {
+            [emotion]: result.book_dtos.map((b: any) => ({
+              title: b.bookName,
+              author: b.bookAuthor,
+              genre: b.bookGenre ?? "미정",
+              description: b.bookDescription ?? ""
             }))
           }
         });
@@ -180,6 +188,7 @@ export default function HomePage() {
               selectedEmotionData={selectedEmotionData}
               musicRecommendations={recommendationResult.musicRecommendations}
               activityRecommendations={recommendationResult.activityRecommendations}
+              bookRecommendations={recommendationResult.bookRecommendations}
             />
           )}
         </main>

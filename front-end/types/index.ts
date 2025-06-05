@@ -26,6 +26,15 @@ export interface ActivityRecommendation {
   type: string;
 }
 
+// 도서 추천 데이터 타입
+export interface BookRecommendation {
+  title: string;
+  author: string;
+  genre: string;
+  description?: string;
+}
+
+
 // 추천 데이터를 담는 객체 타입 (각 감정 ID에 해당하는 배열을 가짐)
 export interface RecommendationsMap<T> {
   [key: string]: T[];
@@ -37,5 +46,8 @@ export interface RecommendationResult {
   };
   activityRecommendations: {
     [emotion: string]: ActivityRecommendation[];
+  };
+  bookRecommendations: {
+    [emotion: string]: BookRecommendation[];
   };
 }

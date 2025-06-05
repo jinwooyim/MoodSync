@@ -5,11 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Music, CheckSquare } from "lucide-react";
+import { Music, CheckSquare, Book} from "lucide-react";
 
 import { useState } from "react";
 // 타입 정의도 새로 만든 types 폴더에서 임포트합니다.
-import { Emotion, RecommendationsMap, MusicRecommendation, ActivityRecommendation } from "@/types";
+import { Emotion, RecommendationsMap, MusicRecommendation, ActivityRecommendation, BookRecommendation } from "@/types";
 
 // 부모 컴포넌트로부터 받을 props의 인터페이스 정의
 interface RecommendationListProps {
@@ -17,6 +17,7 @@ interface RecommendationListProps {
   selectedEmotionData: Emotion; // Emotion 타입 사용
   musicRecommendations: RecommendationsMap<MusicRecommendation>; // RecommendationsMap 타입 사용
   activityRecommendations: RecommendationsMap<ActivityRecommendation>; // RecommendationsMap 타입 사용
+  bookRecommendations: RecommendationsMap<BookRecommendation>; // 도서목록도 추가했습니다.
 }
 
 export default function RecommendationList({
@@ -24,6 +25,7 @@ export default function RecommendationList({
   selectedEmotionData,
   musicRecommendations,
   activityRecommendations,
+  bookRecommendations,
 }: RecommendationListProps) {
   const [recommendationType, setRecommendationType] = useState<"music" | "activity">("music");
 
@@ -38,7 +40,7 @@ export default function RecommendationList({
         onValueChange={(value) => setRecommendationType(value as "music" | "activity")}
         className="w-full"
       >
-        <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
+        <TabsList className="grid w-full grid-cols-3 max-w-md mx-auto">
           <TabsTrigger value="music" className="flex items-center gap-2">
             <Music className="w-4 h-4" />
             음악 추천
@@ -46,6 +48,10 @@ export default function RecommendationList({
           <TabsTrigger value="activity" className="flex items-center gap-2">
             <CheckSquare className="w-4 h-4" />
             활동 추천
+          </TabsTrigger>
+          <TabsTrigger value="book" className="flex items-center gap-2">
+            <Book className="w-4 h-4" />
+            도서 추천
           </TabsTrigger>
         </TabsList>
 
@@ -82,6 +88,29 @@ export default function RecommendationList({
                   <Button className="w-full mt-4" variant="outline">
                     <CheckSquare className="w-4 h-4 mr-2" />
                     시작하기
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="book" className="mt-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {bookRecommendations[selectedEmotion]?.map((book, index) => (
+              <Card key={index} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="text-lg">{book.title}</CardTitle>
+                  <CardDescription>{book.author}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Badge variant="secondary">{book.genre}</Badge>
+                  {book.description && (
+                    <p className="text-sm text-muted-foreground mt-2">{book.description}</p>
+                  )}
+                  <Button className="w-full mt-4" variant="outline">
+                    <Book className="w-4 h-4" />
+                    자세히
                   </Button>
                 </CardContent>
               </Card>

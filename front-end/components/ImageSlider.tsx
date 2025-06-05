@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
 const images = [
-  "/images/banner1.jpg",
-  "/images/banner2.jpg",
-  "/images/banner3.jpg",
+  "/images/banner1.png",
+  "/images/banner2.png",
+  "/images/banner3.png",
 ];
 
 export default function ImageSlider() {
@@ -12,7 +12,7 @@ export default function ImageSlider() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrent((prev) => (prev + 1) % images.length);
-    }, 4000); // 4초마다 슬라이드
+    }, 6000); // 8초마다 슬라이드
 
     return () => clearInterval(interval);
   }, []);

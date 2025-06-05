@@ -6,6 +6,8 @@ import { useState } from "react";
 import EmotionSelection from "@/components/EmotionSelection";
 import RecommendationList from "@/components/RecommendationList";
 import EmotionSliderCard from "@/components/EmotionSliderCard"; // <-- 이 컴포넌트가 이제 내부에서 전환을 담당
+import FaceEmotionDetector from '@/components/FaceEmotionDetector';
+import { CustomMoodScores } from '@/types/emotion';
 
 // 데이터 임포트 경로
 import { emotions } from "@/data/emotions";
@@ -19,18 +21,52 @@ export default function HomePage() {
   const selectedEmotionData = emotions.find((e) => e.id === selectedEmotion);
 
   const [searchValue, setSearchValue] = useState<string>("");
-  const [emotionSliderValue, setEmotionSliderValue] = useState<number>(50); // 슬라이더 값 상태
+  // 감정별 슬라이더 값 상태 (예: { happy: 50, sad: 30, ... })
+  const [emotionSliderValues, setEmotionSliderValues] = useState<Record<string, number>>({});
   const [sliderControlledEmotion, setSliderControlledEmotion] = useState<string | null>(null);
 
+  // 감정 분석 결과 상태
+  const [latestDetectedMoods, setLatestDetectedMoods] = useState<CustomMoodScores | null>(null);
+
+  // 슬라이더 값 변경 핸들러 (감정별로 값 저장)
   const handleSliderValueChange = (value: number, emotionId: string | null) => {
-    setEmotionSliderValue(value);
     if (emotionId) {
+      setEmotionSliderValues((prev) => ({ ...prev, [emotionId]: value }));
       setSelectedEmotion(emotionId);
       setSliderControlledEmotion(emotionId);
-    } else {
-      // 감정 선택이 없으면 슬라이더는 비활성화되므로 이 분기는 거의 실행되지 않음
     }
   };
+
+  // 감정 분석 결과를 받아오면, 각 감정별 슬라이더 값에 반영
+  const handleEmotionDetected = (moodScores: CustomMoodScores | null) => {
+    setLatestDetectedMoods(moodScores);
+    if (moodScores) {
+      // CustomMoodScores의 key(한글)와 emotions의 id(영문) 매핑 필요
+      const moodKeyToId: Record<string, string> = {
+        행복: 'happy',
+        슬픔: 'sad',
+        스트레스: 'stressed',
+        평온: 'calm',
+        신남: 'excited',
+        피곤함: 'tired',
+      };
+      const newSliderValues: Record<string, number> = { ...emotionSliderValues };
+      Object.entries(moodScores).forEach(([moodKey, score]) => {
+        const id = moodKeyToId[moodKey];
+        if (id) newSliderValues[id] = Math.round(score); // 0~100 정수로 반영
+      });
+      setEmotionSliderValues(newSliderValues);
+      // 가장 높은 감정 자동 선택
+      const maxEntry = Object.entries(moodScores).reduce((max, cur) => cur[1] > max[1] ? cur : max, ["", 0]);
+      if (moodKeyToId[maxEntry[0]]) {
+        setSelectedEmotion(moodKeyToId[maxEntry[0]]);
+        setSliderControlledEmotion(moodKeyToId[maxEntry[0]]);
+      }
+    }
+  };
+
+  // 현재 선택된 감정의 슬라이더 값 (없으면 50)
+  const currentSliderValue = selectedEmotion ? (emotionSliderValues[selectedEmotion] ?? 50) : 50;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 relative overflow-hidden">
@@ -65,8 +101,12 @@ export default function HomePage() {
           <EmotionSliderCard
             selectedEmotionData={selectedEmotionData}
             onEmotionValueChange={handleSliderValueChange}
-            initialEmotionValue={emotionSliderValue}
+            initialEmotionValue={currentSliderValue}
           />
+
+          {/* FaceEmotionDetector 감정 분석 UI */}
+          <FaceEmotionDetector onEmotionDetected={handleEmotionDetected} />
+
 
           {/* Recommendations */}
           {selectedEmotion && selectedEmotionData && (

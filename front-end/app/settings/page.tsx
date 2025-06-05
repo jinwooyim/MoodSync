@@ -1,31 +1,41 @@
-// app/page.tsx 또는 다른 클라이언트 컴포넌트
-'use client';
+// app/settings/page.tsx
+'use client'; // 이 페이지가 클라이언트 컴포넌트임을 명시
 
-import React, { useState } from 'react';
-import FaceEmotionDetector from '@/components/FaceEmotionDetector'; // 위에서 만든 컴포넌트 임포트
+import { useState } from 'react';
+import FaceEmotionDetector from '@/components/FaceEmotionDetector';
+import { CustomMoodScores } from '@/types/emotion'; // CustomMoodScores 타입을 임포트해야 합니다.
 
 export default function MyPage() {
-  const [latestDetectedEmotion, setLatestDetectedEmotion] = useState<string | null>(null);
-  const [latestEmotionScore, setLatestEmotionScore] = useState<number | null>(null);
+  const [latestDetectedMoods, setLatestDetectedMoods] = useState<CustomMoodScores | null>(null);
 
-  const handleEmotionDetectionResult = (emotion: string | null, score: number | null) => {
-    setLatestDetectedEmotion(emotion);
-    setLatestEmotionScore(score);
-    console.log("최신 감지된 감정:", emotion, "점수:", score);
-    // 여기에 감지된 감정을 EmotionSelection의 selectedEmotion으로 설정하는 로직 등을 추가할 수 있습니다.
-    // 예를 들어: setSelectedEmotion(convertEmotionToId(emotion));
+  const handleEmotionDetected = (moodScores: CustomMoodScores | null) => {
+    setLatestDetectedMoods(moodScores);
+    // 이 console.log도 수정합니다.
+    console.log('최신 감지된 감정:', moodScores);
   };
 
   return (
-    <div>
-      <h1>나의 감정 분석 앱</h1>
-      <FaceEmotionDetector onEmotionDetected={handleEmotionDetectionResult} />
-      {latestDetectedEmotion && (
-        <p className="mt-4 text-center">
-          최근 감지된 감정: <strong>{latestDetectedEmotion}</strong> (확신도: {(latestEmotionScore! * 100).toFixed(2)}%)
-        </p>
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50">
+      <h1 className="text-4xl font-extrabold text-gray-800 mb-8">내 감정 분석</h1>
+
+      {/* FaceEmotionDetector 컴포넌트 */}
+      <FaceEmotionDetector onEmotionDetected={handleEmotionDetected} />
+
+      {/* ⭐️ 이 부분이 중요합니다: latestDetectedMoods 객체를 직접 렌더링하지 않고 순회하여 표시합니다. */}
+      {latestDetectedMoods && (
+        <div className="mt-8 p-6 bg-white rounded-xl shadow-lg w-full max-w-md">
+          <h2 className="text-2xl font-bold text-gray-700 mb-4 text-center">최신 감지된 감정 결과</h2>
+          <div className="grid grid-cols-2 gap-4">
+            {Object.entries(latestDetectedMoods).map(([mood, score]) => (
+              <div key={mood} className="flex justify-between items-center bg-blue-50 p-3 rounded-lg shadow-sm">
+                <span className="font-medium text-blue-800">{mood}: </span>
+                <span className="text-lg font-semibold text-blue-900">{(score).toFixed(1)}%</span>
+              </div>
+            ))}
+          </div>
+          {/* 필요하다면 여기에 추가적인 메시지나 컴포넌트를 렌더링할 수 있습니다. */}
+        </div>
       )}
-      {/* 다른 컴포넌트들 (EmotionSelection, RecommendationList 등) */}
     </div>
   );
 }

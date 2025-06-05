@@ -32,6 +32,14 @@ interface UserRecord {
   recommendedMusics?: MusicExceptEmotionDTO[];
   recommendedActions?: ActingExceptEmotionDTO[];
   recommendedBooks?: BookExceptEmotionDTO[];
+  youtubeSearchResults?: YoutubeVideo[];
+}
+
+interface YoutubeVideo {
+  title: string;
+  channel: string;
+  thumbnail: string;
+  videoUrl: string;
 }
 
 async function getUserRecord(): Promise<UserRecord | null> {
@@ -86,12 +94,49 @@ export default async function RecordDetailPage() {
           <p>피곤함: {recommend.tired}</p>
           <p>음악 추천</p>
           <ul>
-            {recommend.recommendedMusics?.map((music) => (
-              <li key={music.musicNumber}>
-                🎵 {music.musicName} - {music.musicAuthor}
-              </li>
-            ))}
+            {recommend.recommendedMusics?.map((music) => {
+              console.log('Searching for:', music.musicName);
+
+              const video = recommend.youtubeSearchResults?.find((video) => {
+                return video.title.toLowerCase().includes(music.musicName.toLowerCase()) ||
+                  (video.channel && video.channel.toLowerCase().includes(music.musicName.toLowerCase()));
+              });
+
+              console.log(`Found video for ${music.musicName}:`, video);
+
+              return (
+                <li key={music.musicNumber}>
+                  🎵 {music.musicName} - {music.musicAuthor}
+
+                  {video ? (
+                    <div style={{ marginTop: '10px' }}>
+                      <a
+                        href={video.videoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}
+                      >
+                        {video.thumbnail && (
+                          <img
+                            src={video.thumbnail}
+                            alt={video.title}
+                            style={{ width: '120px', height: '90px', marginRight: '10px', objectFit: 'cover' }}
+                          />
+                        )}
+                        <div>
+                          <strong style={{ display: 'block' }}>{video.title}</strong>
+                          <span style={{ fontSize: '0.9em', color: '#555' }}>채널: {video.channel}</span>
+                        </div>
+                      </a>
+                    </div>
+                  ) : (
+                    <p>유튜브 검색 결과가 없습니다.</p>
+                  )}
+                </li>
+              );
+            })}
           </ul>
+          
           <p>행동 추천:</p>
           <ul>
             {recommend.recommendedActions?.map((action) => (
@@ -106,6 +151,7 @@ export default async function RecordDetailPage() {
               </li>
             ))}
           </ul>
+
           <p>생성일: {recommend.created_at}</p>
         </div>
       ) : (

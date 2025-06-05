@@ -28,7 +28,7 @@ public class YoutubeServiceImpl implements YoutubeService {
                 "?part=snippet" +
                 "&q=" + encodedQuery +
                 "&type=video" +
-                "&maxResults=5" +
+                "&maxResults=1" +
                 "&key=" + API_KEY;
 
         URL url = new URL(urlStr);
@@ -54,6 +54,42 @@ public class YoutubeServiceImpl implements YoutubeService {
                 results.add(data);
             }
             return results;
+        }
+    }
+    
+    @Override
+    public Map<String, String> searchVideo(String query) throws IOException {
+        String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
+        String urlStr = SEARCH_URL +
+                "?part=snippet" +
+                "&q=" + encodedQuery +
+                "&type=video" +
+                "&maxResults=1" +  // Make sure to limit to 1 result
+                "&key=" + API_KEY;
+
+        URL url = new URL(urlStr);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+            String json = reader.lines().collect(Collectors.joining());
+            JSONObject jsonObj = new JSONObject(json);
+            JSONArray items = jsonObj.getJSONArray("items");
+
+            if (items.length() > 0) {
+                JSONObject item = items.getJSONObject(0); // Get the first item
+                JSONObject snippet = item.getJSONObject("snippet");
+                String videoId = item.getJSONObject("id").getString("videoId");
+
+                Map<String, String> data = new HashMap<>();
+                data.put("title", snippet.getString("title"));
+                data.put("channel", snippet.getString("channelTitle"));
+                data.put("thumbnail", snippet.getJSONObject("thumbnails").getJSONObject("high").getString("url"));
+                data.put("videoUrl", "https://www.youtube.com/watch?v=" + videoId);
+                return data;
+            } else {
+                return null;  // No videos found
+            }
         }
     }
 }

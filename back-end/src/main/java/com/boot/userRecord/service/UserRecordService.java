@@ -6,5 +6,5 @@ import com.boot.userRecord.dto.UserRecordDTO;
 
 public interface UserRecordService {
 	public UserRecordDTO findById(Long id);
-	List<UserRecordDTO> getLatestRecords();
+	public List<UserRecordDTO> getLatestRecords();
 }

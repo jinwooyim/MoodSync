@@ -29,4 +29,6 @@ public class UserRecordDTO {
     private List<MusicExceptEmotionDTO> recommendedMusics;
     private List<ActingExceptEmotionDTO> recommendedActions;
     private List<BookExceptEmotionDTO> recommendedBooks;
+    
+    private List<YoutubeVideoDTO> youtubeSearchResults;
 }

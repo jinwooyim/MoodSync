@@ -3,24 +3,25 @@
 
 import { useState } from "react";
 
+import ImageSlider from '@/components/ImageSlider';
 import EmotionSelection from "@/components/EmotionSelection";
 import RecommendationList from "@/components/RecommendationList";
 import EmotionSliderCard from "@/components/EmotionSliderCard"; // <-- 이 컴포넌트가 이제 내부에서 전환을 담당
 import FaceEmotionDetector from '@/components/FaceEmotionDetector';
 import { CustomMoodScores } from '@/types/emotion';
-
 // 데이터 임포트 경로
 import { emotions } from "@/data/emotions";
 import { musicRecommendations } from "@/data/musicRecommendations";
 import { activityRecommendations } from "@/data/activityRecommendations";
 
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/input"; // 헤더로 옮김 (일단 살렸음다)
 
 export default function HomePage() {
   const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null);
   const selectedEmotionData = emotions.find((e) => e.id === selectedEmotion);
 
-  const [searchValue, setSearchValue] = useState<string>("");
+  const [searchValue, setSearchValue] = useState<string>(""); // 헤더로 옮김 (일단 살렸음다)
+
   // 감정별 슬라이더 값 상태 (예: { happy: 50, sad: 30, ... })
   const [emotionSliderValues, setEmotionSliderValues] = useState<Record<string, number>>({});
   const [sliderControlledEmotion, setSliderControlledEmotion] = useState<string | null>(null);
@@ -112,23 +113,24 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 relative overflow-hidden">
       <div>
+        <ImageSlider/>
         <main className="container mx-auto px-4 py-8">
           {/* Hero Section */}
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">지금 당신의 기분은 어떠신가요?</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              현재 감정에 맞는 음악과 활동을 추천해드립니다. 감정을 선택하고 맞춤형 추천을 받아보세요.
+            <p className="text-xl text-gray-600 max-w-4xl mx-auto">
+              현재 감정에 맞는 음악과 활동, 도서를 추천해드립니다. 감정을 선택하고 맞춤형 추천을 받아보세요.
             </p>
           </div>
 
-          <div className="mb-8 max-w-md mx-auto">
+          {/* <div className="mb-8 max-w-md mx-auto">
             <Input
               type="text"
               placeholder="검색어를 입력하세요..."
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
             />
-          </div>
+          </div> */}
 
           <EmotionSelection
             selectedEmotion={selectedEmotion}

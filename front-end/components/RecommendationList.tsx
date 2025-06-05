@@ -27,7 +27,7 @@ export default function RecommendationList({
   activityRecommendations,
   bookRecommendations,
 }: RecommendationListProps) {
-  const [recommendationType, setRecommendationType] = useState<"music" | "activity">("music");
+  const [recommendationType, setRecommendationType] = useState<"music" | "activity" | "book">("music");
 
   return (
     <div className="mb-8">
@@ -37,7 +37,7 @@ export default function RecommendationList({
 
       <Tabs
         value={recommendationType}
-        onValueChange={(value) => setRecommendationType(value as "music" | "activity")}
+        onValueChange={(value) => setRecommendationType(value as "music" | "activity" | "book")}
         className="w-full"
       >
         <TabsList className="grid w-full grid-cols-3 max-w-md mx-auto">

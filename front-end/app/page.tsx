@@ -7,6 +7,7 @@ import ImageSlider from '@/components/ImageSlider';
 import EmotionSelection from "@/components/EmotionSelection";
 import RecommendationList from "@/components/RecommendationList";
 import EmotionSliderCard from "@/components/EmotionSliderCard"; // <-- 이 컴포넌트가 이제 내부에서 전환을 담당
+import EmotionValuesDisplay from "@/components/EmotionValuesDisplay";
 import FaceEmotionDetector from '@/components/FaceEmotionDetector';
 import { CustomMoodScores } from '@/types/emotion';
 import { RecommendationResult } from "@/types/index"; // 새로 추가한 타입(사용자 감정 타입)
@@ -21,7 +22,9 @@ import { Input } from "@/components/ui/input"; // 헤더로 옮김 (일단 살�
 export default function HomePage() {
   const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null);
   const selectedEmotionData = emotions.find((e) => e.id === selectedEmotion);
-
+  const [emotionValues, setEmotionValues] = useState<Record<string, number>>({
+    happy: 0, sad: 0, stress: 0, calm: 0, excited: 0, tired: 0
+  });
   const [searchValue, setSearchValue] = useState<string>(""); // 헤더로 옮김 (일단 살렸습니다!)
 
   // 감정별 슬라이더 값 상태 (예: { happy: 50, sad: 30, ... })
@@ -72,61 +75,66 @@ export default function HomePage() {
       const emotionKeys = ['happy', 'sad', 'stress', 'calm', 'excited', 'tired'] as const;
       type EmotionKey = typeof emotionKeys[number];
 
-      const dummyEmotionData: Record<EmotionKey, number> = { // <== 입력값으로 수정해주세요~!
-        happy: 0.12,
-        sad: 0.14,
-        stress: 0.35,
-        calm: 0.65,
-        excited: 0.75,
-        tired: 0.0
-      };
+      // 모든 감정값이 number이고 0~100 범위인지 확인
+      // const hasValidValues = emotionKeys.every(
+      //   (key) =>
+      //     typeof emotionValues[key] === 'number' &&
+      //     !isNaN(emotionValues[key]) &&
+      //     emotionValues[key] >= 0 &&
+      //     emotionValues[key] <= 100
+      // );
 
-      const hasAllValues = emotionKeys.every((key) => typeof dummyEmotionData[key] === 'number');
-      if (!hasAllValues) {
-        alert("모든 감정의 값을 입력해주세요.");
-        return;
-      }
+      // if (!hasValidValues) {
+      //   alert("모든 감정의 값을 0~100 범위로 입력해주세요.");
+      //   return;
+      // }
+
+      const normalizedEmotionData: Record<EmotionKey, number> = Object.fromEntries(
+        emotionKeys.map((key) => [key, emotionValues[key] / 100])
+      ) as Record<EmotionKey, number>;
 
       try {
         const res = await fetch('/api/sendEmotion', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(dummyEmotionData),
+          body: JSON.stringify(normalizedEmotionData),
         });
 
         const result = await res.json();
         console.log('🎯 추천 결과:', result);
 
-        const emotion = selectedEmotion ?? "happy"; // 기본 감정
+        const emotion = selectedEmotion ?? "happy";
 
         setRecommendationResult({
           musicRecommendations: {
             [emotion]: result.music_dtos.map((m: any) => ({
               title: m.musicName,
               artist: m.musicAuthor,
-              genre: "알 수 없음" as string
-            }))
+              genre: "알 수 없음",
+            })),
           },
           activityRecommendations: {
             [emotion]: result.act_dtos.map((a: any) => ({
               activity: a.actingName,
               type: "일상",
-              duration: "30분"
-            }))
+              duration: "30분",
+            })),
           },
           bookRecommendations: {
             [emotion]: result.book_dtos.map((b: any) => ({
               title: b.bookName,
               author: b.bookAuthor,
               genre: b.bookGenre ?? "미정",
-              description: b.bookDescription ?? ""
-            }))
-          }
+              description: b.bookDescription ?? "",
+            })),
+          },
         });
       } catch (err) {
         console.error('추천 요청 실패:', err);
+        alert("추천 정보를 불러오지 못했습니다. 다시 시도해주세요.");
       }
     };
+
 
   // 현재 선택된 감정의 슬라이더 값 (없으면 50)
   const currentSliderValue = selectedEmotion ? (emotionSliderValues[selectedEmotion] ?? 50) : 50;
@@ -143,16 +151,7 @@ export default function HomePage() {
               현재 감정에 맞는 음악과 활동, 도서를 추천해드립니다. 감정을 선택하고 맞춤형 추천을 받아보세요.
             </p>
           </div>
-
-          {/* <div className="mb-8 max-w-md mx-auto">
-            <Input
-              type="text"
-              placeholder="검색어를 입력하세요..."
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-            />
-          </div> */}
-
+          
           <EmotionSelection
             selectedEmotion={selectedEmotion}
             onSelectEmotion={(emotionId) => {
@@ -161,15 +160,30 @@ export default function HomePage() {
             }}
           />
 
-          {/* EmotionSliderCard를 항상 렌더링하며, 내부에서 UI 전환을 처리합니다. */}
-          <EmotionSliderCard
-            selectedEmotionData={selectedEmotionData}
-            onEmotionValueChange={handleSliderValueChange}
-            initialEmotionValue={currentSliderValue}
-          />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10 w-full">
+            {/* 왼쪽: Face 감정 분석 */}
+            <div className="w-full h-full p-6 bg-blue-50 rounded-2xl shadow-md flex items-center justify-center">
+              <FaceEmotionDetector onEmotionDetected={handleEmotionDetected} />
+            </div>
 
-          {/* FaceEmotionDetector 감정 분석 UI */}
-          <FaceEmotionDetector onEmotionDetected={handleEmotionDetected} />
+            {/* 오른쪽: 슬라이더 + 감정값 */}
+            <div className="flex flex-col justify-between h-full space-y-6 w-full">
+              <div className="w-full p-6 bg-sky-50 rounded-2xl shadow-md">
+                <EmotionSliderCard
+                  selectedEmotionData={selectedEmotionData}
+                  onEmotionValueChange={handleSliderValueChange}
+                  initialEmotionValue={currentSliderValue}
+                />
+              </div>
+              <div className="w-full p-6 bg-indigo-50 rounded-2xl shadow-md">
+                <EmotionValuesDisplay
+                  emotions={emotions}
+                  emotionValues={emotionSliderValues}
+                  onValuesChange={setEmotionValues}
+                />
+              </div>
+            </div>
+          </div>
 
           {/* 입력된 감정들로 출력 결과 도출(버튼 클릭시) */}
           <div className="text-center mt-6">

@@ -9,6 +9,8 @@ import RecommendationList from "@/components/RecommendationList";
 import EmotionSliderCard from "@/components/EmotionSliderCard"; // <-- 이 컴포넌트가 이제 내부에서 전환을 담당
 import FaceEmotionDetector from '@/components/FaceEmotionDetector';
 import { CustomMoodScores } from '@/types/emotion';
+import { RecommendationResult } from "@/types/index"; // 새로 추가한 타입(사용자 감정 타입)
+
 // 데이터 임포트 경로
 import { emotions } from "@/data/emotions";
 import { musicRecommendations } from "@/data/musicRecommendations";
@@ -28,7 +30,7 @@ export default function HomePage() {
 
   // 감정 분석 결과 상태
   const [latestDetectedMoods, setLatestDetectedMoods] = useState<CustomMoodScores | null>(null);
-
+  const [recommendationResult, setRecommendationResult] = useState<RecommendationResult | null>(null); // 🎯
   // 슬라이더 값 변경 핸들러 (감정별로 값 저장)
   const handleSliderValueChange = (value: number, emotionId: string | null) => {
     if (emotionId) {
@@ -67,11 +69,10 @@ export default function HomePage() {
   };
 
     const handleSendEmotion = async () => {
-
       const emotionKeys = ['happy', 'sad', 'stress', 'calm', 'excited', 'tired'] as const;
       type EmotionKey = typeof emotionKeys[number];
 
-      const dummyEmotionData: Record<EmotionKey, number> = { // <== 이자리에 입력 값들이 들어가면 됩니다!!!! 팀원분들~~
+      const dummyEmotionData: Record<EmotionKey, number> = {
         happy: 0.12,
         sad: 0.14,
         stress: 0.35,
@@ -80,32 +81,44 @@ export default function HomePage() {
         tired: 0.0
       };
 
-      // // 필수 감정 값이 모두 있는지 확인
-      const hasAllValues = emotionKeys.every(
-        (key) => typeof dummyEmotionData[key] === 'number' // <== 입력값 들어가면 dummyEmotionData도 바꿔주세요~(유효성 검사)
-      );
-
+      const hasAllValues = emotionKeys.every((key) => typeof dummyEmotionData[key] === 'number');
       if (!hasAllValues) {
         alert("모든 감정의 값을 입력해주세요.");
         return;
       }
-  
-    try {
-      const res = await fetch('/api/sendEmotion', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        // body: JSON.stringify({ value: valueArray }),
-        body: JSON.stringify(dummyEmotionData),
-      });
 
-      const result = await res.json();
-      console.log('🎯 추천 결과:', result);
+      try {
+        const res = await fetch('/api/sendEmotion', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dummyEmotionData),
+        });
 
-      // TODO: 추천 결과를 상태로 저장해서 UI에 표시하거나, 다른 컴포넌트에 넘기기
-    } catch (err) {
-      console.error('추천 요청 실패:', err);
-    }
-  };
+        const result = await res.json();
+        console.log('🎯 추천 결과:', result);
+
+        const emotion = selectedEmotion ?? "happy"; // 기본 감정
+
+        setRecommendationResult({
+          musicRecommendations: {
+            [emotion]: result.music_dtos.map((m: any) => ({
+              title: m.musicName,
+              artist: m.musicAuthor,
+              genre: "알 수 없음" as string
+            }))
+          },
+          activityRecommendations: {
+            [emotion]: result.act_dtos.map((a: any) => ({
+              activity: a.actingName,
+              type: "일상",
+              duration: "30분"
+            }))
+          }
+        });
+      } catch (err) {
+        console.error('추천 요청 실패:', err);
+      }
+    };
 
   // 현재 선택된 감정의 슬라이더 값 (없으면 50)
   const currentSliderValue = selectedEmotion ? (emotionSliderValues[selectedEmotion] ?? 50) : 50;
@@ -161,12 +174,12 @@ export default function HomePage() {
           </div>
 
           {/* Recommendations */}
-          {selectedEmotion && selectedEmotionData && (
+          {selectedEmotion && selectedEmotionData && recommendationResult &&( //<== recommendationResult  추가
             <RecommendationList
               selectedEmotion={selectedEmotion}
               selectedEmotionData={selectedEmotionData}
-              musicRecommendations={musicRecommendations}
-              activityRecommendations={activityRecommendations}
+              musicRecommendations={recommendationResult.musicRecommendations}
+              activityRecommendations={recommendationResult.activityRecommendations}
             />
           )}
         </main>

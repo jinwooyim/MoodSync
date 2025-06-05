@@ -74,14 +74,14 @@ async function ModelTraining(response){
     // 2. Tensor로 변환
     const xs = tf.tensor2d(features); // [N, 6]
     const ys = tf.tensor1d(labels, 'int32'); // [N]
-    const ysOneHot = tf.oneHot(ys, Math.max(...labels) + 1); // [N, numClasses]
-    const numClasses = Math.max(...labels) + 1;
+    const ysOneHot = tf.oneHot(ys, Math.max(...labels)); // [N, numClasses]
+    // const numClasses = Math.max(...labels);
 
     // 3. 모델 정의
     const model = tf.sequential();
     model.add(tf.layers.dense({units: 32, activation: 'relu', inputShape: [6]}));
     model.add(tf.layers.dense({units: 16, activation: 'relu'}));
-    model.add(tf.layers.dense({units: numClasses, activation: 'softmax'}));  // 클래스 수에 맞게 units 조정
+    model.add(tf.layers.dense({units: 6, activation: 'softmax'}));  // 클래스 수에 맞게 units 조정
 
     // 4. 모델 컴파일
     model.compile({

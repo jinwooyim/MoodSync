@@ -1,6 +1,8 @@
 package com.boot.tensor.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +29,15 @@ public class ActingServiceImpl implements ActingService {
 		ActingDAO dao = session.getMapper(ActingDAO.class);
 		int[] random_num_array = new int[3];
 
-		for (int i = 0; i < random_num_array.length; i++) {
-			int random_num = (int) ((Math.random() * 100) + (emotionNumber - 1) * 100) + 1;
-			random_num_array[i] = random_num;
+		Set<Integer> generated = new HashSet<>();
+
+		for (int i = 0; i < random_num_array.length;) {
+			int random_num = ((int) (Math.random() * 100) + (emotionNumber - 1) * 100 + 1);
+			if (!generated.contains(random_num)) {
+				generated.add(random_num);
+				random_num_array[i] = random_num;
+				i++; // i는 중복이 아닐 때만 증가
+			}
 		}
 
 		int num_one = random_num_array[0];

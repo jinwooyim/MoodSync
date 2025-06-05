@@ -30,3 +30,12 @@ export interface ActivityRecommendation {
 export interface RecommendationsMap<T> {
   [key: string]: T[];
 }
+
+export interface RecommendationResult {
+  musicRecommendations: {
+    [emotion: string]: MusicRecommendation[];
+  };
+  activityRecommendations: {
+    [emotion: string]: ActivityRecommendation[];
+  };
+}

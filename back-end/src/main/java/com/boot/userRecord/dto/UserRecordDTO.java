@@ -1,6 +1,7 @@
 package com.boot.userRecord.dto;
 
 import java.sql.Date;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,4 +25,10 @@ public class UserRecordDTO {
     private String book_ids;
 
     private Date created_at;
+    
+    private List<MusicExceptEmotionDTO> recommendedMusics;
+    private List<ActingExceptEmotionDTO> recommendedActions;
+    private List<BookExceptEmotionDTO> recommendedBooks;
+    
+    private List<YoutubeVideoDTO> youtubeSearchResults;
 }

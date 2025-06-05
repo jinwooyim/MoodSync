@@ -1,4 +1,21 @@
 
+interface MusicExceptEmotionDTO {
+  musicNumber: number;
+  musicName: string;
+  musicAuthor: string;
+}
+
+interface ActingExceptEmotionDTO {
+  actingNumber: number;
+  actingName: string;
+}
+
+interface BookExceptEmotionDTO {
+  bookNumber: number;
+  bookName: string;
+  bookAuthor: string;
+}
+
 interface UserRecord {
   id: number;
   happy: number;
@@ -11,6 +28,18 @@ interface UserRecord {
   action_ids: string;
   book_ids: string;
   created_at: string;
+
+  recommendedMusics?: MusicExceptEmotionDTO[];
+  recommendedActions?: ActingExceptEmotionDTO[];
+  recommendedBooks?: BookExceptEmotionDTO[];
+  youtubeSearchResults?: YoutubeVideo[];
+}
+
+interface YoutubeVideo {
+  title: string;
+  channel: string;
+  thumbnail: string;
+  videoUrl: string;
 }
 
 async function getUserRecord(): Promise<UserRecord | null> {
@@ -51,9 +80,6 @@ async function getLatestRecords(): Promise<UserRecord[]> {
 export default async function RecordDetailPage() {
   const recommend = await getUserRecord();
   const records = await getLatestRecords();
-  if (!recommend) {
-    return <p>데이터를 찾을 수 없습니다.</p>;
-  }
 
   return (
     <div>
@@ -66,13 +92,70 @@ export default async function RecordDetailPage() {
           <p>평온함: {recommend.calm}</p>
           <p>신남: {recommend.excited}</p>
           <p>피곤함: {recommend.tired}</p>
-          <p>음악 추천: {recommend.music_ids}</p>
-          <p>행동 추천: {recommend.action_ids}</p>
-          <p>도서 추천: {recommend.book_ids}</p>
+          <p>음악 추천</p>
+          <ul>
+            {recommend.recommendedMusics?.map((music) => {
+              console.log('Searching for:', music.musicName);
+
+              const video = recommend.youtubeSearchResults?.find((video) => {
+                return video.title.toLowerCase().includes(music.musicName.toLowerCase()) ||
+                  (video.channel && video.channel.toLowerCase().includes(music.musicName.toLowerCase()));
+              });
+
+              console.log(`Found video for ${music.musicName}:`, video);
+
+              return (
+                <li key={music.musicNumber}>
+                  🎵 {music.musicName} - {music.musicAuthor}
+
+                  {video ? (
+                    <div style={{ marginTop: '10px' }}>
+                      <a
+                        href={video.videoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}
+                      >
+                        {video.thumbnail && (
+                          <img
+                            src={video.thumbnail}
+                            alt={video.title}
+                            style={{ width: '120px', height: '90px', marginRight: '10px', objectFit: 'cover' }}
+                          />
+                        )}
+                        <div>
+                          <strong style={{ display: 'block' }}>{video.title}</strong>
+                          <span style={{ fontSize: '0.9em', color: '#555' }}>채널: {video.channel}</span>
+                        </div>
+                      </a>
+                    </div>
+                  ) : (
+                    <p>유튜브 검색 결과가 없습니다.</p>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+          
+          <p>행동 추천:</p>
+          <ul>
+            {recommend.recommendedActions?.map((action) => (
+              <li key={action.actingNumber}>🧘 {action.actingName}</li>
+            ))}
+          </ul>
+          <p>도서 추천:</p>
+          <ul>
+            {recommend.recommendedBooks?.map((book) => (
+              <li key={book.bookNumber}>
+                📖 {book.bookName} - {book.bookAuthor}
+              </li>
+            ))}
+          </ul>
+
           <p>생성일: {recommend.created_at}</p>
         </div>
       ) : (
-        <p>데이터를 찾을 수 없습니다.2</p>
+        <p>데이터를 찾을 수 없습니다.</p>
       )}
 
       <hr style={{ margin: '2rem 0' }} />

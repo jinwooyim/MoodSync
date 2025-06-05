@@ -5,6 +5,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +36,23 @@ public class CrawlerController {
             e.printStackTrace();
         }
         return "youtube_result";
+    }
+    
+    @GetMapping("/youtubeToFront") // http://localhost:8485/youtube?keyword=기쁨
+    public ResponseEntity<Map<String, Object>> youtubeSearch2(String keyword) {
+        try {
+            List<Map<String, String>> videoList = youtubeService.searchVideos(keyword);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("keyword", keyword);
+            response.put("videos", videoList);
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+        	 e.printStackTrace();
+             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                  .body(Map.of("error", "검색 중 오류가 발생했습니다."));
+        }
     }
 
     @GetMapping("/test-crawl") // http://localhost:8485/test-crawl?keyword=기쁨

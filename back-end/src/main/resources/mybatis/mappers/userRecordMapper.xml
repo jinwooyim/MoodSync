@@ -31,5 +31,39 @@
         WHERE ROWNUM <= 7
     	]]>
     </select>
+    
+	<select id="findInfoByActingNumbers" resultType="com.boot.userRecord.dto.ActingExceptEmotionDTO">
+        SELECT
+            actingNumber, actingName
+        FROM
+            emotionActing
+        WHERE
+            actingNumber IN
+            <foreach collection="actingNumbers" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+    </select>
+	<select id="findInfoByBookNumbers" resultType="com.boot.userRecord.dto.BookExceptEmotionDTO">
+        SELECT
+            bookNumber, bookName, bookAuthor
+        FROM
+            emotionBook
+        WHERE
+            bookNumber IN
+            <foreach collection="bookNumbers" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+    </select>
+	<select id="findInfoByMusicNumbers" resultType="com.boot.userRecord.dto.MusicExceptEmotionDTO">
+        SELECT
+            musicNumber, musicName, musicAuthor
+        FROM
+            emotionMusic
+        WHERE
+            musicNumber IN
+            <foreach collection="musicNumbers" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+    </select>
 </mapper>
 

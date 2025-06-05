@@ -22,10 +22,10 @@ public class UserRecordController {
 	// http://localhost:3000/recordTest <- 데이터 출력 테스트 중
 	@GetMapping(value = "/test/record", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UserRecordDTO> getRecordById() {
-		Long id = (long) 3;
+		Long id = (long) 5;
 	    UserRecordDTO myInfo = userRecordService.findById(id); // DB 조회
 	    if (myInfo != null) {
-	    	log.info(myInfo.toString());
+	    	log.info("최종 응답 DTO: {}", myInfo);
 	        return ResponseEntity.ok(myInfo); // JSON으로 반환
 	    } else {
 	        return ResponseEntity.notFound().build();
@@ -33,8 +33,17 @@ public class UserRecordController {
 	}
 	
     @GetMapping(value = "/test/record/latest", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<UserRecordDTO> getLatestRecords() {
+    public ResponseEntity<List<UserRecordDTO>> getLatestRecords() {
     	List<UserRecordDTO> list = userRecordService.getLatestRecords();
-        return list;
+    	
+	    if (list != null) {
+	    	for(int i=0; i<list.size(); i++) {
+	    		log.info("list DTO {} : {}", i, list.get(i));
+	    	}
+	        return ResponseEntity.ok(list);
+	    } else {
+	        return ResponseEntity.noContent().build();
+	    }
     }
+    
 }

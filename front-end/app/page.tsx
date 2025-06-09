@@ -52,7 +52,7 @@ export default function HomePage() {
       },
       {
         root: null, // 뷰포트
-        rootMargin: '0px', // 요소가 뷰포트 밖으로 완전히 나갔을 때
+        rootMargin: '-250px', // 요소가 뷰포트 밖으로 완전히 나갔을 때
         threshold: 0.1 // 요소가 뷰포트의 10% 이상 보이지 않을 때
       }
     );
@@ -84,7 +84,7 @@ export default function HomePage() {
       const moodKeyToId: Record<string, string> = {
         행복: 'happy',
         슬픔: 'sad',
-        스트레스: 'stressed',
+        스트레스: 'stressd',
         평온: 'calm',
         신남: 'excited',
         피곤함: 'tired',
@@ -122,7 +122,7 @@ export default function HomePage() {
   };
 
   const handleSendEmotion = async () => {
-    const emotionKeys = ['happy', 'sad', 'stress', 'calm', 'excited', 'tired'] as const;
+    const emotionKeys = ['happy', 'sad', 'stressed', 'calm', 'excited', 'tired'] as const;
     type EmotionKey = typeof emotionKeys[number];
 
       const normalizedEmotionData: Record<EmotionKey, number> = Object.fromEntries(
@@ -225,7 +225,17 @@ export default function HomePage() {
               감정 기반 추천 요청하기
             </button>
           </div>
-
+          
+          {/* Recommendations ✨ 출력 조건 변경 */}
+          {/* {recommendationResult && selectedEmotion && selectedEmotionData && (
+            <RecommendationList
+              selectedEmotion={selectedEmotion}
+              selectedEmotionData={selectedEmotionData}
+              musicRecommendations={recommendationResult.musicRecommendations}
+              activityRecommendations={recommendationResult.activityRecommendations}
+              bookRecommendations={recommendationResult.bookRecommendations}
+            />
+          )} */}
           {/* Recommendations */}
           {selectedEmotion && selectedEmotionData && recommendationResult && (
             <RecommendationList
@@ -239,39 +249,39 @@ export default function HomePage() {
         </main>
       </div>
       {/* --- 플로팅 팝업 EmotionSelection UI --- */}
-{showFloatingEmotionSelection && (
-  <div
-    className="fixed right-4 top-1/2 -translate-y-1/2 z-50 p-4 bg-white rounded-lg shadow-xl border border-gray-100 max-h-[90vh] overflow-y-auto
-               opacity-50 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-    // pointer-events-none: 이 요소 자체는 클릭 이벤트를 받지 않고 아래로 전달합니다.
-  >
-    <h4 className="text-lg font-bold text-gray-800 mb-4 text-center pointer-events-auto">
-      {/* 팝업 내부의 텍스트도 클릭 불가 상태가 될 수 있으므로, 다시 클릭 가능하게 설정 */}
-      현재 감정 선택
-    </h4>
-    <div className="flex flex-col gap-2 pointer-events-auto">
-      {/* 팝업 내부의 클릭 가능한 요소(감정 카드)는 다시 클릭 가능하게 설정 */}
-      {emotions.map((emotion) => (
+      {showFloatingEmotionSelection && (
         <div
-          key={`floating-${emotion.id}`}
-          className={`flex items-center p-2 rounded-md cursor-pointer transition-colors duration-150 hover:bg-gray-50
-          `}
+          className="fixed right-4 top-1/2 -translate-y-1/2 z-50 p-4 bg-white rounded-lg shadow-xl border border-gray-100 max-h-[90vh] overflow-y-auto
+                    opacity-70 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+          // pointer-events-none: 이 요소 자체는 클릭 이벤트를 받지 않고 아래로 전달합니다.
         >
-          {emotion.icon && (
-            <emotion.icon className="w-6 h-6 mr-2 text-gray-600" />
-          )}
-          <span className="font-medium text-gray-800 flex-grow">{emotion.name}</span>
-          {emotionSliderValues[emotion.id] !== undefined && emotionSliderValues[emotion.id] > 0 && (
-            <span className="text-sm font-bold text-indigo-600 ml-auto">
-              {emotionSliderValues[emotion.id]}%
-            </span>
-          )}
+          <h4 className="text-lg font-bold text-gray-800 mb-4 text-center pointer-events-auto">
+            {/* 팝업 내부의 텍스트도 클릭 불가 상태가 될 수 있으므로, 다시 클릭 가능하게 설정 */}
+            현재 감정 선택
+          </h4>
+          <div className="flex flex-col gap-2 pointer-events-auto">
+            {/* 팝업 내부의 클릭 가능한 요소(감정 카드)는 다시 클릭 가능하게 설정 */}
+            {emotions.map((emotion) => (
+              <div
+                key={`floating-${emotion.id}`}
+                className={`flex items-center p-2 rounded-md cursor-pointer transition-colors duration-150 hover:bg-gray-50
+                `}
+              >
+                {emotion.icon && (
+                  <emotion.icon className="w-6 h-6 mr-2 text-gray-600" />
+                )}
+                <span className="font-medium text-gray-800 flex-grow">{emotion.name}</span>
+                {emotionSliderValues[emotion.id] !== undefined && emotionSliderValues[emotion.id] > 0 && (
+                  <span className="text-sm font-bold text-indigo-600 ml-auto">
+                    {emotionSliderValues[emotion.id]}%
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
-      ))}
-    </div>
-  </div>
-)}
-{/* --- 플로팅 팝업 EmotionSelection UI 끝 --- */}
+      )}
+      {/* --- 플로팅 팝업 EmotionSelection UI 끝 --- */}
     </div>
   );
 }

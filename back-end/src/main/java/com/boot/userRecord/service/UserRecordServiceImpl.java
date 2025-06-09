@@ -77,7 +77,6 @@ public class UserRecordServiceImpl implements UserRecordService {
 		dto.setRecommendedBooks(userRecordDAO.findInfoByBookNumbers(bookIds));
 		dto.setRecommendedMusics(userRecordDAO.findInfoByMusicNumbers(musicIds));
 
-<<<<<<< HEAD
 		List<YoutubeVideoDTO> youtubeVideoDTOs = new ArrayList<>();
 
 		for (int i = 0; i < dto.getRecommendedMusics().size(); i++) {
@@ -103,7 +102,6 @@ public class UserRecordServiceImpl implements UserRecordService {
 		dto.setYoutubeSearchResults(youtubeVideoDTOs);
 
 		log.info("UserRecordServiceImpl : " + dto);
-=======
 //    	List<YoutubeVideoDTO> youtubeVideoDTOs = new ArrayList<>();
 //        
 //        for (int i = 0; i < dto.getRecommendedMusics().size(); i++) {
@@ -133,7 +131,6 @@ public class UserRecordServiceImpl implements UserRecordService {
 //        dto.setYoutubeSearchResults(youtubeVideoDTOs);
 //
 //		log.info("UserRecordServiceImpl : " + dto);
->>>>>>> 00e5a615a3fd4077341be7390e1885d5d9aee3fb
 
 		return dto;
 	}

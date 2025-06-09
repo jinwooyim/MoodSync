@@ -90,7 +90,7 @@ export default function HomePage() {
       // }
 
       const normalizedEmotionData: Record<EmotionKey, number> = Object.fromEntries(
-        emotionKeys.map((key) => [key, emotionValues[key] / 100])
+        emotionKeys.map((key) => [key, emotionSliderValues[key] / 100])
       ) as Record<EmotionKey, number>;
 
       console.log("@# normalizedEmotionData =>", normalizedEmotionData);

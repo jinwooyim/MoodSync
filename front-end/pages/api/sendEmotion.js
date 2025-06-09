@@ -5,6 +5,8 @@ export default async function emotion_data_handler(req, res) {
 
   const userEmotionData = req.body; // 예시 : [0.12, 0.14, 0.35, 0. 65, 0.75, 0.00]
 
+  console.log("@# userEmotionData =>", userEmotionData);
+
   // TensorFlow.js 서버로 예측 요청
   const tfResponse = await fetch('http://localhost:4000/predict', {
     method: 'POST',

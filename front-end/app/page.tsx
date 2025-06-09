@@ -227,7 +227,7 @@ export default function HomePage() {
           </div>
           
           {/* Recommendations ✨ 출력 조건 변경 */}
-          {/* {recommendationResult && selectedEmotion && selectedEmotionData && (
+          {recommendationResult && selectedEmotion && selectedEmotionData && (
             <RecommendationList
               selectedEmotion={selectedEmotion}
               selectedEmotionData={selectedEmotionData}
@@ -235,7 +235,7 @@ export default function HomePage() {
               activityRecommendations={recommendationResult.activityRecommendations}
               bookRecommendations={recommendationResult.bookRecommendations}
             />
-          )} */}
+          )}
           {/* Recommendations */}
           {selectedEmotion && selectedEmotionData && recommendationResult && (
             <RecommendationList

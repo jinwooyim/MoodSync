@@ -41,21 +41,37 @@ export default function HomePage() {
     recommendationEmotionId: string | null;
   }) | null>(null);
 
+  const [recommendationDirty, setRecommendationDirty] = useState(false);
+
   // --- 팝업 관련 상태 및 Ref 추가 ---
   const emotionSelectionRef = useRef<HTMLDivElement>(null);
   const [showFloatingEmotionSelection, setShowFloatingEmotionSelection] = useState(false);
+  const lastScrollY = useRef(0);
 
   useEffect(() => {
     if (!emotionSelectionRef.current) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setShowFloatingEmotionSelection(!entry.isIntersecting);
+        // `entry.boundingClientRect.top`은 현재 뷰포트 상단 기준 요소의 위치를 나타냅니다.
+        // 이 값이 음수이면서 요소가 뷰포트 밖으로 나갔을 때 (isIntersecting: false)만 팝업을 보여줍니다.
+        // 즉, 스크롤을 "아래로" 내려서 요소가 화면 위로 사라질 때만 팝업이 나타나게 됩니다.
+        // `entry.boundingClientRect.top < 0` 조건은 스크롤이 아래로 내려갔을 때 요소를 지나친 경우를 의미합니다.
+        const isScrollingDownAndOutOfView = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+        
+        // 스크롤 방향 감지 (선택 사항: 더 정확한 제어를 위해)
+        // const currentScrollY = window.scrollY;
+        // const isScrollingDown = currentScrollY > lastScrollY.current;
+        // lastScrollY.current = currentScrollY;
+
+        // setShowFloatingEmotionSelection(isScrollingDownAndOutOfView && isScrollingDown);
+        // ✨ 더 간결하게, 단순히 요소가 위로 사라졌을 때만 팝업을 띄웁니다.
+        setShowFloatingEmotionSelection(isScrollingDownAndOutOfView);
       },
       {
-        root: null,
-        rootMargin: '-250px',
-        threshold: 0.1
+        root: null, // 뷰포트
+        rootMargin: '-100px 0px 0px 0px',
+        threshold: 0
       }
     );
 
@@ -73,6 +89,7 @@ export default function HomePage() {
       setEmotionSliderValues((prev) => ({ ...prev, [emotionId]: value }));
       setSelectedEmotion(emotionId);
       setSliderControlledEmotion(emotionId);
+      setRecommendationDirty(true); // 슬라이더 값 변경 시 dirty
     }
   };
 
@@ -124,6 +141,11 @@ export default function HomePage() {
         emotionKeys.map((key) => [key, (emotionSliderValues[key] ?? 0) / 100])
     ) as Record<EmotionKey, number>;
 
+    // 가장 높은 감정 id를 찾음
+    const maxEmotionId = emotionKeys.reduce((maxKey, key) => {
+      return (emotionSliderValues[key] ?? 0) > (emotionSliderValues[maxKey] ?? 0) ? key : maxKey;
+    }, emotionKeys[0]);
+
     console.log("@# normalizedEmotionData =>", normalizedEmotionData);
 
     try {
@@ -136,10 +158,10 @@ export default function HomePage() {
       const result = await res.json();
       console.log('🎯 추천 결과:', result);
 
-      const emotionUsedForRecommendation = selectedEmotion ?? "happy"; 
+      // 가장 높은 감정 id를 추천 기준으로 사용
+      const emotionUsedForRecommendation = maxEmotionId;
 
       setRecommendationResult({
-        // ✨ 여기서 이미 특정 감정에 대한 배열만 추출하여 저장합니다.
         musicRecommendations: result.music_dtos.map((m: any) => ({
           title: m.musicName,
           artist: m.musicAuthor,
@@ -158,6 +180,7 @@ export default function HomePage() {
         })),
         recommendationEmotionId: emotionUsedForRecommendation,
       });
+      setRecommendationDirty(false); // 추천 요청 시 dirty 해제
     } catch (err) {
       console.error('추천 요청 실패:', err);
       alert("추천 정보를 불러오지 못했습니다. 다시 시도해주세요.");
@@ -204,7 +227,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="text-center mt-6">
+          <div className="text-center mt-6 ">
             <button
               onClick={handleSendEmotion}
               className="bg-indigo-600 text-white px-6 py-2 rounded-lg shadow hover:bg-indigo-700 transition"
@@ -217,11 +240,11 @@ export default function HomePage() {
           {/* recommendationResult가 있을 때만 렌더링하며, 현재 UI의 selectedEmotion과는 독립적으로 작동합니다. */}
           {recommendationResult && (
             <RecommendationList
-              // ✨ 이미 `handleSendEmotion`에서 특정 감정에 대한 배열만 저장했으므로, 바로 전달합니다.
               musicRecommendations={recommendationResult.musicRecommendations}
               activityRecommendations={recommendationResult.activityRecommendations}
               bookRecommendations={recommendationResult.bookRecommendations}
-              recommendationEmotionId={recommendationResult.recommendationEmotionId} 
+              recommendationEmotionId={recommendationResult.recommendationEmotionId}
+              recommendationDirty={recommendationDirty}
             />
           )}
         </main>

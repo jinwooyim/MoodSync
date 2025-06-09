@@ -20,6 +20,7 @@ interface RecommendationListProps {
   activityRecommendations: ActivityRecommendation[]; // ✨ 변경됨
   bookRecommendations: BookRecommendation[]; // ✨ 변경됨
   recommendationEmotionId: string | null; // 이 추천 결과가 어떤 감정을 기반으로 했는지 알려주는 ID
+  recommendationDirty?: boolean; // 감정 값 변경 여부 prop 추가
 }
 
 export default function RecommendationList({
@@ -27,6 +28,7 @@ export default function RecommendationList({
   activityRecommendations,
   bookRecommendations,
   recommendationEmotionId, 
+  recommendationDirty = false, // 기본값 false
 }: RecommendationListProps) {
   const [recommendationType, setRecommendationType] = useState<"music" | "activity" | "book">("music");
 
@@ -42,10 +44,16 @@ export default function RecommendationList({
   return (
     <div className="mb-8">
       <div className="flex items-center justify-center mb-6">
-        {/* recommendationEmotionId를 기반으로 찾은 감정 정보를 Badge에 표시합니다. */}
-        <Badge className={emotionUsedForDisplay.color}>
-          추천 기준 감정: {emotionUsedForDisplay.name}
-        </Badge>
+        <div className="mb-8"></div>
+        {recommendationDirty ? (
+          <Badge className="bg-red-100 text-red-700 border-red-200">
+            감정 값이 변경되었습니다! 다시 감정 분석을 해주세요!
+          </Badge>
+        ) : (
+          <Badge className={emotionUsedForDisplay.color}>
+            추천 기준 감정: {emotionUsedForDisplay.name}
+          </Badge>
+        )}
       </div>
 
       <Tabs

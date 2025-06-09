@@ -8,31 +8,44 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Music, CheckSquare, Book} from "lucide-react";
 
 import { useState } from "react";
-// 타입 정의도 새로 만든 types 폴더에서 임포트합니다.
+// 타입 정의 및 emotions 데이터 임포트 (Badge 출력을 위해 emotionUsedForDisplay는 여전히 필요합니다.)
 import { Emotion, RecommendationsMap, MusicRecommendation, ActivityRecommendation, BookRecommendation } from "@/types";
+import { emotions } from "@/data/emotions"; 
 
 // 부모 컴포넌트로부터 받을 props의 인터페이스 정의
 interface RecommendationListProps {
-  selectedEmotion: string;
-  selectedEmotionData: Emotion; // Emotion 타입 사용
-  musicRecommendations: RecommendationsMap<MusicRecommendation>; // RecommendationsMap 타입 사용
-  activityRecommendations: RecommendationsMap<ActivityRecommendation>; // RecommendationsMap 타입 사용
-  bookRecommendations: RecommendationsMap<BookRecommendation>; // 도서목록도 추가했습니다.
+  // musicRecommendations, activityRecommendations, bookRecommendations는 이제 Emotion ID를 키로 가지지 않고,
+  // 해당 감정의 추천 목록 배열 자체를 직접 받습니다.
+  musicRecommendations: MusicRecommendation[]; // ✨ 변경됨
+  activityRecommendations: ActivityRecommendation[]; // ✨ 변경됨
+  bookRecommendations: BookRecommendation[]; // ✨ 변경됨
+  recommendationEmotionId: string | null; // 이 추천 결과가 어떤 감정을 기반으로 했는지 알려주는 ID
 }
 
 export default function RecommendationList({
-  selectedEmotion,
-  selectedEmotionData,
   musicRecommendations,
   activityRecommendations,
   bookRecommendations,
+  recommendationEmotionId, 
 }: RecommendationListProps) {
   const [recommendationType, setRecommendationType] = useState<"music" | "activity" | "book">("music");
+
+  // recommendationEmotionId를 사용하여 해당 감정의 전체 데이터를 emotions 배열에서 찾습니다.
+  // 이 부분은 배지(Badge) 출력을 위해 여전히 필요합니다.
+  const emotionUsedForDisplay = emotions.find((e) => e.id === recommendationEmotionId);
+
+  // 만약 유효한 recommendationEmotionId에 해당하는 감정 데이터를 찾지 못했다면 렌더링하지 않습니다.
+  if (!emotionUsedForDisplay) {
+    return null;
+  }
 
   return (
     <div className="mb-8">
       <div className="flex items-center justify-center mb-6">
-        {/* <Badge className={selectedEmotionData?.color}>선택된 감정: {selectedEmotionData?.name}</Badge> */}
+        {/* recommendationEmotionId를 기반으로 찾은 감정 정보를 Badge에 표시합니다. */}
+        <Badge className={emotionUsedForDisplay.color}>
+          추천 기준 감정: {emotionUsedForDisplay.name}
+        </Badge>
       </div>
 
       <Tabs
@@ -57,7 +70,8 @@ export default function RecommendationList({
 
         <TabsContent value="music" className="mt-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {musicRecommendations[selectedEmotion]?.map((music, index) => (
+            {/* ✨ musicRecommendations를 직접 순회합니다. */}
+            {musicRecommendations.map((music, index) => (
               <Card key={index} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <CardTitle className="text-lg">{music.title}</CardTitle>
@@ -77,10 +91,11 @@ export default function RecommendationList({
 
         <TabsContent value="activity" className="mt-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {activityRecommendations[selectedEmotion]?.map((activity, index) => (
+            {/* ✨ activityRecommendations를 직접 순회합니다. */}
+            {activityRecommendations.map((activity, index) => (
               <Card key={index} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
-                  <CardTitle className="text-lg">{activity.activity}</CardTitle> {/* 'activity'로 변경 */}
+                  <CardTitle className="text-lg">{activity.activity}</CardTitle>
                   <CardDescription>소요시간: {activity.duration}</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -97,7 +112,8 @@ export default function RecommendationList({
 
         <TabsContent value="book" className="mt-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {bookRecommendations[selectedEmotion]?.map((book, index) => (
+            {/* ✨ bookRecommendations를 직접 순회합니다. */}
+            {bookRecommendations.map((book, index) => (
               <Card key={index} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <CardTitle className="text-lg">{book.title}</CardTitle>

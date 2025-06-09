@@ -1,6 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import {
+  getUserRecord,
+  getLatestRecords,
+  type UserRecord,
+} from "@/lib/mypage/mypage-types"
 import { Calendar, TrendingUp, BookOpen, BarChart3 } from "lucide-react"
 import {
   Sidebar,
@@ -42,17 +47,52 @@ const menuItems = [
 
 export function EmotionDashboard() {
   const [activeView, setActiveView] = useState("daily-emotions")
+  const [currentRecord, setCurrentRecord] = useState<UserRecord | null>(null)
+  const [allRecords, setAllRecords] = useState<UserRecord[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true)
+      try {
+        const [current, latest] = await Promise.all([
+          getUserRecord(),
+          getLatestRecords(),
+        ])
+        setCurrentRecord(current)
+        setAllRecords(latest)
+      } catch (error) {
+        console.error("데이터 로딩 실패:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [])
 
   const renderContent = () => {
+    if (loading) {
+      return <p className="p-4">데이터 로딩 중...</p>
+    }
+
     switch (activeView) {
       case "daily-emotions":
-        return <DailyEmotionView />
+        return (
+          <DailyEmotionView
+            currentRecord={currentRecord}
+            allRecords={allRecords}
+          />
+        )
       case "weekly-trend":
-        return <WeeklyTrendView />
+        return <WeeklyTrendView allRecords={allRecords} />
       case "weekly-recommendations":
-        return <WeeklyRecommendationsView />
+        return (
+          <WeeklyRecommendationsView
+            allRecords={allRecords}
+          />
+        )
       default:
-        return <DailyEmotionView />
+        return <DailyEmotionView currentRecord={currentRecord} allRecords={allRecords} />
     }
   }
 

@@ -147,7 +147,6 @@ app.post('/predict', express.json(), async (req, res) => {
     const inputData = req.body; // 예시 : [0.12, 0.14, 0.35, 0. 65, 0.75, 0.00]
     console.log("predict inputData =>" , inputData);
     let { happy, sad, stress, calm, excited, tired } = inputData;
-
     happy = happy ?? 0;
     sad = sad ?? 0;
     stress = stress ?? 0;

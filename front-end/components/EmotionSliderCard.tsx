@@ -10,7 +10,7 @@ import { Emotion } from "@/types"; // Emotion 타입 임포트
 interface EmotionSliderCardProps {
   selectedEmotionData: Emotion | undefined; // 선택된 감정 데이터
   onEmotionValueChange: (value: number, emotionId: string | null) => void; // 슬라이더 값과 감정 ID 전달
-  initialEmotionValue: number; // 초기 슬라이더 값
+  initialEmotionValue: number; // 외부에서 주입되는 값
 }
 
 export default function EmotionSliderCard({
@@ -21,7 +21,9 @@ export default function EmotionSliderCard({
   // 슬라이더 표시 여부 상태 (초기에는 Call to Action 카드 상태)
   const [showSlider, setShowSlider] = useState<boolean>(false);
   const [emotionValue, setEmotionValue] = useState<number>(initialEmotionValue);
-
+  useEffect(() => {
+    setEmotionValue(initialEmotionValue);
+  }, [initialEmotionValue]); // initialEmotionValue가 변경될 때마다 실행
   // 선택된 감정이 변경될 때 슬라이더 값을 초기화하거나 특정 값으로 설정합니다.
   useEffect(() => {
     if (selectedEmotionData) {

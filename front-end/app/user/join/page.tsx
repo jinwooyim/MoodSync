@@ -13,7 +13,6 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Progress } from "@/components/ui/progress"
 import {
   Loader2,
   Mail,
@@ -176,14 +175,13 @@ export default function UserJoinPage() {
 
       if (response.success) {
         // 다양한 응답 구조에 대응
-        // const code = response.code || response.verificationCode || response.authCode
         const code = response.code
         console.log("추출된 인증번호:", code)
 
         setServerCode(String(code)) // 문자열로 변환하여 저장
         setShowVerificationInput(true)
         setEmailLocked(true) // 이메일 입력 잠금
-        setEmailSuccess(`인증번호가 발송되었습니다. 이메일을 확인해주세요.`)
+        setEmailSuccess(`인증번호가 발송되었습니다. 이메일을 확인해주세요. (테스트용: ${code})`)
       } else {
         setEmailError(response.message || "인증번호 발송에 실패했습니다.")
         setEmailSuccess("")
@@ -288,7 +286,7 @@ export default function UserJoinPage() {
       setCurrentStep(4)
       setTimeout(() => {
         router.push("/user/login")
-      }, 3000)
+      }, 2000)
     } catch (err: any) {
       console.error("회원가입 중 오류 발생:", err.response?.data || err.message)
 
@@ -328,26 +326,26 @@ export default function UserJoinPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-violet-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-purple-400/20 to-blue-400/20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-pink-400/20 to-rose-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
       </div>
 
       <div className="container max-w-2xl mx-auto py-8 px-4 relative z-10">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 animate-slide-up">
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full blur-xl opacity-30 animate-pulse"></div>
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full blur-xl opacity-30 animate-pulse"></div>
             </div>
-            <div className="relative bg-gradient-to-br from-violet-500 to-purple-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto shadow-2xl">
+            {/* <div className="relative bg-gradient-to-br from-purple-500 to-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto shadow-2xl transform hover:scale-105 transition-transform duration-300">
               <Sparkles className="w-8 h-8 text-white" />
-            </div>
+            </div> */}
           </div>
 
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-pink-600 bg-clip-text text-transparent mb-2">
             MoodSync 회원가입
           </h1>
           <p className="text-gray-600">감정 기반 맞춤 추천 서비스에 가입하세요</p>
@@ -360,7 +358,7 @@ export default function UserJoinPage() {
         </div>
 
         {/* Progress Bar */}
-        <div className="mb-8">
+        <div className="mb-8 animate-slide-up delay-200">
           <div className="flex justify-between items-center mb-4">
             {steps.map((step, index) => {
               const Icon = step.icon
@@ -372,9 +370,9 @@ export default function UserJoinPage() {
                   <div
                     className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all duration-300 ${
                       isCompleted
-                        ? "bg-green-500 text-white"
+                        ? "bg-gradient-to-r from-purple-500 to-blue-600 text-white"
                         : isActive
-                          ? "bg-violet-500 text-white"
+                          ? "bg-purple-500 text-white"
                           : "bg-gray-200 text-gray-400"
                     }`}
                   >
@@ -382,7 +380,7 @@ export default function UserJoinPage() {
                   </div>
                   <span
                     className={`text-xs font-medium ${
-                      isActive ? "text-violet-600" : isCompleted ? "text-green-600" : "text-gray-400"
+                      isActive ? "text-purple-600" : isCompleted ? "text-purple-600" : "text-gray-400"
                     }`}
                   >
                     {step.title}
@@ -391,11 +389,20 @@ export default function UserJoinPage() {
               )
             })}
           </div>
-          <Progress value={progress} className="h-2" />
+
+          {/* 커스텀 프로그레스 바 */}
+          <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              className="absolute top-0 left-0 h-full bg-gradient-to-r from-purple-500 to-blue-600 rounded-full transition-all duration-500 ease-out"
+              style={{ width: `${progress}%` }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-blue-500 opacity-50 animate-pulse"></div>
+            </div>
+          </div>
         </div>
 
         {/* Step Content */}
-        <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
+        <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm animate-slide-up delay-300">
           <CardHeader className="text-center">
             <CardTitle className="text-xl font-semibold text-gray-800">{steps[currentStep - 1]?.title}</CardTitle>
             <CardDescription className="text-gray-600">
@@ -409,7 +416,7 @@ export default function UserJoinPage() {
           <CardContent className="space-y-6">
             {/* Step 1: 약관 동의 */}
             {currentStep === 1 && (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2">
                     <Checkbox
@@ -417,43 +424,135 @@ export default function UserJoinPage() {
                       checked={agreements.allAgree}
                       onCheckedChange={(checked) => handleAgreementChange("allAgree", checked as boolean)}
                     />
-                    <Label htmlFor="allAgree" className="font-semibold text-gray-800">
+                    <Label htmlFor="allAgree" className="font-semibold text-gray-800 text-lg">
                       전체 동의
                     </Label>
                   </div>
 
-                  <div className="border-t pt-4 space-y-3">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="terms"
-                        checked={agreements.terms}
-                        onCheckedChange={(checked) => handleAgreementChange("terms", checked as boolean)}
-                      />
-                      <Label htmlFor="terms" className="text-gray-700">
-                        서비스 이용약관 동의 <span className="text-red-500">*</span>
-                      </Label>
+                  <div className="border-t pt-6 space-y-6">
+                    {/* 서비스 이용약관 */}
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="terms"
+                          checked={agreements.terms}
+                          onCheckedChange={(checked) => handleAgreementChange("terms", checked as boolean)}
+                        />
+                        <Label htmlFor="terms" className="text-gray-700 font-medium">
+                          서비스 이용약관 동의 <span className="text-red-500">*</span>
+                        </Label>
+                      </div>
+                      <div className="bg-gray-50 p-4 rounded-lg max-h-32 overflow-y-auto text-sm text-gray-600 border">
+                        <h4 className="font-semibold mb-2">제1조 (목적)</h4>
+                        <p className="mb-3">
+                          본 약관은 MoodSync(이하 "회사")가 제공하는 감정 기반 맞춤 추천 서비스(이하 "서비스")의 이용과
+                          관련하여 회사와 이용자 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.
+                        </p>
+
+                        <h4 className="font-semibold mb-2">제2조 (정의)</h4>
+                        <p className="mb-3">
+                          1. "서비스"란 회사가 제공하는 감정 분석 및 음악, 도서, 활동 추천 서비스를 의미합니다.
+                          <br />
+                          2. "이용자"란 본 약관에 따라 회사가 제공하는 서비스를 받는 회원을 말합니다.
+                          <br />
+                          3. "회원"이란 회사에 개인정보를 제공하여 회원등록을 한 자로서, 회사의 서비스를 지속적으로
+                          이용할 수 있는 자를 말합니다.
+                        </p>
+
+                        <h4 className="font-semibold mb-2">제3조 (약관의 효력 및 변경)</h4>
+                        <p className="mb-3">
+                          1. 본 약관은 서비스를 이용하고자 하는 모든 이용자에 대하여 그 효력을 발생합니다.
+                          <br />
+                          2. 회사는 필요한 경우 관련 법령을 위배하지 않는 범위에서 본 약관을 변경할 수 있습니다.
+                        </p>
+
+                        <h4 className="font-semibold mb-2">제4조 (서비스의 제공)</h4>
+                        <p>
+                          회사는 다음과 같은 서비스를 제공합니다:
+                          <br />- 감정 상태 분석 서비스
+                          <br />- 개인 맞춤형 음악 추천
+                          <br />- 개인 맞춤형 도서 추천
+                          <br />- 개인 맞춤형 활동 추천
+                          <br />- 기타 회사가 정하는 서비스
+                        </p>
+                      </div>
                     </div>
 
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="privacy"
-                        checked={agreements.privacy}
-                        onCheckedChange={(checked) => handleAgreementChange("privacy", checked as boolean)}
-                      />
-                      <Label htmlFor="privacy" className="text-gray-700">
-                        개인정보 처리방침 동의 <span className="text-red-500">*</span>
-                      </Label>
+                    {/* 개인정보 처리방침 */}
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="privacy"
+                          checked={agreements.privacy}
+                          onCheckedChange={(checked) => handleAgreementChange("privacy", checked as boolean)}
+                        />
+                        <Label htmlFor="privacy" className="text-gray-700 font-medium">
+                          개인정보 처리방침 동의 <span className="text-red-500">*</span>
+                        </Label>
+                      </div>
+                      <div className="bg-gray-50 p-4 rounded-lg max-h-32 overflow-y-auto text-sm text-gray-600 border">
+                        <h4 className="font-semibold mb-2">1. 개인정보의 수집 및 이용목적</h4>
+                        <p className="mb-3">
+                          회사는 다음의 목적을 위하여 개인정보를 처리합니다:
+                          <br />- 회원 가입 및 관리
+                          <br />- 서비스 제공 및 맞춤형 추천
+                          <br />- 감정 분석 및 데이터 처리
+                          <br />- 고객 상담 및 불만 처리
+                          <br />- 서비스 개선 및 신규 서비스 개발
+                        </p>
+
+                        <h4 className="font-semibold mb-2">2. 수집하는 개인정보의 항목</h4>
+                        <p className="mb-3">
+                          필수항목: 이메일, 아이디, 이름, 비밀번호, 전화번호, 생년월일, 주소
+                          <br />
+                          선택항목: 감정 상태 정보, 서비스 이용 기록, 추천 선호도
+                        </p>
+
+                        <h4 className="font-semibold mb-2">3. 개인정보의 보유 및 이용기간</h4>
+                        <p className="mb-3">
+                          회원 탈퇴 시까지 보유하며, 탈퇴 후 즉시 파기합니다. 단, 관련 법령에 의해 보존이 필요한 경우
+                          해당 기간 동안 보관합니다.
+                        </p>
+
+                        <h4 className="font-semibold mb-2">4. 개인정보의 제3자 제공</h4>
+                        <p>
+                          회사는 이용자의 개인정보를 원칙적으로 외부에 제공하지 않습니다. 다만, 법령에 의해 요구되는
+                          경우는 예외로 합니다.
+                        </p>
+                      </div>
                     </div>
 
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="marketing"
-                        checked={agreements.marketing}
-                        onCheckedChange={(checked) => handleAgreementChange("marketing", checked as boolean)}
-                      />
-                      <Label htmlFor="marketing" className="text-gray-700">
-                        마케팅 정보 수신 동의 (선택)
-                      </Label>
+                    {/* 마케팅 정보 수신 동의 */}
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="marketing"
+                          checked={agreements.marketing}
+                          onCheckedChange={(checked) => handleAgreementChange("marketing", checked as boolean)}
+                        />
+                        <Label htmlFor="marketing" className="text-gray-700 font-medium">
+                          마케팅 정보 수신 동의 (선택)
+                        </Label>
+                      </div>
+                      <div className="bg-gray-50 p-4 rounded-lg max-h-32 overflow-y-auto text-sm text-gray-600 border">
+                        <h4 className="font-semibold mb-2">마케팅 정보 수신 동의</h4>
+                        <p className="mb-3">
+                          회사는 다음과 같은 마케팅 정보를 제공합니다:
+                          <br />- 신규 서비스 및 기능 안내
+                          <br />- 이벤트 및 프로모션 정보
+                          <br />- 맞춤형 추천 콘텐츠
+                          <br />- 서비스 이용 팁 및 가이드
+                        </p>
+
+                        <p className="mb-3">수신 방법: 이메일, SMS, 앱 푸시 알림</p>
+
+                        <p className="mb-3">
+                          동의 철회: 언제든지 회원정보 수정 페이지에서 수신 거부를 선택하거나 고객센터를 통해 철회할 수
+                          있습니다.
+                        </p>
+
+                        <p>본 동의는 선택사항이며, 동의하지 않아도 서비스 이용에는 제한이 없습니다.</p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -489,7 +588,7 @@ export default function UserJoinPage() {
                       type="button"
                       onClick={handleSendCode}
                       disabled={emailLoading || emailLocked || !form.userEmail}
-                      className="h-12 px-6"
+                      className="h-12 px-6 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white"
                     >
                       {emailLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "인증번호 발송"}
                     </Button>
@@ -508,13 +607,13 @@ export default function UserJoinPage() {
                         onChange={(e) => setVerificationCode(e.target.value)}
                         placeholder="인증번호 8자리 입력"
                         className="h-12"
-                        maxLength={10}
+                        maxLength={8}
                       />
                       <Button
                         type="button"
                         onClick={handleVerifyCode}
                         disabled={verificationCode.length === 0}
-                        className="h-12 px-6"
+                        className="h-12 px-6 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white"
                       >
                         인증 확인
                       </Button>
@@ -695,7 +794,12 @@ export default function UserJoinPage() {
                         readOnly
                         required
                       />
-                      <Button type="button" onClick={handleOpenPostcode} className="h-12 px-6" variant="outline">
+                      <Button
+                        type="button"
+                        onClick={handleOpenPostcode}
+                        className="h-12 px-6 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white"
+                        variant="outline"
+                      >
                         <MapPin className="w-4 h-4 mr-2" />
                         주소 검색
                       </Button>
@@ -729,8 +833,8 @@ export default function UserJoinPage() {
             {/* Step 4: 완료 */}
             {currentStep === 4 && (
               <div className="text-center space-y-6">
-                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                  <CheckCircle className="w-10 h-10 text-green-600" />
+                <div className="w-20 h-20 bg-gradient-to-r from-purple-100 to-blue-100 rounded-full flex items-center justify-center mx-auto">
+                  <CheckCircle className="w-10 h-10 text-purple-600" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-gray-800 mb-2">회원가입 완료!</h3>
@@ -756,7 +860,7 @@ export default function UserJoinPage() {
                   variant="outline"
                   onClick={handlePrev}
                   disabled={currentStep === 1}
-                  className="h-12 px-6"
+                  className="h-12 px-6 border-purple-300 text-purple-600 hover:bg-purple-50"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   이전
@@ -767,7 +871,7 @@ export default function UserJoinPage() {
                     type="submit"
                     onClick={handleSubmit}
                     disabled={loading || !canProceedToNext()}
-                    className="h-12 px-6"
+                    className="h-12 px-6 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white"
                   >
                     {loading ? (
                       <>
@@ -782,7 +886,12 @@ export default function UserJoinPage() {
                     )}
                   </Button>
                 ) : (
-                  <Button type="button" onClick={handleNext} disabled={!canProceedToNext()} className="h-12 px-6">
+                  <Button
+                    type="button"
+                    onClick={handleNext}
+                    disabled={!canProceedToNext()}
+                    className="h-12 px-6 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white"
+                  >
                     다음
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
@@ -793,10 +902,10 @@ export default function UserJoinPage() {
         </Card>
 
         {/* Login Link */}
-        <div className="text-center mt-6">
+        <div className="text-center mt-6 animate-slide-up delay-400">
           <p className="text-gray-600">
             이미 계정이 있으신가요?{" "}
-            <Link href="/user/login" className="text-violet-600 font-semibold hover:text-violet-700">
+            <Link href="/user/login" className="text-purple-600 font-semibold hover:text-purple-700">
               로그인하기
             </Link>
           </p>
@@ -804,6 +913,35 @@ export default function UserJoinPage() {
       </div>
 
       <Script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" strategy="beforeInteractive" />
+
+      <style jsx>{`
+        @keyframes slide-up {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .animate-slide-up {
+          animation: slide-up 0.8s ease-out;
+        }
+
+        .delay-200 {
+          animation-delay: 0.2s;
+        }
+
+        .delay-300 {
+          animation-delay: 0.3s;
+        }
+
+        .delay-400 {
+          animation-delay: 0.4s;
+        }
+      `}</style>
     </div>
   )
 }

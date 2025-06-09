@@ -62,12 +62,12 @@ export default function EmotionSliderCard({
   if (!showSlider || !selectedEmotionData) { // selectedEmotionData가 없으면 항상 Call to Action 카드 표시
     // 초기 Call to Action 카드 UI
     return (
-      <div className="text-center max-w-md mx-auto mb-8"> {/* 외부 div 클래스 유지 */}
+      <div className="w-full h-full flex items-center justify-center text-center"> 
         <Card
-          className="cursor-pointer hover:shadow-lg transition-shadow duration-200"
+          className="w-full h-full shadow-none border-none cursor-pointer transition-shadow duration-200"
           onClick={handleCardClick} // 클릭 이벤트 추가
         >
-          <CardContent className="p-8">
+          <CardContent className="p-8 flex flex-col items-center justify-center h-full">
             <Sparkles className="w-12 h-12 mx-auto mb-4 text-purple-500" />
             <h3 className="text-xl font-semibold mb-2">맞춤형 추천을 받아보세요</h3>
             <p className="text-gray-600 mb-4">
@@ -81,10 +81,11 @@ export default function EmotionSliderCard({
 
   // 슬라이더 UI
   return (
-    <div className="text-center max-w-md mx-auto mb-8"> {/* 외부 div 클래스 유지 */}
-      <Card className="p-6">
-        <CardContent className="flex flex-col items-center justify-center p-0">
-          <div className="w-full flex justify-start mb-4">
+    <div className="w-full h-full flex items-center justify-center text-center"> 
+      <Card className="border-none shadow-none w-full h-full">
+        <CardContent className="p-8 flex flex-col items-center justify-center h-full">
+          {/* 뒤로가기 버튼의 필요성을 못느껴서 주석 */}
+          {/* <div className="w-full flex justify-start mb-4">
             <button
               onClick={handleBackToCard}
               className="p-2 rounded-md hover:bg-gray-100 flex items-center text-gray-600"
@@ -93,7 +94,7 @@ export default function EmotionSliderCard({
               <ArrowLeft className="w-5 h-5 mr-1" />
               <span className="sr-only">뒤로 가기</span>
             </button>
-          </div>
+          </div> */}
 
           {/* 감정 아이콘 또는 기본 슬라이더 아이콘 */}
           <CurrentEmotionIcon

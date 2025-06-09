@@ -1,4 +1,5 @@
-// components/AppProviders.tsx (새 파일 생성)
+// components/AppProviders.tsx
+// 헤더  풋터 컴포넌트 포함,AuthInitializer 실행한 후 다른 요소들이 출력되도록 함
 'use client';
 
 import { useEffect } from 'react';
@@ -6,7 +7,6 @@ import useAuthStore from '@/store/authStore';
 import Header from './Header'; // Header 컴포넌트 임포트
 import Footer from './Footer'; // Footer 컴포넌트 임포트
 
-// AuthInitializer와 비슷한 역할을 하지만, children을 렌더링하는 시점을 제어
 export default function AppProviders({ children }: { children: React.ReactNode }) {
   const { loading, checkAuthStatus } = useAuthStore();
 

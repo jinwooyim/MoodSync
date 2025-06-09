@@ -151,24 +151,27 @@ export default function HomePage() {
               현재 감정에 맞는 음악과 활동, 도서를 추천해드립니다. 감정을 선택하고 맞춤형 추천을 받아보세요.
             </p>
           </div>
-          
+
           <EmotionSelection
             selectedEmotion={selectedEmotion}
             onSelectEmotion={(emotionId) => {
               setSelectedEmotion(emotionId);
-              setSliderControlledEmotion(null); // 감정 선택 시 슬라이더 제어 해제 (필요시)
+              setSliderControlledEmotion(null); // 실제 코드에 있다면 유지
             }}
+            emotionValues={emotionSliderValues} // emotionSliderValues를 여기에 전달
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10 w-full">
             {/* 왼쪽: Face 감정 분석 */}
-            <div className="w-full h-full p-6 bg-white rounded-2xl shadow-md flex items-center justify-center">
-              <FaceEmotionDetector onEmotionDetected={handleEmotionDetected} />
+            <div className="flex flex-col justify-between  space-y-6 w-full">
+              <div className="w-full  p-6 bg-white rounded-2xl hover:shadow-lg transition-shadow duration-200 shadow-md ">
+                <FaceEmotionDetector onEmotionDetected={handleEmotionDetected} />
+              </div>
             </div>
 
             {/* 오른쪽: 슬라이더 + 감정값 */}
-            <div className="flex flex-col justify-between h-full space-y-6 w-full">
-              <div className="w-full p-6 bg-white rounded-2xl shadow-md">
+            <div className="flex flex-col justify-between  space-y-6 w-full">
+              <div className="w-full  p-6 bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-200 ">
               {/* <div className="w-full p-6 bg-sky-50 rounded-2xl shadow-md"> */}
                 <EmotionSliderCard
                   selectedEmotionData={selectedEmotionData}
@@ -176,13 +179,14 @@ export default function HomePage() {
                   initialEmotionValue={currentSliderValue}
                 />
               </div>
-              <div className="w-full p-6 bg-white rounded-2xl shadow-md">
+              {/* 여기 부분을 위로 옮겼습니다 */}
+              {/* <div className="w-full p-6 bg-white rounded-2xl shadow-md">
                 <EmotionValuesDisplay
                   emotions={emotions}
                   emotionValues={emotionSliderValues}
                   onValuesChange={setEmotionValues}
                 />
-              </div>
+              </div> */}
             </div>
           </div>
 

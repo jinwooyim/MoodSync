@@ -2,17 +2,19 @@
 'use client';
 
 import { Card, CardContent } from "@/components/ui/card";
-import { emotions } from "@/data/emotions"; // 경로 변경
+import { emotions } from "@/data/emotions";
 import { LucideIcon } from "lucide-react"; // icon prop 타입을 위해 LucideIcon 임포트
 
 interface EmotionSelectionProps {
   selectedEmotion: string | null;
   onSelectEmotion: (emotionId: string) => void;
+  emotionValues: Record<string, number>; // emotionValues prop 추가
 }
 
 export default function EmotionSelection({
   selectedEmotion,
   onSelectEmotion,
+  emotionValues, // emotionValues prop을 비구조화 할당
 }: EmotionSelectionProps) {
   return (
     <div className="mb-12">
@@ -32,9 +34,16 @@ export default function EmotionSelection({
               <h3 className="font-medium text-gray-900">
                 {emotion.name}
               </h3>
-              <p className="text-xs text-gray-500 mt-1">
-                {emotion.description}
-              </p>
+              {/* emotionValues에 따라 조건부 렌더링 */}
+              {emotionValues[emotion.id] && emotionValues[emotion.id] > 0 ? (
+                <span className="text-lg font-bold text-indigo-600">
+                  {emotionValues[emotion.id]}%
+                </span>
+              ) : (
+                <p className="text-xs text-gray-500 mt-1">
+                  {emotion.description}
+                </p>
+              )}
             </CardContent>
           </Card>
         ))}

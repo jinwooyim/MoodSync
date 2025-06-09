@@ -1,7 +1,11 @@
 package com.boot.userRecord.service;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.boot.crawling.service.YoutubeService;
 import com.boot.userRecord.dao.UserRecordDAO;
 import com.boot.userRecord.dto.UserRecordDTO;
+import com.boot.userRecord.dto.YoutubeVideoDTO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -99,8 +104,8 @@ public class UserRecordServiceImpl implements UserRecordService {
 //        }
 //    	
 //        dto.setYoutubeSearchResults(youtubeVideoDTOs);
-
-		log.info("UserRecordServiceImpl : " + dto);
+//
+//		log.info("UserRecordServiceImpl : " + dto);
 
 		return dto;
 	}

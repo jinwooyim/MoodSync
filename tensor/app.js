@@ -92,9 +92,9 @@ async function ModelTraining(response){
 
     // 5. 모델 훈련
     await model.fit(xs, ysOneHot, { // xs : 모델 입력 데이터[배치 크기, 특성 개수], usOneHot[배치 크기, 클래스 개수] : 레이블 데이터
-      epochs: 600, // 데이터셋에 대해 학습을 50번 반복
+      epochs: 600, // 에포크 = 학습 반복 횟수
       batchSize: 16, // 한 번에 모델에 입력하는 데이터의 개수
-      shuffle: true, //  epoch마다 학습 데이터의 순서를 섞어서
+      shuffle: true, //  셔플 - 트루 = 데이터순서 다 섞음
       callbacks: {
         onEpochEnd: (epoch, logs) => { // 손실(loss), 정확도(acc)
           console.log(`Epoch ${epoch + 1}: loss = ${logs.loss.toFixed(4)}, acc = ${logs.acc.toFixed(4)}`);

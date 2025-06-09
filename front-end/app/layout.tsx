@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
-import AppProviders from '@/components/AppProviders';
+import AppProviders from '@/components/layout/AppProviders';
 import './globals.css'
 
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
   title: "MoodSync - 당신의 감정을 동기화하세요",

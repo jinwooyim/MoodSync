@@ -1,4 +1,5 @@
-// components/AuthInitializer.tsx (새 파일 생성)
+// components/AuthInitializer.tsx 
+// 토큰이 있는지 없는지 체크 
 'use client';
 import { useEffect } from 'react';
 import useAuthStore from '@/store/authStore';

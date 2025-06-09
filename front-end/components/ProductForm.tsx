@@ -1,5 +1,6 @@
 // components/ProductForm.tsx
-'use client'; // <-- 이 지시어를 추가하여 클라이언트 컴포넌트임을 명시합니다.
+// 참고용 컴포넌트 입니다. (삭제 예정)
+'use client';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 

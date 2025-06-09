@@ -7,17 +7,12 @@ import ImageSlider from '@/components/ImageSlider';
 import EmotionSelection from "@/components/EmotionSelection";
 import RecommendationList from "@/components/RecommendationList";
 import EmotionSliderCard from "@/components/EmotionSliderCard";
-import EmotionValuesDisplay from "@/components/EmotionValuesDisplay"; // EmotionValuesDisplay는 현재 사용되지 않는 것 같지만, 코드에 있으니 유지합니다.
 import FaceEmotionDetector from '@/components/FaceEmotionDetector';
 import { CustomMoodScores } from '@/types/emotion';
 import { RecommendationResult } from "@/types/index";
 
 // 데이터 임포트 경로
 import { emotions } from "@/data/emotions";
-import { musicRecommendations } from "@/data/musicRecommendations"; // 현재 사용되지 않음
-import { activityRecommendations } from "@/data/activityRecommendations"; // 현재 사용되지 않음
-
-import { Input } from "@/components/ui/input"; // 현재 사용되지 않음
 
 export default function HomePage() {
   const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null);

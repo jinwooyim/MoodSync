@@ -1,442 +1,815 @@
-'use client';
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import Script from 'next/script';
-import { register, sendVerificationEmail } from '@/lib/api/auth'; // register 함수 임포트 및 sendVerificationEmail 임포트 추가
+"use client"
+
+import type React from "react"
+
+import { useState } from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import Script from "next/script"
+import { register, sendVerificationEmail } from "@/lib/api/auth"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Progress } from "@/components/ui/progress"
+import {
+  Loader2,
+  Mail,
+  Shield,
+  User,
+  CheckCircle,
+  ArrowRight,
+  ArrowLeft,
+  Lock,
+  Unlock,
+  MapPin,
+  Calendar,
+  Phone,
+  Eye,
+  EyeOff,
+  Sparkles,
+  Heart,
+  Music,
+  BookOpen,
+} from "lucide-react"
+
+interface FormData {
+  userEmail: string
+  userId: string
+  userName: string
+  userPw: string
+  pwdConfirm: string
+  userTel: string
+  userBirth: string
+  userZipCode: string
+  userAddress: string
+  userDetailAddress: string
+}
 
 export default function UserJoinPage() {
-  // 폼 상태
-  const [form, setForm] = useState({
-    userEmail: '',
-    userId: '',
-    userName: '',
-    userPw: '',
-    pwdConfirm: '',
-    userTel: '',
-    userBirth: '',
-    userZipCode: '',
-    userAddress: '',
-    userDetailAddress: '',
-  });
+  const [currentStep, setCurrentStep] = useState(1)
+  const [form, setForm] = useState<FormData>({
+    userEmail: "",
+    userId: "",
+    userName: "",
+    userPw: "",
+    pwdConfirm: "",
+    userTel: "",
+    userBirth: "",
+    userZipCode: "",
+    userAddress: "",
+    userDetailAddress: "",
+  })
 
-  const [emailVerified, setEmailVerified] = useState(false); // 이메일 인증 완료 여부
-  const [verificationCode, setVerificationCode] = useState(''); // 사용자가 입력한 인증번호
-  const [serverCode, setServerCode] = useState(''); // 서버에서 발송한 인증번호 (실제 백엔드 연동 시 필요)
-  const [showVerificationInput, setShowVerificationInput] = useState(false); // 인증번호 입력 필드 보이기/숨기기
-  const [emailError, setEmailError] = useState(''); // 이메일 관련 에러 메시지
-  const [emailSuccess, setEmailSuccess] = useState(''); // 이메일 관련 성공 메시지
-  const [passwordMatchError, setPasswordMatchError] = useState(''); // 비밀번호 일치 에러
+  // 약관 동의 상태
+  const [agreements, setAgreements] = useState({
+    terms: false,
+    privacy: false,
+    marketing: false,
+    allAgree: false,
+  })
 
-  const [error, setError] = useState(''); // 일반 에러 메시지
-  const [success, setSuccess] = useState(''); // 일반 성공 메시지
-  const [loading, setLoading] = useState(false); // 회원가입 제출 로딩
+  // 이메일 인증 상태
+  const [emailVerified, setEmailVerified] = useState(false)
+  const [verificationCode, setVerificationCode] = useState("")
+  const [serverCode, setServerCode] = useState("")
+  const [showVerificationInput, setShowVerificationInput] = useState(false)
+  const [emailLocked, setEmailLocked] = useState(false)
+  const [verificationLocked, setVerificationLocked] = useState(false)
 
-  const router = useRouter();
+  // UI 상태
+  const [showPassword, setShowPassword] = useState(false)
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [emailLoading, setEmailLoading] = useState(false)
+
+  // 에러 및 성공 메시지
+  const [emailError, setEmailError] = useState("")
+  const [emailSuccess, setEmailSuccess] = useState("")
+  const [passwordMatchError, setPasswordMatchError] = useState("")
+  const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
+
+  const router = useRouter()
+
+  const steps = [
+    { id: 1, title: "약관 동의", icon: Shield },
+    { id: 2, title: "이메일 인증", icon: Mail },
+    { id: 3, title: "정보 입력", icon: User },
+    { id: 4, title: "가입 완료", icon: CheckCircle },
+  ]
+
+  const progress = (currentStep / steps.length) * 100
+
+  // 약관 동의 핸들러
+  const handleAgreementChange = (type: string, checked: boolean) => {
+    if (type === "allAgree") {
+      setAgreements({
+        terms: checked,
+        privacy: checked,
+        marketing: checked,
+        allAgree: checked,
+      })
+    } else {
+      const newAgreements = { ...agreements, [type]: checked }
+      newAgreements.allAgree = newAgreements.terms && newAgreements.privacy && newAgreements.marketing
+      setAgreements(newAgreements)
+    }
+  }
 
   // 입력 핸들러
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setForm((prevForm) => ({ ...prevForm, [name]: value }));
+    const { name, value } = e.target
+    setForm((prevForm) => ({ ...prevForm, [name]: value }))
 
     // 비밀번호 확인 실시간 체크
-    if (name === 'pwdConfirm' || name === 'userPw') {
-      if (name === 'pwdConfirm' && value !== form.userPw) {
-        setPasswordMatchError('비밀번호가 일치하지 않습니다.');
-      } else if (name === 'userPw' && value !== form.pwdConfirm && form.pwdConfirm !== '') {
-        // userPw 변경 시 pwdConfirm이 이미 입력되어 있다면 다시 일치 여부 확인
-        setPasswordMatchError('비밀번호가 일치하지 않습니다.');
+    if (name === "pwdConfirm" || name === "userPw") {
+      if (name === "pwdConfirm" && value !== form.userPw) {
+        setPasswordMatchError("비밀번호가 일치하지 않습니다.")
+      } else if (name === "userPw" && value !== form.pwdConfirm && form.pwdConfirm !== "") {
+        setPasswordMatchError("비밀번호가 일치하지 않습니다.")
       } else {
-        setPasswordMatchError('');
+        setPasswordMatchError("")
       }
     }
-  };
+  }
 
-  // 이메일 인증번호 발송 요청
-  const handleSendCode = async () => {
-    // 이메일 유효성 검사 (클라이언트 측)
-    const emailPattern = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
-    if (!emailPattern.test(form.userEmail)) {
-      setEmailError('올바른 이메일 주소 형식으로 입력해주세요.');
-      setEmailSuccess('');
-      return;
+  // 전화번호 자동 하이픈 추가
+  const handleTelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    let newValue = value.replace(/\D/g, "")
+
+    if (newValue.length > 11) {
+      newValue = newValue.substring(0, 11)
     }
 
-    setEmailError(''); // 기존 에러 초기화
-    setEmailSuccess('인증번호 발송 중...');
-    setLoading(true);
+    if (newValue.length <= 3) {
+      newValue = newValue
+    } else if (newValue.length <= 7) {
+      newValue = `${newValue.substring(0, 3)}-${newValue.substring(3)}`
+    } else {
+      newValue = `${newValue.substring(0, 3)}-${newValue.substring(3, 7)}-${newValue.substring(7)}`
+    }
+    setForm((prevForm) => ({ ...prevForm, [name]: newValue }))
+  }
+
+  // 이메일 인증번호 발송
+  const handleSendCode = async () => {
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    if (!emailPattern.test(form.userEmail)) {
+      setEmailError("올바른 이메일 주소 형식으로 입력해주세요.")
+      setEmailSuccess("")
+      return
+    }
+
+    setEmailError("")
+    setEmailSuccess("인증번호 발송 중...")
+    setEmailLoading(true)
 
     try {
-      // sendVerificationEmail 함수를 사용하여 백엔드에 이메일 인증 요청
-      const response = await sendVerificationEmail(form.userEmail);
+      const response = await sendVerificationEmail(form.userEmail)
+
+      // 응답 구조 디버깅
+      console.log("서버 응답:", response)
 
       if (response.success) {
-        // 서버에서 받은 인증번호를 저장 (실제로는 클라이언트에서 알 필요는 없으나, 테스트를 위해 저장)
-        setServerCode(response.code); // 백엔드에서 code 필드에 인증번호를 담아준다고 가정
-        setShowVerificationInput(true); // 인증번호 입력 필드 보이도록 설정
-        setEmailSuccess(`인증번호가 발송되었습니다. 이메일을 확인해주세요.`);
-        // 테스트 목적으로만 (실제 서비스에서는 보안상 제거): setEmailSuccess(`인증번호가 발송되었습니다. 이메일을 확인해주세요. (테스트 코드: ${response.code})`);
+        // 다양한 응답 구조에 대응
+        // const code = response.code || response.verificationCode || response.authCode
+        const code = response.code
+        console.log("추출된 인증번호:", code)
+
+        setServerCode(String(code)) // 문자열로 변환하여 저장
+        setShowVerificationInput(true)
+        setEmailLocked(true) // 이메일 입력 잠금
+        setEmailSuccess(`인증번호가 발송되었습니다. 이메일을 확인해주세요.`)
       } else {
-        setEmailError(response.message || '인증번호 발송에 실패했습니다.');
-        setEmailSuccess('');
+        setEmailError(response.message || "인증번호 발송에 실패했습니다.")
+        setEmailSuccess("")
       }
     } catch (err: any) {
-      console.error('인증번호 발송 실패:', err.response?.data || err.message);
-      setEmailError(err.response?.data?.message || '인증번호 발송에 실패했습니다. 다시 시도해주세요.');
-      setEmailSuccess('');
+      console.error("인증번호 발송 실패:", err.response?.data || err.message)
+      setEmailError(err.response?.data?.message || "인증번호 발송에 실패했습니다. 다시 시도해주세요.")
+      setEmailSuccess("")
     } finally {
-      setLoading(false);
+      setEmailLoading(false)
     }
-  };
+  }
 
   // 인증번호 확인
   const handleVerifyCode = () => {
-    if (verificationCode === serverCode && verificationCode !== '') {
-      setEmailVerified(true);
-      setEmailError('');
-      setEmailSuccess('이메일 인증이 완료되었습니다!');
-      setShowVerificationInput(false); // 인증 완료 후 입력 필드 숨김
+    // 디버깅을 위한 콘솔 로그 추가
+    console.log("입력한 인증번호:", verificationCode)
+    console.log("서버 인증번호:", serverCode)
+    console.log("타입 확인 - 입력:", typeof verificationCode, "서버:", typeof serverCode)
+
+    // 공백 제거 및 문자열로 변환하여 비교
+    const inputCode = String(verificationCode).trim()
+    const serverCodeStr = String(serverCode).trim()
+
+    console.log("정제된 비교 - 입력:", inputCode, "서버:", serverCodeStr)
+
+    if (inputCode === serverCodeStr && inputCode !== "") {
+      setEmailVerified(true)
+      setVerificationLocked(true) // 인증번호 입력 잠금
+      setEmailError("")
+      setEmailSuccess("이메일 인증이 완료되었습니다!")
+      setShowVerificationInput(false)
     } else {
-      setEmailVerified(false);
-      setEmailError('인증번호가 일치하지 않거나 유효하지 않습니다.');
-      setEmailSuccess('');
+      setEmailVerified(false)
+      setEmailError(`인증번호가 일치하지 않습니다. (입력: ${inputCode}, 예상: ${serverCodeStr})`)
+      setEmailSuccess("")
     }
-  };
+  }
 
   // 주소 검색
   const handleOpenPostcode = () => {
-    if (typeof window !== 'undefined' && window.daum && window.daum.Postcode) {
+    if (typeof window !== "undefined" && window.daum && window.daum.Postcode) {
       new window.daum.Postcode({
-        oncomplete: function (data: any) {
-          let fullAddress = data.address;
-          let extraAddress = '';
+        oncomplete: (data: any) => {
+          let fullAddress = data.address
+          let extraAddress = ""
 
-          if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
-            extraAddress += data.bname;
+          if (data.bname !== "" && /[동|로|가]$/g.test(data.bname)) {
+            extraAddress += data.bname
           }
-          if (data.buildingName !== '' && data.apartment === 'Y') {
-            extraAddress +=
-              extraAddress !== '' ? ', ' + data.buildingName : data.buildingName;
+          if (data.buildingName !== "" && data.apartment === "Y") {
+            extraAddress += extraAddress !== "" ? ", " + data.buildingName : data.buildingName
           }
-          if (extraAddress !== '') {
-            fullAddress += ' (' + extraAddress + ')';
+          if (extraAddress !== "") {
+            fullAddress += " (" + extraAddress + ")"
           }
 
           setForm((prevForm) => ({
             ...prevForm,
             userZipCode: data.zonecode,
             userAddress: fullAddress,
-          }));
+          }))
         },
-      }).open();
-    } else {
-      console.warn('Daum Postcode API가 아직 로드되지 않았습니다.');
-      // API 로딩이 완료될 때까지 기다리거나 사용자에게 안내
+      }).open()
     }
-  };
+  }
 
-  // 전화번호 자동 하이픈 추가
-  const handleTelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    let newValue = value.replace(/\D/g, ''); // 숫자만 남기기
-
-    if (newValue.length > 11) {
-      newValue = newValue.substring(0, 11); // 11자리 초과 방지
+  // 다음 단계로
+  const handleNext = () => {
+    if (currentStep < steps.length) {
+      setCurrentStep(currentStep + 1)
     }
+  }
 
-    if (newValue.length <= 3) {
-      // 010
-      newValue = newValue;
-    } else if (newValue.length <= 7) {
-      // 010-XXXX
-      newValue = `${newValue.substring(0, 3)}-${newValue.substring(3)}`;
-    } else {
-      // 010-XXXX-XXXX
-      newValue = `${newValue.substring(0, 3)}-${newValue.substring(3, 7)}-${newValue.substring(7)}`;
+  // 이전 단계로
+  const handlePrev = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1)
     }
-    setForm((prevForm) => ({ ...prevForm, [name]: newValue }));
-  };
+  }
 
   // 회원가입 제출
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
-    setPasswordMatchError(''); // 제출 전 에러 초기화
+    e.preventDefault()
+    setError("")
+    setSuccess("")
 
-    // 폼 유효성 검사 (React 상태와 HTML5 pattern 속성 활용)
-    // HTML5 pattern으로 기본적인 유효성 검사는 되지만, 수동으로도 확인
     if (!emailVerified) {
-      setError('이메일 인증을 완료해주세요.');
-      return;
+      setError("이메일 인증을 완료해주세요.")
+      return
     }
     if (form.userPw !== form.pwdConfirm) {
-      setPasswordMatchError('비밀번호가 일치하지 않습니다.');
-      setError('비밀번호를 확인해주세요.'); // 전체 에러 메시지도 추가
-      return;
+      setPasswordMatchError("비밀번호가 일치하지 않습니다.")
+      setError("비밀번호를 확인해주세요.")
+      return
     }
 
-    // 비밀번호 강도, 패턴 등 추가 유효성 검사는 필요에 따라 여기에 추가
-    // (JSP의 checkPasswordStrength 함수 로직을 React에 맞게 변환하여 사용)
-
-    setLoading(true);
+    setLoading(true)
     try {
-      // register 함수는 'lib/api/auth'에 정의되어 있고,
-      // 'application/x-www-form-urlencoded' 타입으로 전송한다고 가정합니다.
-      await register(form);
-      setSuccess('회원가입이 완료되었습니다!');
-      // 1초 후에 로그인 페이지로 리다이렉트
+      await register(form)
+      setSuccess("회원가입이 완료되었습니다!")
+      setCurrentStep(4)
       setTimeout(() => {
-        router.push('/user/login');
-      }, 1000);
+        router.push("/user/login")
+      }, 3000)
     } catch (err: any) {
-      console.error('회원가입 중 오류 발생:', err.response?.data || err.message);
-      setError(err.response?.data?.message || '회원가입 중 오류가 발생했습니다.');
+      console.error("회원가입 중 오류 발생:", err.response?.data || err.message)
+
+      // 아이디 중복 에러 처리
+      if (err.response?.data?.message?.includes("아이디") || err.response?.data?.message?.includes("중복")) {
+        setError("이미 사용 중인 아이디입니다. 다른 아이디를 입력해주세요.")
+      } else {
+        setError(err.response?.data?.message || "회원가입 중 오류가 발생했습니다.")
+      }
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
+
+  // 단계별 유효성 검사
+  const canProceedToNext = () => {
+    switch (currentStep) {
+      case 1:
+        return agreements.terms && agreements.privacy
+      case 2:
+        return emailVerified
+      case 3:
+        return (
+          form.userId &&
+          form.userName &&
+          form.userPw &&
+          form.pwdConfirm &&
+          form.userTel &&
+          form.userBirth &&
+          form.userZipCode &&
+          form.userAddress &&
+          !passwordMatchError
+        )
+      default:
+        return false
+    }
+  }
 
   return (
-    <div className="container max-w-lg mx-auto py-10">
-      <h2 className="text-2xl font-bold mb-6 text-center">회원가입</h2>
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow">
-        {/* 이메일 인증 섹션 */}
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">
-            이메일 <span className="text-red-500">*</span>
-          </label>
-          <div className="flex gap-2">
-            <input
-              type="email"
-              name="userEmail"
-              id="userEmail" // ID 추가
-              value={form.userEmail}
-              onChange={handleChange}
-              required
-              placeholder="example@email.com"
-              pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
-              className="flex-1 border rounded px-3 py-2"
-              disabled={emailVerified} // 인증 완료 시 이메일 입력 비활성화
-            />
-            <button
-              type="button"
-              id="checkEmail" // ID 추가
-              className="bg-blue-600 text-white px-3 py-2 rounded disabled:bg-gray-400" // Tailwind CSS 스타일
-              onClick={handleSendCode}
-              disabled={loading || emailVerified || !form.userEmail} // 로딩 중, 인증 완료 시, 이메일 미입력 시 비활성화
-            >
-              인증번호 발송
-            </button>
-          </div>
-          {/* 이메일 관련 메시지 출력 */}
-          {emailError && <div className="text-red-500 text-sm mt-1">{emailError}</div>}
-          {emailSuccess && <div className="text-green-600 text-sm mt-1">{emailSuccess}</div>}
-        </div>
-
-        {/* 인증번호 입력 필드 (조건부 렌더링) */}
-        {showVerificationInput && !emailVerified && (
-          <div id="verificationCodeGroup" className="mb-4">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                id="verificationCode" // ID 추가
-                value={verificationCode}
-                onChange={(e) => setVerificationCode(e.target.value)}
-                placeholder="인증번호 입력"
-                required
-                className="flex-1 border rounded px-3 py-2"
-              />
-              <button
-                type="button"
-                id="verifyEmailBtn" // ID 추가
-                className="bg-green-600 text-white px-3 py-2 rounded disabled:bg-gray-400" // Tailwind CSS 스타일
-                onClick={handleVerifyCode}
-                disabled={loading || verificationCode.length === 0} // 로딩 중, 인증번호 미입력 시 비활성화
-              >
-                인증 확인
-              </button>
-            </div>
-            <div id="memailconfirmTxt" className="text-sm mt-1"></div> {/* 메시지 표시 영역, 필요시 React 상태로 관리 */}
-          </div>
-        )}
-
-        {/* 나머지 폼 필드 */}
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">
-            아이디 <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="userId"
-            value={form.userId}
-            onChange={handleChange}
-            required
-            pattern="^[a-zA-Z0-9]{4,12}$"
-            className="w-full border rounded px-3 py-2"
-            placeholder="영문, 숫자로 4~12자 입력"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">
-            이름 <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="userName"
-            value={form.userName}
-            onChange={handleChange}
-            required
-            pattern="^[가-힣]{2,4}$"
-            className="w-full border rounded px-3 py-2"
-            placeholder="한글 2~4자 입력"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">
-            비밀번호 <span className="text-red-500">*</span>
-          </label>
-          <div className="password-input-container relative">
-            <input
-              type="password"
-              name="userPw"
-              id="userPw"
-              value={form.userPw}
-              onChange={handleChange}
-              required
-              className="w-full border rounded px-3 py-2 pr-10"
-              placeholder="영문, 숫자, 특수문자 포함 8~16자"
-            />
-          </div>
-        </div>
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">
-            비밀번호 확인 <span className="text-red-500">*</span>
-          </label>
-          <div className="password-input-container relative">
-            <input
-              type="password"
-              name="pwdConfirm"
-              id="pwdConfirm"
-              value={form.pwdConfirm}
-              onChange={handleChange}
-              required
-              className="w-full border rounded px-3 py-2 pr-10"
-              placeholder="비밀번호를 다시 입력"
-            />
-          </div>
-          {passwordMatchError && (
-            <div id="pwMatchError" className="text-red-500 text-sm mt-1">
-              {passwordMatchError}
-            </div>
-          )}
-        </div>
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">
-            전화번호 <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="tel"
-            name="userTel"
-            value={form.userTel}
-            onChange={handleTelChange}
-            required
-            pattern="^010-\d{4}-\d{4}$"
-            className="w-full border rounded px-3 py-2"
-            placeholder="010-0000-0000"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">
-            생년월일 <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="date"
-            name="userBirth"
-            value={form.userBirth}
-            onChange={handleChange}
-            required
-            className="w-full border rounded px-3 py-2"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">
-            우편번호 <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="userZipCode"
-            id="zipCode"
-            value={form.userZipCode}
-            onChange={handleChange}
-            required
-            className="w-full border rounded px-3 py-2"
-            placeholder="우편번호 입력"
-            readOnly
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">
-            주소 <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="userAddress"
-            id="userAddress"
-            value={form.userAddress}
-            onChange={handleChange}
-            required
-            className="w-full border rounded px-3 py-2"
-            placeholder="도로명 또는 지번 주소 입력"
-            readOnly
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">상세 주소</label>
-          <input
-            type="text"
-            name="userDetailAddress"
-            value={form.userDetailAddress}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
-            placeholder="상세 주소 입력 (선택사항)"
-          />
-        </div>
-        <button
-          type="button"
-          className="w-full bg-gray-300 text-black py-2 rounded hover:bg-gray-400 mb-4"
-          onClick={handleOpenPostcode}
-        >
-          주소 검색
-        </button>
-        {error && <div className="mb-4 text-red-500">{error}</div>}
-        {success && <div className="mb-4 text-green-600">{success}</div>}
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-          disabled={loading || !emailVerified || !!passwordMatchError}
-        >
-          {loading ? '가입 중...' : '회원가입'}
-        </button>
-      </form>
-      <div className="text-center mt-6">
-        <p>
-          이미 계정이 있으신가요?{' '}
-          <Link href="/user/login" className="text-blue-700 underline">
-            로그인
-          </Link>
-        </p>
+    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-violet-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-pink-400/20 to-rose-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
       </div>
-      <Script
-        src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
-        strategy="beforeInteractive"
-      />
+
+      <div className="container max-w-2xl mx-auto py-8 px-4 relative z-10">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="relative mb-6">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full blur-xl opacity-30 animate-pulse"></div>
+            </div>
+            <div className="relative bg-gradient-to-br from-violet-500 to-purple-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto shadow-2xl">
+              <Sparkles className="w-8 h-8 text-white" />
+            </div>
+          </div>
+
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+            MoodSync 회원가입
+          </h1>
+          <p className="text-gray-600">감정 기반 맞춤 추천 서비스에 가입하세요</p>
+
+          <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-500">
+            <Heart className="w-4 h-4 text-pink-500" />
+            <Music className="w-4 h-4 text-blue-500" />
+            <BookOpen className="w-4 h-4 text-green-500" />
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="mb-8">
+          <div className="flex justify-between items-center mb-4">
+            {steps.map((step, index) => {
+              const Icon = step.icon
+              const isActive = currentStep === step.id
+              const isCompleted = currentStep > step.id
+
+              return (
+                <div key={step.id} className="flex flex-col items-center">
+                  <div
+                    className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all duration-300 ${
+                      isCompleted
+                        ? "bg-green-500 text-white"
+                        : isActive
+                          ? "bg-violet-500 text-white"
+                          : "bg-gray-200 text-gray-400"
+                    }`}
+                  >
+                    {isCompleted ? <CheckCircle className="w-6 h-6" /> : <Icon className="w-6 h-6" />}
+                  </div>
+                  <span
+                    className={`text-xs font-medium ${
+                      isActive ? "text-violet-600" : isCompleted ? "text-green-600" : "text-gray-400"
+                    }`}
+                  >
+                    {step.title}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+          <Progress value={progress} className="h-2" />
+        </div>
+
+        {/* Step Content */}
+        <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
+          <CardHeader className="text-center">
+            <CardTitle className="text-xl font-semibold text-gray-800">{steps[currentStep - 1]?.title}</CardTitle>
+            <CardDescription className="text-gray-600">
+              {currentStep === 1 && "서비스 이용약관에 동의해주세요"}
+              {currentStep === 2 && "이메일 인증을 완료해주세요"}
+              {currentStep === 3 && "회원 정보를 입력해주세요"}
+              {currentStep === 4 && "회원가입이 완료되었습니다!"}
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-6">
+            {/* Step 1: 약관 동의 */}
+            {currentStep === 1 && (
+              <div className="space-y-4">
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="allAgree"
+                      checked={agreements.allAgree}
+                      onCheckedChange={(checked) => handleAgreementChange("allAgree", checked as boolean)}
+                    />
+                    <Label htmlFor="allAgree" className="font-semibold text-gray-800">
+                      전체 동의
+                    </Label>
+                  </div>
+
+                  <div className="border-t pt-4 space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="terms"
+                        checked={agreements.terms}
+                        onCheckedChange={(checked) => handleAgreementChange("terms", checked as boolean)}
+                      />
+                      <Label htmlFor="terms" className="text-gray-700">
+                        서비스 이용약관 동의 <span className="text-red-500">*</span>
+                      </Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="privacy"
+                        checked={agreements.privacy}
+                        onCheckedChange={(checked) => handleAgreementChange("privacy", checked as boolean)}
+                      />
+                      <Label htmlFor="privacy" className="text-gray-700">
+                        개인정보 처리방침 동의 <span className="text-red-500">*</span>
+                      </Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="marketing"
+                        checked={agreements.marketing}
+                        onCheckedChange={(checked) => handleAgreementChange("marketing", checked as boolean)}
+                      />
+                      <Label htmlFor="marketing" className="text-gray-700">
+                        마케팅 정보 수신 동의 (선택)
+                      </Label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 2: 이메일 인증 */}
+            {currentStep === 2 && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="userEmail" className="text-sm font-semibold text-gray-700">
+                    이메일 주소 <span className="text-red-500">*</span>
+                  </Label>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Input
+                        id="userEmail"
+                        name="userEmail"
+                        type="email"
+                        value={form.userEmail}
+                        onChange={handleChange}
+                        placeholder="example@email.com"
+                        className="h-12 pr-10"
+                        disabled={emailLocked}
+                      />
+                      {emailLocked ? (
+                        <Lock className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      ) : (
+                        <Unlock className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      )}
+                    </div>
+                    <Button
+                      type="button"
+                      onClick={handleSendCode}
+                      disabled={emailLoading || emailLocked || !form.userEmail}
+                      className="h-12 px-6"
+                    >
+                      {emailLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "인증번호 발송"}
+                    </Button>
+                  </div>
+                </div>
+
+                {showVerificationInput && !verificationLocked && (
+                  <div className="space-y-2">
+                    <Label htmlFor="verificationCode" className="text-sm font-semibold text-gray-700">
+                      인증번호
+                    </Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="verificationCode"
+                        value={verificationCode}
+                        onChange={(e) => setVerificationCode(e.target.value)}
+                        placeholder="인증번호 8자리 입력"
+                        className="h-12"
+                        maxLength={10}
+                      />
+                      <Button
+                        type="button"
+                        onClick={handleVerifyCode}
+                        disabled={verificationCode.length === 0}
+                        className="h-12 px-6"
+                      >
+                        인증 확인
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {emailVerified && (
+                  <Alert className="border-green-200 bg-green-50">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <AlertDescription className="text-green-600 font-medium">
+                      이메일 인증이 완료되었습니다!
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {emailError && (
+                  <Alert className="border-red-200 bg-red-50">
+                    <AlertDescription className="text-red-600">{emailError}</AlertDescription>
+                  </Alert>
+                )}
+
+                {emailSuccess && !emailError && (
+                  <Alert className="border-blue-200 bg-blue-50">
+                    <AlertDescription className="text-blue-600">{emailSuccess}</AlertDescription>
+                  </Alert>
+                )}
+              </div>
+            )}
+
+            {/* Step 3: 정보 입력 */}
+            {currentStep === 3 && (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="userId" className="text-sm font-semibold text-gray-700">
+                      아이디 <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="userId"
+                      name="userId"
+                      value={form.userId}
+                      onChange={handleChange}
+                      placeholder="영문, 숫자 4~12자"
+                      className="h-12"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="userName" className="text-sm font-semibold text-gray-700">
+                      이름 <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="userName"
+                      name="userName"
+                      value={form.userName}
+                      onChange={handleChange}
+                      placeholder="한글 2~4자"
+                      className="h-12"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="userPw" className="text-sm font-semibold text-gray-700">
+                    비밀번호 <span className="text-red-500">*</span>
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="userPw"
+                      name="userPw"
+                      type={showPassword ? "text" : "password"}
+                      value={form.userPw}
+                      onChange={handleChange}
+                      placeholder="영문, 숫자, 특수문자 포함 8~16자"
+                      className="h-12 pr-10"
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-12 px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-gray-400" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-gray-400" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="pwdConfirm" className="text-sm font-semibold text-gray-700">
+                    비밀번호 확인 <span className="text-red-500">*</span>
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="pwdConfirm"
+                      name="pwdConfirm"
+                      type={showPasswordConfirm ? "text" : "password"}
+                      value={form.pwdConfirm}
+                      onChange={handleChange}
+                      placeholder="비밀번호를 다시 입력"
+                      className="h-12 pr-10"
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-12 px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
+                    >
+                      {showPasswordConfirm ? (
+                        <EyeOff className="h-4 w-4 text-gray-400" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-gray-400" />
+                      )}
+                    </Button>
+                  </div>
+                  {passwordMatchError && <p className="text-sm text-red-500">{passwordMatchError}</p>}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="userTel" className="text-sm font-semibold text-gray-700">
+                      전화번호 <span className="text-red-500">*</span>
+                    </Label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Input
+                        id="userTel"
+                        name="userTel"
+                        value={form.userTel}
+                        onChange={handleTelChange}
+                        placeholder="010-0000-0000"
+                        className="h-12 pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="userBirth" className="text-sm font-semibold text-gray-700">
+                      생년월일 <span className="text-red-500">*</span>
+                    </Label>
+                    <div className="relative">
+                      <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Input
+                        id="userBirth"
+                        name="userBirth"
+                        type="date"
+                        value={form.userBirth}
+                        onChange={handleChange}
+                        className="h-12 pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold text-gray-700">
+                    주소 <span className="text-red-500">*</span>
+                  </Label>
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <Input
+                        name="userZipCode"
+                        value={form.userZipCode}
+                        placeholder="우편번호"
+                        className="h-12"
+                        readOnly
+                        required
+                      />
+                      <Button type="button" onClick={handleOpenPostcode} className="h-12 px-6" variant="outline">
+                        <MapPin className="w-4 h-4 mr-2" />
+                        주소 검색
+                      </Button>
+                    </div>
+                    <Input
+                      name="userAddress"
+                      value={form.userAddress}
+                      placeholder="도로명 또는 지번 주소"
+                      className="h-12"
+                      readOnly
+                      required
+                    />
+                    <Input
+                      name="userDetailAddress"
+                      value={form.userDetailAddress}
+                      onChange={handleChange}
+                      placeholder="상세 주소 (선택사항)"
+                      className="h-12"
+                    />
+                  </div>
+                </div>
+
+                {error && (
+                  <Alert className="border-red-200 bg-red-50">
+                    <AlertDescription className="text-red-600">{error}</AlertDescription>
+                  </Alert>
+                )}
+              </form>
+            )}
+
+            {/* Step 4: 완료 */}
+            {currentStep === 4 && (
+              <div className="text-center space-y-6">
+                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                  <CheckCircle className="w-10 h-10 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">회원가입 완료!</h3>
+                  <p className="text-gray-600">
+                    MoodSync에 오신 것을 환영합니다.
+                    <br />
+                    잠시 후 로그인 페이지로 이동합니다.
+                  </p>
+                </div>
+                <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+                  <Heart className="w-4 h-4 text-pink-500" />
+                  <span>감정 기반 맞춤 추천 서비스</span>
+                  <Music className="w-4 h-4 text-blue-500" />
+                </div>
+              </div>
+            )}
+
+            {/* Navigation Buttons */}
+            {currentStep < 4 && (
+              <div className="flex justify-between pt-6">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handlePrev}
+                  disabled={currentStep === 1}
+                  className="h-12 px-6"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  이전
+                </Button>
+
+                {currentStep === 3 ? (
+                  <Button
+                    type="submit"
+                    onClick={handleSubmit}
+                    disabled={loading || !canProceedToNext()}
+                    className="h-12 px-6"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        가입 중...
+                      </>
+                    ) : (
+                      <>
+                        회원가입
+                        <CheckCircle className="w-4 h-4 ml-2" />
+                      </>
+                    )}
+                  </Button>
+                ) : (
+                  <Button type="button" onClick={handleNext} disabled={!canProceedToNext()} className="h-12 px-6">
+                    다음
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Login Link */}
+        <div className="text-center mt-6">
+          <p className="text-gray-600">
+            이미 계정이 있으신가요?{" "}
+            <Link href="/user/login" className="text-violet-600 font-semibold hover:text-violet-700">
+              로그인하기
+            </Link>
+          </p>
+        </div>
+      </div>
+
+      <Script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" strategy="beforeInteractive" />
     </div>
-  );
+  )
 }
 
 declare global {
   interface Window {
-    daum: any;
+    daum: any
   }
 }

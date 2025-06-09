@@ -28,13 +28,7 @@ export default function AppProviders({ children }: { children: React.ReactNode }
       {/* Header는 여기서 로딩 상태를 직접 확인하며 렌더링됩니다. */}
       <Header />
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
-        {/* AuthStore의 loading 상태가 false가 되어야 children이 렌더링됩니다. */}
-        {/* 하지만 Header에서 이미 loading 상태를 처리하고 있으므로,
-            여기서 children 렌더링을 막는 것은 불필요하거나 오히려 문제를 야기할 수 있습니다.
-            대신, children에 로딩 상태를 전달하거나, Header가 로딩을 처리하도록 맡기는 것이 좋습니다.
-            현재 코드에서는 Header가 로딩을 처리하므로, 여기서는 children을 항상 렌더링합니다.
-            핵심은 Header가 로딩 중일 때 '로그인/로그아웃' 버튼을 숨기는 것입니다. */}
-        {children}
+          {children}
       </div>
       <Footer />
     </>

@@ -98,7 +98,8 @@ export function EmotionDashboard() {
 
   return (
     <SidebarProvider>
-      <Sidebar style={{ display: 'flex', paddingTop: '70px' }}>
+      <div className="flex flex-grow">
+      <Sidebar className="flex pt-[70px] ">
         <SidebarHeader>
           <div className="flex items-center gap-2 px-4 py-2">
             <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
@@ -141,6 +142,7 @@ export function EmotionDashboard() {
         </header>
         <div className="flex-1 overflow-auto">{renderContent()}</div>
       </SidebarInset>
+    </div>
     </SidebarProvider>
   )
 }

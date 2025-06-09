@@ -77,6 +77,33 @@ public class UserRecordServiceImpl implements UserRecordService {
 		dto.setRecommendedBooks(userRecordDAO.findInfoByBookNumbers(bookIds));
 		dto.setRecommendedMusics(userRecordDAO.findInfoByMusicNumbers(musicIds));
 
+<<<<<<< HEAD
+		List<YoutubeVideoDTO> youtubeVideoDTOs = new ArrayList<>();
+
+		for (int i = 0; i < dto.getRecommendedMusics().size(); i++) {
+			String videoName = dto.getRecommendedMusics().get(i).getMusicName();
+			List<Map<String, String>> videos = null;
+
+			try {
+				videos = new ArrayList<>();
+				videos.add(youtubeService.searchVideo(videoName));
+			} catch (IOException e) {
+				e.printStackTrace();
+				videos = Collections.emptyList();
+			}
+
+			if (!videos.isEmpty()) {
+				Map<String, String> videoData = videos.get(0);
+				YoutubeVideoDTO videoDTO = new YoutubeVideoDTO(videoData.get("title"), videoData.get("channel"),
+						videoData.get("thumbnail"), videoData.get("videoUrl"));
+				youtubeVideoDTOs.add(videoDTO);
+			}
+		}
+
+		dto.setYoutubeSearchResults(youtubeVideoDTOs);
+
+		log.info("UserRecordServiceImpl : " + dto);
+=======
 //    	List<YoutubeVideoDTO> youtubeVideoDTOs = new ArrayList<>();
 //        
 //        for (int i = 0; i < dto.getRecommendedMusics().size(); i++) {
@@ -106,6 +133,7 @@ public class UserRecordServiceImpl implements UserRecordService {
 //        dto.setYoutubeSearchResults(youtubeVideoDTOs);
 //
 //		log.info("UserRecordServiceImpl : " + dto);
+>>>>>>> 00e5a615a3fd4077341be7390e1885d5d9aee3fb
 
 		return dto;
 	}

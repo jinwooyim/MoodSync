@@ -1,132 +1,173 @@
-// app/user/login/page.tsx
-'use client';
+"use client"
 
-import { useState, useEffect } from 'react';
-import { login } from '@/lib/api/auth';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import useAuthStore from '@/store/authStore'; // Zustand 스토어 임포트
+import type React from "react"
+
+import { useState, useEffect } from "react"
+import { login } from "@/lib/api/auth"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import useAuthStore from "@/store/authStore"
 
 export default function UserLoginPage() {
-  const [userId, setUserId] = useState('');
-  const [userPw, setUserPw] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const [userId, setUserId] = useState("")
+  const [userPw, setUserPw] = useState("")
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
-  // ⭐️ 수정: useAuthStore 셀렉터 함수를 최적화하여 getSnapshot 경고를 피합니다.
-  // 필요한 상태만 구조분해 할당으로 가져오되, 셀렉터 함수는 useCallback으로 메모이제이션하거나
-  // 아예 분리된 useStore를 사용하거나, 단순히 필요한 상태만 나열하는 방식으로 작성합니다.
-  // 여기서는 명확성을 위해 각 상태를 개별적으로 가져오는 방식을 사용합니다.
-  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-  const authLoading = useAuthStore((state) => state.loading);
-  const loginSuccess = useAuthStore((state) => state.loginSuccess); // loginSuccess도 가져옵니다.
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn)
+  const authLoading = useAuthStore((state) => state.loading)
+  const loginSuccess = useAuthStore((state) => state.loginSuccess)
 
-  // ⭐️ 수정: useEffect 로직 개선
   useEffect(() => {
-    // authLoading이 false (초기 인증 확인 완료)이고, isLoggedIn이 true이면 리다이렉트
-    // 로그인 페이지는 로그인이 되어있지 않을 때만 보여져야 합니다.
-    // 따라서, 로그인 성공 후에는 이 페이지가 아니라 다른 페이지로 보내야 합니다.
     if (!authLoading && isLoggedIn) {
-      router.replace('/record'); // 이미 로그인된 상태이므로 /record로 이동
+      router.replace("/record")
     }
-  }, [isLoggedIn, authLoading, router]);
-
+  }, [isLoggedIn, authLoading, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+    e.preventDefault()
+    setLoading(true)
+    setError("")
 
     try {
-      const userData = await login({ userId, userPw });
-      // ⭐️ loginSuccess 함수 호출 누락된 부분 수정 (주석 해제 또는 추가)
-      loginSuccess(userData); // 로그인 성공 시 전역 상태 업데이트
-
-      // ⭐️ 로그인 성공 후 즉시 리다이렉트
-      router.push('/'); // 메인 페이지 또는 적절한 로그인 후 페이지로 리디렉션
+      const userData = await login({ userId, userPw })
+      loginSuccess(userData)
+      router.push("/")
     } catch (err: any) {
-      console.error("로그인 에러:", err);
+      console.error("로그인 에러:", err)
       if (err.response && err.response.data && err.response.data.message) {
-        setError(err.response.data.message);
+        setError(err.response.data.message)
       } else if (err.message) {
-        setError(err.message);
+        setError(err.message)
       } else {
-        setError('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+        setError("로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.")
       }
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  // ⭐️ 수정: authLoading이 true이면 로딩 메시지를 보여주고, 그 외에는 isLoggedIn 상태에 따라 렌더링
   if (authLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <p>로그인 상태 확인 중...</p>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 flex justify-center items-center">
+        <div className="bg-white p-8 rounded-2xl shadow-md">
+          <p className="text-lg text-gray-600">로그인 상태 확인 중...</p>
+        </div>
       </div>
-    );
+    )
   }
 
-  // ⭐️ 수정: authLoading이 false인데 isLoggedIn이 true인 경우, 이미 useEffect에서 리다이렉트되었을 것이므로
-  // 이 페이지는 렌더링할 필요가 없습니다. (혹시 모를 경우를 대비한 방어 코드)
   if (isLoggedIn) {
-      return null;
+    return null
   }
 
-  // isLoggedIn이 false일 때만 로그인 폼을 렌더링
   return (
-    <div className="container max-w-md mx-auto py-10">
-      <div className="text-center mb-8">
-        <div className="text-4xl mb-2">
-          <i className="fa-solid fa-train-subway"></i>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 relative overflow-hidden">
+      <div className="container max-w-md mx-auto py-16 px-4">
+        {/* Hero Section */}
+        <div className="text-center mb-12">
+          <div className="text-6xl mb-6">
+            <i className="fa-solid fa-train-subway text-indigo-600"></i>
+          </div>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">MoodSync</h1>
+          <h2 className="text-2xl font-semibold text-gray-700 mb-2">로그인</h2>
+          <p className="text-lg text-gray-600">감정 기반 맞춤 추천 서비스에 오신 것을 환영합니다</p>
         </div>
-        <h2 className="text-2xl font-bold">로그인</h2>
-      </div>
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow">
-        <div className="mb-4">
-          <label htmlFor="userId" className="block mb-1 font-medium">아이디</label>
-          <input
-            id="userId"
-            name="userId"
-            type="text"
-            required
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
-            className="w-full border rounded px-3 py-2"
-            placeholder="아이디를 입력하세요"
-          />
+
+        {/* Login Form Card */}
+        <div className="bg-white p-8 rounded-2xl shadow-md">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="userId" className="block text-sm font-semibold text-gray-700 mb-2">
+                아이디
+              </label>
+              <input
+                id="userId"
+                name="userId"
+                type="text"
+                required
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                placeholder="아이디를 입력하세요"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="userPw" className="block text-sm font-semibold text-gray-700 mb-2">
+                비밀번호
+              </label>
+              <input
+                id="userPw"
+                name="userPw"
+                type="password"
+                required
+                value={userPw}
+                onChange={(e) => setUserPw(e.target.value)}
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                placeholder="비밀번호를 입력하세요"
+              />
+            </div>
+
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                <div className="text-red-600 text-sm font-medium">{error}</div>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="w-full bg-indigo-600 text-white py-3 px-6 rounded-xl font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={loading}
+            >
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  로그인 중...
+                </div>
+              ) : (
+                "로그인"
+              )}
+            </button>
+          </form>
         </div>
-        <div className="mb-4">
-          <label htmlFor="userPw" className="block mb-1 font-medium">비밀번호</label>
-          <input
-            id="userPw"
-            name="userPw"
-            type="password"
-            required
-            value={userPw}
-            onChange={(e) => setUserPw(e.target.value)}
-            className="w-full border rounded px-3 py-2"
-            placeholder="비밀번호를 입력하세요"
-          />
+
+        {/* Sign Up Link */}
+        <div className="text-center mt-8">
+          <div className="bg-white p-6 rounded-2xl shadow-md">
+            <p className="text-gray-600 mb-2">MoodSync 회원이 아니신가요?</p>
+            <Link
+              href="/user/join"
+              className="inline-flex items-center text-indigo-600 font-semibold hover:text-indigo-700 transition-colors duration-200"
+            >
+              회원가입하기
+              <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
         </div>
-        {error && <div className="mb-4 text-red-500 text-sm font-medium">{error}</div>}
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-          disabled={loading}
-        >
-          {loading ? '로그인 중...' : '로그인'}
-        </button>
-      </form>
-      <div className="text-center mt-6">
-        <p>
-          MoodSync 회원이 아니신가요?{' '}
-          <Link href="/user/join" className="text-blue-700 underline">
-            회원가입
-          </Link>
-        </p>
       </div>
     </div>
-  );
+  )
 }

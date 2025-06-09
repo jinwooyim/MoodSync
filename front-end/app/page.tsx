@@ -125,9 +125,11 @@ export default function HomePage() {
     const emotionKeys = ['happy', 'sad', 'stress', 'calm', 'excited', 'tired'] as const;
     type EmotionKey = typeof emotionKeys[number];
 
-    const normalizedEmotionData: Record<EmotionKey, number> = Object.fromEntries(
-      emotionKeys.map((key) => [key, (emotionSliderValues[key] ?? 0) / 100]) // emotionValues 대신 emotionSliderValues 사용
-    ) as Record<EmotionKey, number>;
+      const normalizedEmotionData: Record<EmotionKey, number> = Object.fromEntries(
+        emotionKeys.map((key) => [key, emotionValues[key] / 100])
+      ) as Record<EmotionKey, number>;
+
+      console.log("@# normalizedEmotionData =>", normalizedEmotionData);
 
     try {
       const res = await fetch('/api/sendEmotion', {

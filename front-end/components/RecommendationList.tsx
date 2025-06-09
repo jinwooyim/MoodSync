@@ -32,7 +32,7 @@ export default function RecommendationList({
   return (
     <div className="mb-8">
       <div className="flex items-center justify-center mb-6">
-        <Badge className={selectedEmotionData?.color}>선택된 감정: {selectedEmotionData?.name}</Badge>
+        {/* <Badge className={selectedEmotionData?.color}>선택된 감정: {selectedEmotionData?.name}</Badge> */}
       </div>
 
       <Tabs

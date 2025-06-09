@@ -247,7 +247,7 @@ export default function FaceEmotionDetector({ onEmotionDetected }: FaceEmotionDe
                     <span className="sr-only">뒤로 가기</span>
                   </Button>
                 </div>
-                <p className="text-lg font-semibold mb-2 text-gray-800">감지된 무드 스코어</p>
+                <p className="text-lg font-semibold mb-2 text-gray-800 text-center">감지된 무드 스코어</p>
                 <div className="grid grid-cols-2 gap-2 text-left">
                   {Object.entries(mappedMoods).map(([mood, score]) => (
                     <div key={mood} className="flex justify-between items-center bg-gray-50 p-2 rounded-md shadow-sm">

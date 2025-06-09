@@ -98,7 +98,7 @@ export function EmotionDashboard() {
 
   return (
     <SidebarProvider>
-      <Sidebar>
+      <Sidebar style={{ display: 'flex', paddingTop: '70px' }}>
         <SidebarHeader>
           <div className="flex items-center gap-2 px-4 py-2">
             <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">

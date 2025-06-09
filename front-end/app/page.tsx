@@ -93,6 +93,8 @@ export default function HomePage() {
         emotionKeys.map((key) => [key, emotionValues[key] / 100])
       ) as Record<EmotionKey, number>;
 
+      console.log("@# normalizedEmotionData =>", normalizedEmotionData);
+
       try {
         const res = await fetch('/api/sendEmotion', {
           method: 'POST',

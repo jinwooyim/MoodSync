@@ -19,7 +19,7 @@ export default function HomePage() {
   const selectedEmotionData = emotions.find((e) => e.id === selectedEmotion);
   // emotionValues는 EmotionValuesDisplay에서만 사용될 것으로 보이며, 슬라이더 값과는 별개입니다.
   const [emotionValues, setEmotionValues] = useState<Record<string, number>>({
-    happy: 0, sad: 0, stress: 0, calm: 0, excited: 0, tired: 0
+    happy: 0, sad: 0, stressed: 0, calm: 0, excited: 0, tired: 0
   });
   const [searchValue, setSearchValue] = useState<string>(""); // 현재 사용되지 않음
 
@@ -79,7 +79,7 @@ export default function HomePage() {
       const moodKeyToId: Record<string, string> = {
         행복: 'happy',
         슬픔: 'sad',
-        스트레스: 'stressd',
+        스트레스: 'stressed',
         평온: 'calm',
         신남: 'excited',
         피곤함: 'tired',

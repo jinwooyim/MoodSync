@@ -1,23 +1,22 @@
-// app/page.tsx (이전과 동일)
+// app/page.tsx
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import ImageSlider from '@/components/ImageSlider';
 import EmotionSelection from "@/components/EmotionSelection";
 import RecommendationList from "@/components/RecommendationList";
-import EmotionSliderCard from "@/components/EmotionSliderCard"; // <-- 이 컴포넌트가 이제 내부에서 전환을 담당
-import EmotionValuesDisplay from "@/components/EmotionValuesDisplay";
+import EmotionSliderCard from "@/components/EmotionSliderCard";
 import FaceEmotionDetector from '@/components/FaceEmotionDetector';
 import { CustomMoodScores } from '@/types/emotion';
-import { RecommendationResult } from "@/types/index"; // 새로 추가한 타입(사용자 감정 타입)
+import { RecommendationResult } from "@/types/index";
 
 // 데이터 임포트 경로
 import { emotions } from "@/data/emotions";
-import { musicRecommendations } from "@/data/musicRecommendations";
-import { activityRecommendations } from "@/data/activityRecommendations";
+// import { musicRecommendations } from "@/data/musicRecommendations"; // 현재 사용되지 않음
+// import { activityRecommendations } from "@/data/activityRecommendations"; // 현재 사용되지 않음
 
-import { Input } from "@/components/ui/input"; // 헤더로 옮김 (일단 살렸습니다!)
+// import { Input } from "@/components/ui/input"; // 현재 사용되지 않음
 
 export default function HomePage() {
   const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null);
@@ -25,189 +24,262 @@ export default function HomePage() {
   const [emotionValues, setEmotionValues] = useState<Record<string, number>>({
     happy: 0, sad: 0, stress: 0, calm: 0, excited: 0, tired: 0
   });
-  const [searchValue, setSearchValue] = useState<string>(""); // 헤더로 옮김 (일단 살렸습니다!)
+  const [searchValue, setSearchValue] = useState<string>("");
 
-  // 감정별 슬라이더 값 상태 (예: { happy: 50, sad: 30, ... })
   const [emotionSliderValues, setEmotionSliderValues] = useState<Record<string, number>>({});
   const [sliderControlledEmotion, setSliderControlledEmotion] = useState<string | null>(null);
 
-  // 감정 분석 결과 상태
   const [latestDetectedMoods, setLatestDetectedMoods] = useState<CustomMoodScores | null>(null);
-  const [recommendationResult, setRecommendationResult] = useState<RecommendationResult | null>(null); // 🎯
-  // 슬라이더 값 변경 핸들러 (감정별로 값 저장)
+
+  // ✨ recommendationResult 타입에 `recommendationEmotionId` 필드를 추가하여,
+  // 이 추천 결과가 어떤 감정을 기반으로 생성되었는지 기록합니다.
+  // 그리고 map 타입은 이제 각 추천 목록에 직접 들어가지 않고, RecommendationResult 안에서 통합됩니다.
+  const [recommendationResult, setRecommendationResult] = useState<(Omit<RecommendationResult, 'musicRecommendations' | 'activityRecommendations' | 'bookRecommendations'> & {
+    musicRecommendations: RecommendationResult['musicRecommendations'][string]; // 특정 감정에 대한 배열만 받음
+    activityRecommendations: RecommendationResult['activityRecommendations'][string]; // 특정 감정에 대한 배열만 받음
+    bookRecommendations: RecommendationResult['bookRecommendations'][string]; // 특정 감정에 대한 배열만 받음
+    recommendationEmotionId: string | null;
+  }) | null>(null);
+
+  const [recommendationDirty, setRecommendationDirty] = useState(false);
+
+  // --- 팝업 관련 상태 및 Ref 추가 ---
+  const emotionSelectionRef = useRef<HTMLDivElement>(null);
+  const [showFloatingEmotionSelection, setShowFloatingEmotionSelection] = useState(false);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    if (!emotionSelectionRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // `entry.boundingClientRect.top`은 현재 뷰포트 상단 기준 요소의 위치를 나타냅니다.
+        // 이 값이 음수이면서 요소가 뷰포트 밖으로 나갔을 때 (isIntersecting: false)만 팝업을 보여줍니다.
+        // 즉, 스크롤을 "아래로" 내려서 요소가 화면 위로 사라질 때만 팝업이 나타나게 됩니다.
+        // `entry.boundingClientRect.top < 0` 조건은 스크롤이 아래로 내려갔을 때 요소를 지나친 경우를 의미합니다.
+        const isScrollingDownAndOutOfView = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+        
+        // 스크롤 방향 감지 (선택 사항: 더 정확한 제어를 위해)
+        // const currentScrollY = window.scrollY;
+        // const isScrollingDown = currentScrollY > lastScrollY.current;
+        // lastScrollY.current = currentScrollY;
+
+        // setShowFloatingEmotionSelection(isScrollingDownAndOutOfView && isScrollingDown);
+        // ✨ 더 간결하게, 단순히 요소가 위로 사라졌을 때만 팝업을 띄웁니다.
+        setShowFloatingEmotionSelection(isScrollingDownAndOutOfView);
+      },
+      {
+        root: null, // 뷰포트
+        rootMargin: '-100px 0px 0px 0px',
+        threshold: 0
+      }
+    );
+
+    observer.observe(emotionSelectionRef.current);
+
+    return () => {
+      if (emotionSelectionRef.current) {
+        observer.unobserve(emotionSelectionRef.current);
+      }
+    };
+  }, []);
+
   const handleSliderValueChange = (value: number, emotionId: string | null) => {
     if (emotionId) {
       setEmotionSliderValues((prev) => ({ ...prev, [emotionId]: value }));
       setSelectedEmotion(emotionId);
       setSliderControlledEmotion(emotionId);
+      setRecommendationDirty(true); // 슬라이더 값 변경 시 dirty
     }
   };
 
-  // 감정 분석 결과를 받아오면, 각 감정별 슬라이더 값에 반영
   const handleEmotionDetected = (moodScores: CustomMoodScores | null) => {
-      setLatestDetectedMoods(moodScores);
-      if (moodScores) {
-        // CustomMoodScores의 key(한글)와 emotions의 id(영문) 매핑 필요
-        const moodKeyToId: Record<string, string> = {
-          행복: 'happy',
-          슬픔: 'sad',
-          스트레스: 'stressed',
-          평온: 'calm',
-          신남: 'excited',
-          피곤함: 'tired',
-        };
-        const newSliderValues: Record<string, number> = { ...emotionSliderValues };
-        Object.entries(moodScores).forEach(([moodKey, score]) => {
-          const id = moodKeyToId[moodKey];
-          if (id) newSliderValues[id] = Math.round(score); // 0~100 정수로 반영
-        });
-        setEmotionSliderValues(newSliderValues);
-        // 가장 높은 감정 자동 선택
-        const maxEntry = Object.entries(moodScores).reduce((max, cur) => cur[1] > max[1] ? cur : max, ["", 0]);
-        if (moodKeyToId[maxEntry[0]]) {
-          setSelectedEmotion(moodKeyToId[maxEntry[0]]);
-          setSliderControlledEmotion(moodKeyToId[maxEntry[0]]);
-        }
+    setLatestDetectedMoods(moodScores);
+    if (moodScores) {
+      const moodKeyToId: Record<string, string> = {
+        행복: 'happy',
+        슬픔: 'sad',
+        스트레스: 'stressed',
+        평온: 'calm',
+        신남: 'excited',
+        피곤함: 'tired',
+      };
+      const newSliderValues: Record<string, number> = { ...emotionSliderValues };
+
+      Object.entries(moodScores).forEach(([moodKey, score]) => {
+        const id = moodKeyToId[moodKey];
+        if (id) newSliderValues[id] = Math.round(score);
+      });
+
+      setEmotionSliderValues(newSliderValues);
+      const maxEntry = Object.entries(moodScores).reduce((max, cur) => cur[1] > max[1] ? cur : max, ["", 0]);
+      if (moodKeyToId[maxEntry[0]]) {
+        setSelectedEmotion(moodKeyToId[maxEntry[0]]);
+        setSliderControlledEmotion(moodKeyToId[maxEntry[0]]);
       }
+    }
   };
 
-    const handleSendEmotion = async () => {
-      const emotionKeys = ['happy', 'sad', 'stress', 'calm', 'excited', 'tired'] as const;
-      type EmotionKey = typeof emotionKeys[number];
+  const handleEmotionSelectClick = (emotionId: string) => {
+    setSelectedEmotion(emotionId);
+    setSliderControlledEmotion(null);
 
-      // 모든 감정값이 number이고 0~100 범위인지 확인
-      // const hasValidValues = emotionKeys.every(
-      //   (key) =>
-      //     typeof emotionValues[key] === 'number' &&
-      //     !isNaN(emotionValues[key]) &&
-      //     emotionValues[key] >= 0 &&
-      //     emotionValues[key] <= 100
-      // );
-
-      // if (!hasValidValues) {
-      //   alert("모든 감정의 값을 0~100 범위로 입력해주세요.");
-      //   return;
-      // }
-
-      const normalizedEmotionData: Record<EmotionKey, number> = Object.fromEntries(
-        emotionKeys.map((key) => [key, emotionValues[key] / 100])
-      ) as Record<EmotionKey, number>;
-
-      try {
-        const res = await fetch('/api/sendEmotion', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(normalizedEmotionData),
-        });
-
-        const result = await res.json();
-        console.log('🎯 추천 결과:', result);
-
-        const emotion = selectedEmotion ?? "happy";
-
-        setRecommendationResult({
-          musicRecommendations: {
-            [emotion]: result.music_dtos.map((m: any) => ({
-              title: m.musicName,
-              artist: m.musicAuthor,
-              genre: "알 수 없음",
-            })),
-          },
-          activityRecommendations: {
-            [emotion]: result.act_dtos.map((a: any) => ({
-              activity: a.actingName,
-              type: "일상",
-              duration: "30분",
-            })),
-          },
-          bookRecommendations: {
-            [emotion]: result.book_dtos.map((b: any) => ({
-              title: b.bookName,
-              author: b.bookAuthor,
-              genre: b.bookGenre ?? "미정",
-              description: b.bookDescription ?? "",
-            })),
-          },
-        });
-      } catch (err) {
-        console.error('추천 요청 실패:', err);
-        alert("추천 정보를 불러오지 못했습니다. 다시 시도해주세요.");
+    setEmotionSliderValues((prev) => {
+      const currentVal = prev[emotionId];
+      if (currentVal === undefined || currentVal === 0) {
+        return { ...prev, [emotionId]: 50 };
       }
-    };
+      return prev;
+    });
+  };
 
+  const handleSendEmotion = async () => {
+    const emotionKeys = ['happy', 'sad', 'stressed', 'calm', 'excited', 'tired'] as const;
+    type EmotionKey = typeof emotionKeys[number];
 
-  // 현재 선택된 감정의 슬라이더 값 (없으면 50)
+    const normalizedEmotionData: Record<EmotionKey, number> = Object.fromEntries(
+        emotionKeys.map((key) => [key, (emotionSliderValues[key] ?? 0) / 100])
+    ) as Record<EmotionKey, number>;
+
+    // 가장 높은 감정 id를 찾음
+    const maxEmotionId = emotionKeys.reduce((maxKey, key) => {
+      return (emotionSliderValues[key] ?? 0) > (emotionSliderValues[maxKey] ?? 0) ? key : maxKey;
+    }, emotionKeys[0]);
+
+    console.log("@# normalizedEmotionData =>", normalizedEmotionData);
+
+    try {
+      const res = await fetch('/api/sendEmotion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(normalizedEmotionData),
+      });
+
+      const result = await res.json();
+      console.log('🎯 추천 결과:', result);
+
+      // 가장 높은 감정 id를 추천 기준으로 사용
+      const emotionUsedForRecommendation = maxEmotionId;
+
+      setRecommendationResult({
+        musicRecommendations: result.music_dtos.map((m: any) => ({
+          title: m.musicName,
+          artist: m.musicAuthor,
+          genre: "알 수 없음",
+        })),
+        activityRecommendations: result.act_dtos.map((a: any) => ({
+          activity: a.actingName,
+          type: "일상",
+          duration: "30분",
+        })),
+        bookRecommendations: result.book_dtos.map((b: any) => ({
+          title: b.bookName,
+          author: b.bookAuthor,
+          genre: b.bookGenre ?? "미정",
+          description: b.bookDescription ?? "",
+        })),
+        recommendationEmotionId: emotionUsedForRecommendation,
+      });
+      setRecommendationDirty(false); // 추천 요청 시 dirty 해제
+    } catch (err) {
+      console.error('추천 요청 실패:', err);
+      alert("추천 정보를 불러오지 못했습니다. 다시 시도해주세요.");
+      setRecommendationResult(null);
+    }
+  };
+
   const currentSliderValue = selectedEmotion ? (emotionSliderValues[selectedEmotion] ?? 50) : 50;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 relative overflow-hidden">
       <div>
-        <ImageSlider/>
+        <ImageSlider />
         <main className="container mx-auto px-4 py-8">
-          {/* Hero Section */}
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">지금 당신의 기분은 어떠신가요?</h2>
             <p className="text-xl text-gray-600 max-w-4xl mx-auto">
               현재 감정에 맞는 음악과 활동, 도서를 추천해드립니다. 감정을 선택하고 맞춤형 추천을 받아보세요.
             </p>
           </div>
-          
-          <EmotionSelection
-            selectedEmotion={selectedEmotion}
-            onSelectEmotion={(emotionId) => {
-              setSelectedEmotion(emotionId);
-              setSliderControlledEmotion(null); // 감정 선택 시 슬라이더 제어 해제 (필요시)
-            }}
-          />
+          <div ref={emotionSelectionRef}>
+            <EmotionSelection
+              selectedEmotion={selectedEmotion}
+              onSelectEmotion={handleEmotionSelectClick}
+              emotionValues={emotionSliderValues}
+            />
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10 w-full">
-            {/* 왼쪽: Face 감정 분석 */}
-            <div className="w-full h-full p-6 bg-white rounded-2xl shadow-md flex items-center justify-center">
-              <FaceEmotionDetector onEmotionDetected={handleEmotionDetected} />
+            <div className="flex flex-col justify-between space-y-6 w-full">
+              <div className="w-full p-6 bg-white rounded-2xl hover:shadow-lg transition-shadow duration-200 shadow-md ">
+                <FaceEmotionDetector onEmotionDetected={handleEmotionDetected} />
+              </div>
             </div>
 
-            {/* 오른쪽: 슬라이더 + 감정값 */}
-            <div className="flex flex-col justify-between h-full space-y-6 w-full">
-              <div className="w-full p-6 bg-white rounded-2xl shadow-md">
-              {/* <div className="w-full p-6 bg-sky-50 rounded-2xl shadow-md"> */}
+            <div className="flex flex-col justify-between space-y-6 w-full">
+              <div className="w-full p-6 bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-200 ">
                 <EmotionSliderCard
                   selectedEmotionData={selectedEmotionData}
                   onEmotionValueChange={handleSliderValueChange}
                   initialEmotionValue={currentSliderValue}
                 />
               </div>
-              <div className="w-full p-6 bg-white rounded-2xl shadow-md">
-                <EmotionValuesDisplay
-                  emotions={emotions}
-                  emotionValues={emotionSliderValues}
-                  onValuesChange={setEmotionValues}
-                />
-              </div>
             </div>
           </div>
 
-          {/* 입력된 감정들로 출력 결과 도출(버튼 클릭시) */}
-          <div className="text-center mt-6">
-          <button
-            onClick={handleSendEmotion}
-            className="bg-indigo-600 text-white px-6 py-2 rounded-lg shadow hover:bg-indigo-700 transition"
-          >
-            감정 기반 추천 요청하기
-          </button>
+          <div className="text-center mt-6 ">
+            <button
+              onClick={handleSendEmotion}
+              className="bg-indigo-600 text-white px-6 py-2 rounded-lg shadow hover:bg-indigo-700 transition"
+            >
+              감정 기반 추천 요청하기
+            </button>
           </div>
-
-          {/* Recommendations */}
-          {selectedEmotion && selectedEmotionData && recommendationResult &&( //<== recommendationResult  추가
+          
+          {/* Recommendations ✨ 출력 조건 변경 */}
+          {/* recommendationResult가 있을 때만 렌더링하며, 현재 UI의 selectedEmotion과는 독립적으로 작동합니다. */}
+          {recommendationResult && (
             <RecommendationList
-              selectedEmotion={selectedEmotion}
-              selectedEmotionData={selectedEmotionData}
               musicRecommendations={recommendationResult.musicRecommendations}
               activityRecommendations={recommendationResult.activityRecommendations}
               bookRecommendations={recommendationResult.bookRecommendations}
+              recommendationEmotionId={recommendationResult.recommendationEmotionId}
+              recommendationDirty={recommendationDirty}
             />
           )}
         </main>
       </div>
+      {showFloatingEmotionSelection && (
+        <div
+          className="fixed right-4 top-1/2 -translate-y-1/2 z-50 p-4 bg-white rounded-lg shadow-xl border border-gray-100 max-h-[90vh] overflow-y-auto
+                     opacity-70 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+        >
+          <h4 className="text-lg font-bold text-gray-800 mb-4 text-center pointer-events-auto">
+            현재 감정 선택
+          </h4>
+          <div className="flex flex-col gap-2 pointer-events-auto">
+            {emotions.map((emotion) => (
+              <div
+                key={`floating-${emotion.id}`}
+                className={`flex items-center p-2 rounded-md cursor-pointer transition-colors duration-150 hover:bg-gray-50
+                            ${selectedEmotion === emotion.id ? "bg-purple-100 ring-1 ring-purple-400" : ""}
+                `}
+                onClick={() => handleEmotionSelectClick(emotion.id)}
+              >
+                {emotion.icon && (
+                  <emotion.icon className="w-6 h-6 mr-2 text-gray-600" />
+                )}
+                <span className="font-medium text-gray-800 flex-grow">{emotion.name}</span>
+                {emotionSliderValues[emotion.id] !== undefined && emotionSliderValues[emotion.id] > 0 && (
+                  <span className="text-sm font-bold text-indigo-600 ml-auto">
+                    {emotionSliderValues[emotion.id]}%
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

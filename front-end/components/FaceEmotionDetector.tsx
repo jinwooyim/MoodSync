@@ -6,7 +6,7 @@ import * as faceapi from 'face-api.js';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Sparkles,ArrowLeft } from 'lucide-react'; // Sparkles 아이콘만 사용
+import { ArrowLeft, ScanFace} from 'lucide-react';
 
 // TensorFlow.js 코어 및 백엔드 모듈 임포트 추가
 import * as tf from '@tensorflow/tfjs-core';
@@ -139,15 +139,14 @@ export default function FaceEmotionDetector({ onEmotionDetected }: FaceEmotionDe
 
 // showUpload 상태에 따라 다른 UI 렌더링
   if (!showUpload) { // selectedEmotionData가 없으면 항상 Call to Action 카드 표시
-    // 초기 Call to Action 카드 UI
     return (
-      <div className="text-center max-w-md mx-auto mb-8"> {/* 외부 div 클래스 유지 */}
+      <div className="w-full h-full flex items-center justify-center text-center"> 
         <Card
-          className="cursor-pointer hover:shadow-lg transition-shadow duration-200"
-          onClick={() => setShowUpload(true)} // 클릭 이벤트 추가
+          className="shadow-none border-none cursor-pointer w-full h-full" 
+          onClick={() => setShowUpload(true)}
         >
-          <CardContent className="p-8">
-            <Sparkles className="w-12 h-12 mx-auto mb-4 text-purple-500" />
+          <CardContent className="p-8 flex flex-col items-center justify-center h-full"> 
+            <ScanFace className="w-12 h-12 mx-auto mb-4 text-purple-500" />
             <h3 className="text-xl font-semibold mb-2">얼굴 감정 분석</h3>
             <p className="text-gray-600 mb-4">
               클릭하여 이미지를 업로드하고 얼굴 감정을 분석해보세요.
@@ -159,8 +158,8 @@ export default function FaceEmotionDetector({ onEmotionDetected }: FaceEmotionDe
   }
 
   return (
-    <div className="text-center max-w-md mx-auto mb-8"> {/* 외부 div 클래스 유지 */}
-      <Card className="p-6">
+    <div> 
+      <Card className="border-none shadow-none p-6">
         <CardContent className="flex flex-col items-center justify-center p-0">
           <div className="w-full flex justify-start mb-4">
             <button
@@ -174,8 +173,10 @@ export default function FaceEmotionDetector({ onEmotionDetected }: FaceEmotionDe
           </div>
         
           <>
+          {/* 얼굴 감정 분석 UI */}
+            <ScanFace className="w-12 h-12 mx-auto mb-4 " />
             <h3 className="text-2xl font-bold text-gray-800 mb-4">
-              이미지 업로드
+              얼굴 감정 분석
             </h3>
             {loadingModels && <p className="text-center text-blue-500 mb-4">모델 로딩 중...</p>}
             {errorMessage && <p className="text-center text-red-500 mb-4">{errorMessage}</p>}
@@ -186,11 +187,11 @@ export default function FaceEmotionDetector({ onEmotionDetected }: FaceEmotionDe
                 accept="image/*"
                 onChange={handleImageUpload}
                 disabled={loadingModels}
-                className="file:text-blue-600 file:font-semibold file:bg-blue-100 file:border-none file:rounded-md file:py-2 file:px-4 hover:file:bg-blue-200"
+                className=" h-13 file:text-blue-600 file:font-semibold file:bg-blue-100 file:border-none file:rounded-md file:py-2 file:px-4 hover:file:bg-blue-200"
               />
 
             <p className="text-md text-gray-500 text-center">
-              감정 분석 결과는 얼굴 인식 기술을 기반으로 하며, 정확도는 이미지 품질과 조명에 따라 달라질 수 있습니다.
+              감정 분석 결과는 얼굴 인식 기술을 기반으로 하며, <br></br>정확도는 이미지 품질과 조명에 따라 달라질 수 있습니다.
             </p>
               {imageSrc && (
                 <div className="relative border-2 border-purple-300 rounded-lg overflow-hidden shadow-md">
@@ -246,7 +247,7 @@ export default function FaceEmotionDetector({ onEmotionDetected }: FaceEmotionDe
                     <span className="sr-only">뒤로 가기</span>
                   </Button>
                 </div>
-                <p className="text-lg font-semibold mb-2 text-gray-800">감지된 무드 스코어</p>
+                <p className="text-lg font-semibold mb-2 text-gray-800 text-center">감지된 무드 스코어</p>
                 <div className="grid grid-cols-2 gap-2 text-left">
                   {Object.entries(mappedMoods).map(([mood, score]) => (
                     <div key={mood} className="flex justify-between items-center bg-gray-50 p-2 rounded-md shadow-sm">

@@ -5,7 +5,7 @@ import Link from 'next/link'; // Link 컴포넌트 사용 시 임포트
 
 export default function Footer() {
   return (
-    <footer className="bg-white border-t mt-16">
+    <footer className="bg-white border-t " >
       <div className="container mx-auto px-4 py-8">
         <div className="grid md:grid-cols-4 gap-8">
           <div>

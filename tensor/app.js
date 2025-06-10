@@ -92,9 +92,9 @@ async function ModelTraining(response){
 
     // 5. 모델 훈련
     await model.fit(xs, ysOneHot, { // xs : 모델 입력 데이터[배치 크기, 특성 개수], usOneHot[배치 크기, 클래스 개수] : 레이블 데이터
-      epochs: 600, // 데이터셋에 대해 학습을 50번 반복
+      epochs: 600, // 에포크 = 학습 반복 횟수
       batchSize: 16, // 한 번에 모델에 입력하는 데이터의 개수
-      shuffle: true, //  epoch마다 학습 데이터의 순서를 섞어서
+      shuffle: true, //  셔플 - 트루 = 데이터순서 다 섞음
       callbacks: {
         onEpochEnd: (epoch, logs) => { // 손실(loss), 정확도(acc)
           console.log(`Epoch ${epoch + 1}: loss = ${logs.loss.toFixed(4)}, acc = ${logs.acc.toFixed(4)}`);
@@ -146,7 +146,13 @@ app.post('/predict', express.json(), async (req, res) => {
     
     const inputData = req.body; // 예시 : [0.12, 0.14, 0.35, 0. 65, 0.75, 0.00]
     console.log("predict inputData =>" , inputData);
-    const { happy, sad, stress, calm, excited, tired } = inputData;
+    let { happy, sad, stress, calm, excited, tired } = inputData;
+    happy = happy ?? 0;
+    sad = sad ?? 0;
+    stress = stress ?? 0;
+    calm = calm ?? 0;
+    excited = excited ?? 0;
+    tired = tired ?? 0;
     console.log("predict happy =>" , happy);
     console.log("predict sad =>" , sad);
     console.log("predict stress =>" , stress);

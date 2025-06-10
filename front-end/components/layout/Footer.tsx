@@ -19,19 +19,13 @@ export default function Footer() {
             <h4 className="font-semibold mb-4">서비스</h4>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
-                <Link href="#" className="hover:text-gray-900">
                   음악 추천
-                </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-gray-900">
                   활동 추천
-                </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-gray-900">
                   감정 기록
-                </Link>
               </li>
             </ul>
           </div>
@@ -59,17 +53,17 @@ export default function Footer() {
             <h4 className="font-semibold mb-4">정보</h4>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
-                <Link href="#" className="hover:text-gray-900">
+                <Link href="/privacy" className="hover:text-gray-900">
                   개인정보처리방침
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-gray-900">
+                <Link href="/terms" className="hover:text-gray-900">
                   이용약관
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-gray-900">
+                <Link href="/about" className="hover:text-gray-900">
                   회사소개
                 </Link>
               </li>

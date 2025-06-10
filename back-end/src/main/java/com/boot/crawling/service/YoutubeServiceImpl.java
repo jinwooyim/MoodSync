@@ -66,13 +66,7 @@ public class YoutubeServiceImpl implements YoutubeService {
 	@Override
 	public Map<String, String> searchVideo(String query) throws IOException {
 		String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
-		String urlStr = SEARCH_URL + "?part=snippet" + "&q=" + encodedQuery + "&type=video" + "&maxResults=1" + // Make
-																												// sure
-																												// to
-																												// limit
-																												// to 1
-																												// result
-				"&key=" + API_KEY;
+		String urlStr = SEARCH_URL + "?part=snippet" + "&q=" + encodedQuery + "&type=video" + "&maxResults=1" + "&key=" + API_KEY;
 
 		URL url = new URL(urlStr);
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -100,7 +94,7 @@ public class YoutubeServiceImpl implements YoutubeService {
 		}
 	}
     
-    // test YouTube RSS Feed 방식
+    // test YouTube RSS Feed 방식 <- 503 error
 //    @Override
 //    public Map<String, String> searchVideo(String query) throws IOException {
 //        String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);

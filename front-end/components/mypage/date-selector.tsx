@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { format } from "date-fns"
+import { format, isAfter } from "date-fns"
 import { ko } from "date-fns/locale"
 import { CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -12,15 +12,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 interface DateSelectorProps {
   selectedDate: Date
   onDateChange: (date: Date) => void
-  availableDates: Date[]
 }
 
-export function DateSelector({ selectedDate, onDateChange, availableDates }: DateSelectorProps) {
+export function DateSelector({ selectedDate, onDateChange }: DateSelectorProps) {
   const [open, setOpen] = useState(false)
-
-  const isDateAvailable = (date: Date) => {
-    return availableDates.some((availableDate) => format(availableDate, "yyyy-MM-dd") === format(date, "yyyy-MM-dd"))
-  }
 
   return (
     <div className="flex flex-col space-y-2">
@@ -40,12 +35,12 @@ export function DateSelector({ selectedDate, onDateChange, availableDates }: Dat
             mode="single"
             selected={selectedDate}
             onSelect={(date) => {
-              if (date && isDateAvailable(date)) {
+              if (date && !isAfter(date, new Date())) {
                 onDateChange(date)
                 setOpen(false)
               }
             }}
-            disabled={(date) => !isDateAvailable(date)}
+            disabled={(date) => isAfter(date, new Date())}
             initialFocus
             locale={ko}
           />

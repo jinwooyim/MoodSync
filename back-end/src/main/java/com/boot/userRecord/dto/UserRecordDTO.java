@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserRecordDTO {
     private long id;
+    private int userNumber;
 
     private int happy;
     private int sad;

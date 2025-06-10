@@ -13,15 +13,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 @Service("YoutubeService")
 public class YoutubeServiceImpl implements YoutubeService {
-	private static final String API_KEY = "AIzaSyA6lwpMPY1KZQMWhnRSlBj7VsHnnUAGVw8";
+    private static final String API_KEY = "key";
     private static final String SEARCH_URL = "https://www.googleapis.com/youtube/v3/search";
 
+    // 비디오 여러개 가져올 경우 사용
     public List<Map<String, String>> searchVideos(String query) throws IOException {
         String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
         String urlStr = SEARCH_URL +
@@ -57,6 +64,7 @@ public class YoutubeServiceImpl implements YoutubeService {
         }
     }
     
+    // 할당량 문제
     @Override
     public Map<String, String> searchVideo(String query) throws IOException {
         String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
@@ -64,7 +72,7 @@ public class YoutubeServiceImpl implements YoutubeService {
                 "?part=snippet" +
                 "&q=" + encodedQuery +
                 "&type=video" +
-                "&maxResults=1" +  // Make sure to limit to 1 result
+                "&maxResults=1" + 
                 "&key=" + API_KEY;
 
         URL url = new URL(urlStr);
@@ -77,7 +85,7 @@ public class YoutubeServiceImpl implements YoutubeService {
             JSONArray items = jsonObj.getJSONArray("items");
 
             if (items.length() > 0) {
-                JSONObject item = items.getJSONObject(0); // Get the first item
+                JSONObject item = items.getJSONObject(0);
                 JSONObject snippet = item.getJSONObject("snippet");
                 String videoId = item.getJSONObject("id").getString("videoId");
 
@@ -88,8 +96,53 @@ public class YoutubeServiceImpl implements YoutubeService {
                 data.put("videoUrl", "https://www.youtube.com/watch?v=" + videoId);
                 return data;
             } else {
-                return null;  // No videos found
+                return null;
             }
         }
     }
+    
+    // test YouTube RSS Feed 방식
+//    @Override
+//    public Map<String, String> searchVideo(String query) throws IOException {
+//        String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
+//        String urlStr = "https://rsshub.app/youtube/search/" + encodedQuery;
+//
+//        URL url = new URL(urlStr);
+//        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+//        conn.setRequestMethod("GET");
+//
+//        try {
+//            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+//            DocumentBuilder builder = factory.newDocumentBuilder();
+//            Document doc = builder.parse(conn.getInputStream());
+//            doc.getDocumentElement().normalize();
+//
+//            NodeList entries = doc.getElementsByTagName("entry");
+//            if (entries.getLength() == 0) {
+//                return null;
+//            }
+//
+//            Element entry = (Element) entries.item(0);
+//
+//            String title = entry.getElementsByTagName("title").item(0).getTextContent();
+//            String videoUrl = entry.getElementsByTagName("link").item(0).getAttributes()
+//                                   .getNamedItem("href").getTextContent();
+//            String channel = entry.getElementsByTagName("author").item(0)
+//                                  .getFirstChild().getTextContent();
+//            String thumbnail = entry.getElementsByTagName("media:thumbnail").item(0)
+//                                    .getAttributes().getNamedItem("url").getTextContent();
+//
+//            Map<String, String> data = new HashMap<>();
+//            data.put("title", title);
+//            data.put("channel", channel);
+//            data.put("thumbnail", thumbnail);
+//            data.put("videoUrl", videoUrl);
+//            return data;
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
+
 }

@@ -5,6 +5,7 @@ import com.boot.user.service.UserService;
 import com.boot.z_config.security.PrincipalDetails;
 import com.boot.z_config.security.jwt.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.slf4j.Logger;
@@ -35,19 +38,51 @@ public class FrontSecurityController {
     // 로그인 (JWT 토큰 발급)
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody HashMap<String, String> loginRequest, HttpServletResponse response) {
-        String userId = loginRequest.get("userId");
-        String userPw = loginRequest.get("userPw");
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(userId, userPw)
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = jwtTokenUtil.generateToken(authentication);
-        // 크로스도메인 쿠키 저장을 위해 SameSite=None; Secure 명시적으로 추가
-        String cookieValue = "jwt_token=" + token + "; Path=/; HttpOnly; Max-Age=1800; SameSite=None; Secure";
-        response.addHeader("Set-Cookie", cookieValue);
-        return ResponseEntity.ok().body(new HashMap<String, Object>() {{
-            put("token", token);
-        }});
+        String userId = loginRequest.get("userId"); // 사용자 로그인 아이디 (String)
+        String userPw = loginRequest.get("userPw"); // 사용자 비밀번호 (String)
+
+        if (userId == null || userPw == null) {
+            return ResponseEntity.badRequest().body("아이디 또는 비밀번호가 누락되었습니다.");
+        }
+
+        try {
+            // UsernamePasswordAuthenticationToken은 사용자 로그인 아이디와 비밀번호를 받습니다.
+            // AuthenticationManager는 내부적으로 PrincipalDetailsService를 호출하여
+            // 이 userId로 DB에서 사용자 정보를 조회하고, 비밀번호를 검증한 후,
+            // 인증된 PrincipalDetails 객체를 포함하는 Authentication 객체를 반환합니다.
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(userId, userPw)
+            );
+
+            // 인증 성공 시, SecurityContextHolder에 인증 객체를 설정합니다.
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            // JWT 토큰을 생성합니다. generateToken 메서드는 Authentication 객체로부터
+            // UserDetails(PrincipalDetails)를 가져와 토큰에 필요한 정보를 담습니다.
+            String token = jwtTokenUtil.generateToken(authentication);
+
+            // 크로스도메인 쿠키 저장을 위해 SameSite=None; Secure 명시적으로 추가
+            String cookieValue = "jwt_token=" + token + "; Path=/; HttpOnly; Max-Age=1800; SameSite=None; Secure";
+            response.addHeader("Set-Cookie", cookieValue);
+
+            PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+            UserDTO authenticatedUser = userService.getUserInfo(loginRequest);
+            
+//            log.info("2authenticatedUser=>"+authenticatedUser);
+            return ResponseEntity.ok().body(new HashMap<String, Object>() {{
+                put("token", token);
+                put("user", authenticatedUser); // 인증된 UserDTO 정보 포함
+            }});
+
+        } catch (org.springframework.security.core.AuthenticationException e) {
+            log.warn("로그인 실패: {}", e.getMessage());
+            // 인증 실패 (아이디/비밀번호 불일치 등)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패: 아이디 또는 비밀번호를 확인해주세요.");
+        } catch (Exception e) {
+            log.error("로그인 중 서버 오류 발생: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류 발생");
+        }
+    
     }
 
     // 회원가입

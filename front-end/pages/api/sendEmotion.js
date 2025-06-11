@@ -29,6 +29,8 @@ export default async function emotion_data_handler(req, res) {
     body: JSON.stringify(requestData),
   });
 
+  console.log("@#@#@#@#@#@#@userEmotionData => " + userEmotionData);
+
   if (!springResponse.ok) {
     const text = await springResponse.text(); // JSON 아님. 텍스트 출력해보기
     console.error('Spring server response error:', springResponse.status, text);

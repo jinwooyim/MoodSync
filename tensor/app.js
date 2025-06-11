@@ -131,7 +131,7 @@ app.get('/train', async (req, res) => {
     await saveModelPureJS(book_model, path.join(__dirname, 'book_model'));
     console.log('📦 순수 JS 모델 저장 완료');
 
-    res.send({ message: 'Training and saving completed successfully!' });
+    res.send({ message: 'Training and saving completed successfully!test' });
 
   } catch (error) {
     console.error('Training failed:', error);

@@ -10,6 +10,6 @@
 		<mapper resource="mybatis/mappers/bookMapper.xml"/>
 		<mapper resource="mybatis/mappers/userRecordMapper.xml"/>
 		<mapper resource="mybatis/mappers/YoutubeVideoMapper.xml"/>
-		
+		<mapper resource="mybatis/mappers/collectionMapper.xml"/>
 	</mappers>
 </configuration>

@@ -1,0 +1,169 @@
+"use client"
+
+import type React from "react"
+
+import { Heart, Mail, Phone, MapPin, Send } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { useState } from "react"
+
+export default function ContactPage() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  })
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    // 실제 구현에서는 서버로 데이터를 전송
+    console.log("Contact form submitted:", formData)
+    alert("문의사항이 성공적으로 전송되었습니다. 빠른 시일 내에 답변드리겠습니다.")
+    setFormData({ name: "", email: "", subject: "", message: "" })
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    })
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
+      <div className="container mx-auto px-4 py-12">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Heart className="w-8 h-8 text-pink-500" />
+            <h1 className="text-3xl font-bold">문의하기</h1>
+          </div>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            MoodSync에 대한 궁금한 점이나 문의사항이 있으시면 언제든지 연락해주세요
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {/* Contact Info */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+              <h2 className="text-xl font-semibold mb-6">연락처 정보</h2>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <Mail className="w-5 h-5 text-blue-500 mt-1" />
+                  <div>
+                    <div className="font-medium">이메일</div>
+                    <div className="text-sm text-gray-600">support@moodsync.com</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Phone className="w-5 h-5 text-green-500 mt-1" />
+                  <div>
+                    <div className="font-medium">전화번호</div>
+                    <div className="text-sm text-gray-600">02-1234-5678</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <MapPin className="w-5 h-5 text-red-500 mt-1" />
+                  <div>
+                    <div className="font-medium">주소</div>
+                    <div className="text-sm text-gray-600">
+                      서울특별시 강남구
+                      <br />
+                      테헤란로 123, 456호
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-lg p-6">
+              <h3 className="font-semibold text-gray-900 mb-2">빠른 답변을 위한 팁</h3>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• 구체적인 문제 상황을 설명해주세요</li>
+                <li>• 사용 중인 기기와 브라우저를 알려주세요</li>
+                <li>• 스크린샷이 있다면 첨부해주세요</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Contact Form */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="text-xl font-semibold mb-6">문의 양식</h2>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                      이름 *
+                    </label>
+                    <Input
+                      id="name"
+                      name="name"
+                      type="text"
+                      required
+                      value={formData.name}
+                      onChange={handleChange}
+                      placeholder="이름을 입력해주세요"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                      이메일 *
+                    </label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      required
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="이메일을 입력해주세요"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+                    제목 *
+                  </label>
+                  <Input
+                    id="subject"
+                    name="subject"
+                    type="text"
+                    required
+                    value={formData.subject}
+                    onChange={handleChange}
+                    placeholder="문의 제목을 입력해주세요"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                    문의 내용 *
+                  </label>
+                  <Textarea
+                    id="message"
+                    name="message"
+                    required
+                    value={formData.message}
+                    onChange={handleChange}
+                    placeholder="문의하실 내용을 자세히 작성해주세요"
+                    rows={6}
+                  />
+                </div>
+
+                <Button type="submit" className="w-full bg-pink-500 hover:bg-pink-600">
+                  <Send className="w-4 h-4 mr-2" />
+                  문의하기
+                </Button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

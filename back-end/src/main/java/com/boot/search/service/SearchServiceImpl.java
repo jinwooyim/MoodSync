@@ -1,5 +1,8 @@
 package com.boot.search.service;
 
+import org.springframework.stereotype.Service;
+
+@Service("SearchService")
 public class SearchServiceImpl implements SearchService {
 	private KeyboardMapper keyboardMapper;
 	private TypoCheck typoCheck;

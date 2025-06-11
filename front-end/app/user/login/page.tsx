@@ -26,7 +26,7 @@ export default function UserLoginPage() {
 
   useEffect(() => {
     if (!authLoading && isLoggedIn) {
-      router.replace("/record")
+      router.replace("/") // 로그인 상태라면 홈으로 리다이렉트
     }
   }, [isLoggedIn, authLoading, router])
 

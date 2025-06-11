@@ -15,28 +15,24 @@ const mockCollections: Collection[] = [
 				type: "activity", // CollectionItem 구분용
 				activity: "요가 클래스",
 				duration: "1시간",
-				// typeCategory: "운동", // 별도 카테고리 필드로 사용 (UI에서 활용 가능)
 			},
 			{
 				id: "a1",
 				type: "activity", // CollectionItem 구분용
 				activity: "요가 클래스",
 				duration: "1시간",
-				// typeCategory: "운동", // 별도 카테고리 필드로 사용 (UI에서 활용 가능)
 			},
 			{
 				id: "a1",
 				type: "activity", // CollectionItem 구분용
 				activity: "요가 클래스",
 				duration: "1시간",
-				// typeCategory: "운동", // 별도 카테고리 필드로 사용 (UI에서 활용 가능)
 			},
 			{
 				id: "a1",
 				type: "activity", // CollectionItem 구분용
 				activity: "요가 클래스",
 				duration: "1시간",
-				// typeCategory: "운동", // 별도 카테고리 필드로 사용 (UI에서 활용 가능)
 			},
 		],
 	},

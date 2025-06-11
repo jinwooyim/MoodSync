@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import {
   getUserRecord,
   getLatestRecords,
@@ -45,13 +45,19 @@ const menuItems = [
   },
 ]
 
+
 export function EmotionDashboard() {
   const [activeView, setActiveView] = useState("daily-emotions")
   const [currentRecord, setCurrentRecord] = useState<UserRecord | null>(null)
   const [allRecords, setAllRecords] = useState<UserRecord[]>([])
   const [loading, setLoading] = useState(true)
+  const hasFetched = useRef(false)
 
   useEffect(() => {
+    // 1번만 실행되도록
+    if (hasFetched.current) return
+    hasFetched.current = true
+
     async function fetchData() {
       setLoading(true)
       try {

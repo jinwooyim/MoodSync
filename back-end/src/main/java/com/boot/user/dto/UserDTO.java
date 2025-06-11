@@ -26,19 +26,19 @@ public class UserDTO {
 	private int userAdmin;
 	private String userRegdate;
 	
-	@Override
-	public String toString() {
-	    return "UserDTO(userNumber=" + userNumber + 
-	           ", userId=" + userId + 
-	           ", userPw=[PROTECTED]" + // 비밀번호 해시 숨김
-	           ", userName=" + userName + 
-	           ", userEmail=" + userEmail + 
-	           ", userTel=" + userTel + 
-	           ", userBirth=" + userBirth + 
-	           ", userZipCode=" + userZipCode + 
-	           ", userAddress=" + userAddress + 
-	           ", userDetailAddress=[PROTECTED]"+
-	           ", userAdmin=" + userAdmin + 
-	           ", userRegdate=" + userRegdate + ")";
-	}
+//	@Override
+//	public String toString() {
+//	    return "UserDTO(userNumber=" + userNumber + 
+//	           ", userId=" + userId + 
+//	           ", userPw=[PROTECTED]" + // 비밀번호 해시 숨김
+//	           ", userName=" + userName + 
+//	           ", userEmail=" + userEmail + 
+//	           ", userTel=" + userTel + 
+//	           ", userBirth=" + userBirth + 
+//	           ", userZipCode=" + userZipCode + 
+//	           ", userAddress=" + userAddress + 
+//	           ", userDetailAddress=[PROTECTED]"+
+//	           ", userAdmin=" + userAdmin + 
+//	           ", userRegdate=" + userRegdate + ")";
+//	}
 }

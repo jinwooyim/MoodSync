@@ -36,6 +36,10 @@ public class PrincipalDetails implements UserDetails, OAuth2User
 	public String getName() {
 		return user.getUserId(); // 고유 ID로
 	}
+	
+	public int getUserNumber() {
+		return user.getUserNumber(); // 고유 ID로
+	}
 
 
 

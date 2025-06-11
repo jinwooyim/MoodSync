@@ -50,6 +50,7 @@ public class FrontSecurityController {
             // AuthenticationManager는 내부적으로 PrincipalDetailsService를 호출하여
             // 이 userId로 DB에서 사용자 정보를 조회하고, 비밀번호를 검증한 후,
             // 인증된 PrincipalDetails 객체를 포함하는 Authentication 객체를 반환합니다.
+        	UserDTO authenticatedUser = userService.getUserInfo(loginRequest);
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(userId, userPw)
             );
@@ -66,7 +67,7 @@ public class FrontSecurityController {
             response.addHeader("Set-Cookie", cookieValue);
 
 //            PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-            UserDTO authenticatedUser = userService.getUserInfo(loginRequest);
+//            UserDTO authenticatedUser = userService.getUserInfo(loginRequest);
             
 //            log.info("2authenticatedUser=>"+authenticatedUser);
             return ResponseEntity.ok().body(new HashMap<String, Object>() {{

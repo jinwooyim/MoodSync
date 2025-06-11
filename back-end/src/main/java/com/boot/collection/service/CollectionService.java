@@ -3,12 +3,21 @@ package com.boot.collection.service;
 import java.util.List;
 
 import com.boot.collection.dto.CollectionDTO;
+import com.boot.collection.dto.CollectionItemDTO;
 
 public interface CollectionService {
     int createCollection(CollectionDTO collection);
     int updateCollection(CollectionDTO collection);
-    int deleteCollection(Long id);
-    CollectionDTO getCollection(Long id);
+    int deleteCollection(int id);
+    CollectionDTO getCollection(int id);
     List<CollectionDTO> getAllCollections();
-    List<CollectionDTO> getCollectionsByUserId(String userNumber);
+    List<CollectionDTO> getCollectionsByUserId(int userNumber);
+    
+    
+    public int insertCollectionItem(CollectionItemDTO collectionItem);
+//    public CollectionDTO updateCollectionItem(CollectionItemDTO collectionItem);
+    
+    public int deleteCollectionItem(int collectionId);
+    public void deleteBycollectionId(int collectionId);
+    
 }

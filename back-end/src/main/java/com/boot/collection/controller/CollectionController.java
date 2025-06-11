@@ -12,9 +12,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
 import java.util.HashMap; // HashMap 임포트 추가
 
 import com.boot.z_config.security.PrincipalDetails;
+import com.boot.user.dto.BasicUserDTO;
 import com.boot.user.dto.UserDTO;
 import com.boot.user.service.UserService; // UserService 임포트 추가
 
@@ -28,42 +32,12 @@ public class CollectionController {
     private UserService userService; // UserService 주입
 
     @PostMapping
-    public ResponseEntity<?> createCollection(
-            @RequestBody CollectionDTO collection,
-            Authentication authentication // Spring Security Authentication 객체 주입
-    ) {
-        log.info("createCollection 요청 시작=>"+collection);
-
-        // 1. 인증 및 PrincipalDetails 검증
-        if (authentication == null || !authentication.isAuthenticated() ||
-            authentication.getPrincipal() == null ||
-            "anonymousUser".equals(authentication.getPrincipal()) ||
-            !(authentication.getPrincipal() instanceof PrincipalDetails)) {
-            log.warn("인증되지 않은 사용자의 컬렉션 생성 시도");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Not authenticated or invalid token.");
+    public ResponseEntity<?> createCollection(@RequestBody CollectionDTO collection,@AuthenticationPrincipal PrincipalDetails principalDetails, HttpServletRequest request) {
+        if (principalDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // 인증되지 않은 경우
         }
-
-        // PrincipalDetails에서 로그인된 사용자 ID를 가져옴
-        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        String loggedInUserId = principal.getUsername(); // PrincipalDetails의 getUsername()은 userId를 반환
-
-        // PrincipalDetails 내의 UserDTO 대신, UserService를 통해 최신 UserDTO를 다시 조회합니다.
-        HashMap<String, String> param = new HashMap<>();
-        param.put("userId", loggedInUserId);
-        UserDTO fullUser = userService.getUserInfo(param); // DB에서 최신 유저 정보 조회
-
-        if (fullUser == null || fullUser.getUserNumber() == 0) { // userNumber가 Long 타입일 경우 null 체크
-            log.error("로그인된 사용자 정보 (UserNumber)를 가져오지 못했습니다.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to retrieve full user details or UserNumber not found.");
-        }
-
-        // 2. CollectionDTO에 userId (여기서는 userNumber) 설정
-        // 백엔드에서 토큰을 통해 얻은 userNumber를 강제로 주입합니다.
-        collection.setUserId(fullUser.getUserId()); // userService.getUserInfo()에서 가져온 userNumber 사용
-
-        log.info("컬렉션 생성 - 사용자 ID (UserId): {}", collection.getUserId());
-        log.info("컬렉션 이름: {}", collection.getName());
-
+        BasicUserDTO user = (BasicUserDTO) request.getAttribute("user");
+        collection.setUserId(user.getUserNumber()); 
         try {
             int result = collectionService.createCollection(collection);
             if (result > 0) {
@@ -78,25 +52,26 @@ public class CollectionController {
     }
 
     @PutMapping("/{id}")
-    public int updateCollection(@PathVariable Long id, @RequestBody CollectionDTO collection) {
+    public int updateCollection(@PathVariable int id, @RequestBody CollectionDTO collection) {
 //    	log.info("컬렉션 수정 - 사용자 ID (UserNumber): {}", collection.getUserId());
         collection.setCollectionId(id);
         return collectionService.updateCollection(collection);
     }
 
     @DeleteMapping("/{id}")
-    public int deleteCollection(@PathVariable Long id) {
+    public int deleteCollection(@PathVariable int id) {
         return collectionService.deleteCollection(id);
     }
 
     @GetMapping("/user-collections") 
-    public ResponseEntity<List<CollectionDTO>> getCollections(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+    public ResponseEntity<List<CollectionDTO>> getCollections(@AuthenticationPrincipal PrincipalDetails principalDetails, HttpServletRequest request) {
         if (principalDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // 인증되지 않은 경우
         }
-        String userId = principalDetails.getUsername(); // PrincipalDetails에서 userId (String)를 가져옵니다.
-//        log.info("principalDetails.getUsername()"+principalDetails.getUsername());
-        List<CollectionDTO> collections = collectionService.getCollectionsByUserId(userId); // 파라미터 타입을 String으로 변경
+        
+        BasicUserDTO user = (BasicUserDTO) request.getAttribute("user");
+        
+        List<CollectionDTO> collections = collectionService.getCollectionsByUserId(user.getUserNumber()); // 파라미터 타입을 String으로 변경
         return ResponseEntity.ok(collections);
     }
     @GetMapping

@@ -9,7 +9,9 @@ select * from EMOTIONACTING
 </select>
 
 <select id="getRandomActing" resultType="com.boot.tensor.dto.ActingDTO">
-select * from emotionActing where emotionNumber=#{emotionNumber} and (actingNumber in(#{num_one}, #{num_two}, #{num_three}))
+SELECT * FROM emotionActing 
+WHERE actingSubNumber = #{actingSubNumber} 
+AND ROWNUM = 1
 </select>
 </mapper>
 

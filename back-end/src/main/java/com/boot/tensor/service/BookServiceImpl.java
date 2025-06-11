@@ -41,11 +41,12 @@ public class BookServiceImpl implements BookService {
 			}
 		}
 
-		int num_one = random_num_array[0];
-		int num_two = random_num_array[1];
-		int num_three = random_num_array[2];
+//		int num_one = random_num_array[0];
+//		int num_two = random_num_array[1];
+//		int num_three = random_num_array[2];
 
-		ArrayList<BookDTO> dtos = dao.getRandomBook(emotionNumber, num_one, num_two, num_three);
+//		ArrayList<BookDTO> dtos = dao.getRandomBook(emotionNumber, num_one, num_two, num_three);
+		ArrayList<BookDTO> dtos = dao.getRandomBook(emotionNumber);
 
 		return dtos;
 	}

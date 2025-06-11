@@ -1,4 +1,3 @@
-
 <!DOCTYPE mapper
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -9,7 +8,7 @@ select * from EMOTIONMUSIC
 </select>
 
 <select id="getRandomMusic" resultType="com.boot.tensor.dto.MusicDTO">
-select * from emotionMusic where emotionNumber=#{emotionNumber} and (musicNumber in(#{num_one}, #{num_two}, #{num_three}))
+select * from emotionMusic where musicSubNumber=#{musicSubNumber}AND ROWNUM = 1
 </select>
 </mapper>
 

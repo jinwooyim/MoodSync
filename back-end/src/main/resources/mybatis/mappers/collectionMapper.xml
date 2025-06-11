@@ -31,4 +31,10 @@
         SELECT collectionId, userId, name, description, isPublic, createdAt, updatedAt -- 컬럼 명시적 지정 권장
         FROM collections
     </select>
+    <select id="findCollectionsByUserId" parameterType="String" resultType="com.boot.collection.dto.CollectionDTO">
+	    SELECT collectionId, userId, name, description, isPublic, createdAt, updatedAt
+	    FROM collections
+	    WHERE userId = #{userId}
+	    ORDER BY createdAt DESC
+	</select>
 </mapper>

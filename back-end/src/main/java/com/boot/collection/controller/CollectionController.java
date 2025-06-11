@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.HashMap; // HashMap 임포트 추가
@@ -58,9 +59,9 @@ public class CollectionController {
 
         // 2. CollectionDTO에 userId (여기서는 userNumber) 설정
         // 백엔드에서 토큰을 통해 얻은 userNumber를 강제로 주입합니다.
-        collection.setUserId(fullUser.getUserNumber()); // userService.getUserInfo()에서 가져온 userNumber 사용
+        collection.setUserId(fullUser.getUserId()); // userService.getUserInfo()에서 가져온 userNumber 사용
 
-        log.info("컬렉션 생성 - 사용자 ID (UserNumber): {}", collection.getUserId());
+        log.info("컬렉션 생성 - 사용자 ID (UserId): {}", collection.getUserId());
         log.info("컬렉션 이름: {}", collection.getName());
 
         try {
@@ -78,6 +79,7 @@ public class CollectionController {
 
     @PutMapping("/{id}")
     public int updateCollection(@PathVariable Long id, @RequestBody CollectionDTO collection) {
+//    	log.info("컬렉션 수정 - 사용자 ID (UserNumber): {}", collection.getUserId());
         collection.setCollectionId(id);
         return collectionService.updateCollection(collection);
     }
@@ -87,11 +89,16 @@ public class CollectionController {
         return collectionService.deleteCollection(id);
     }
 
-    @GetMapping("/{id}")
-    public CollectionDTO getCollection(@PathVariable Long id) {
-        return collectionService.getCollection(id);
+    @GetMapping("/user-collections") 
+    public ResponseEntity<List<CollectionDTO>> getCollections(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        if (principalDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // 인증되지 않은 경우
+        }
+        String userId = principalDetails.getUsername(); // PrincipalDetails에서 userId (String)를 가져옵니다.
+//        log.info("principalDetails.getUsername()"+principalDetails.getUsername());
+        List<CollectionDTO> collections = collectionService.getCollectionsByUserId(userId); // 파라미터 타입을 String으로 변경
+        return ResponseEntity.ok(collections);
     }
-
     @GetMapping
     public List<CollectionDTO> getAllCollections() {
         return collectionService.getAllCollections();

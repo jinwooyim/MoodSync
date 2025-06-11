@@ -10,4 +10,5 @@ public interface CollectionDAO {
     int deleteCollection(Long id);
     CollectionDTO selectCollection(Long id);
     List<CollectionDTO> selectAllCollections();
+    List<CollectionDTO> findCollectionsByUserId(String userId);
 }

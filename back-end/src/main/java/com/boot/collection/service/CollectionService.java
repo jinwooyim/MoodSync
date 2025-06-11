@@ -10,4 +10,5 @@ public interface CollectionService {
     int deleteCollection(Long id);
     CollectionDTO getCollection(Long id);
     List<CollectionDTO> getAllCollections();
+    List<CollectionDTO> getCollectionsByUserId(String userNumber);
 }

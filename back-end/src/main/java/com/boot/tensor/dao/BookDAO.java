@@ -10,4 +10,5 @@ public interface BookDAO {
 	public ArrayList<BookDTO> getBookDTO();
 
 	public ArrayList<BookDTO> getRandomBook(@Param("bookSubNumber") int bookSubNumber);
+//	public ArrayList<BookDTO> getRandomBook(@Param("emotionNumber") int emotionNumber, @Param("bookSubNumber") int bookSubNumber);
 }

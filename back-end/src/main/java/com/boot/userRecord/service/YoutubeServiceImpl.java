@@ -1,4 +1,4 @@
-package com.boot.crawling.service;
+package com.boot.userRecord.service;
 
 import java.io.BufferedReader;
 import java.io.IOException;

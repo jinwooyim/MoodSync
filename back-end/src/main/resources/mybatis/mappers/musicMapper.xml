@@ -8,7 +8,14 @@ select * from EMOTIONMUSIC
 </select>
 
 <select id="getRandomMusic" resultType="com.boot.tensor.dto.MusicDTO">
-select * from emotionMusic where musicSubNumber=#{musicSubNumber}AND ROWNUM = 1
+SELECT * FROM (
+        SELECT * FROM emotionMusic 
+        WHERE musicSubNumber = #{musicSubNumber}
+        ORDER BY DBMS_RANDOM.VALUE
+    ) 
+    WHERE ROWNUM &lt;= 1
+    
+<!--select * from emotionMusic where musicSubNumber=#{musicSubNumber}AND ROWNUM = 1-->
 </select>
 </mapper>
 

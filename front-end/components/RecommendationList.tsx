@@ -49,7 +49,9 @@ export default function RecommendationList({
             감정 값이 변경되었습니다! 다시 감정 분석을 해주세요!
           </Badge>
         ) : (
-          <Badge className={`${emotionUsedForDisplay.color} transition-colors duration-300`}>
+          <Badge
+            className={`${emotionUsedForDisplay.color} transition-colors duration-300 dark:bg-gray-600 dark:text-gray-200`}
+          >
             추천 기준 감정: {emotionUsedForDisplay.name}
           </Badge>
         )}
@@ -60,24 +62,24 @@ export default function RecommendationList({
         onValueChange={(value) => setRecommendationType(value as "music" | "activity" | "book")}
         className="w-full"
       >
-        <TabsList className="grid w-full grid-cols-3 max-w-md mx-auto bg-muted dark:bg-gray-800 transition-colors duration-300">
+        <TabsList className="grid w-full grid-cols-3 max-w-md mx-auto bg-muted dark:bg-gray-700 transition-colors duration-300">
           <TabsTrigger
             value="music"
-            className="flex items-center gap-2 data-[state=active]:bg-background dark:data-[state=active]:bg-gray-700 transition-colors duration-300"
+            className="flex items-center gap-2 data-[state=active]:bg-background dark:data-[state=active]:bg-gray-600 transition-colors duration-300"
           >
             <Music className="w-4 h-4" />
             음악 추천
           </TabsTrigger>
           <TabsTrigger
             value="activity"
-            className="flex items-center gap-2 data-[state=active]:bg-background dark:data-[state=active]:bg-gray-700 transition-colors duration-300"
+            className="flex items-center gap-2 data-[state=active]:bg-background dark:data-[state=active]:bg-gray-600 transition-colors duration-300"
           >
             <CheckSquare className="w-4 h-4" />
             활동 추천
           </TabsTrigger>
           <TabsTrigger
             value="book"
-            className="flex items-center gap-2 data-[state=active]:bg-background dark:data-[state=active]:bg-gray-700 transition-colors duration-300"
+            className="flex items-center gap-2 data-[state=active]:bg-background dark:data-[state=active]:bg-gray-600 transition-colors duration-300"
           >
             <Book className="w-4 h-4" />
             도서 추천
@@ -90,20 +92,20 @@ export default function RecommendationList({
             {musicRecommendations.map((music, index) => (
               <Card
                 key={index}
-                className="hover:shadow-lg dark:hover:shadow-gray-900/20 transition-all duration-300 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                className="hover:shadow-lg dark:hover:shadow-gray-900/20 transition-all duration-300 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600"
               >
                 <CardHeader>
-                  <CardTitle className="text-lg text-gray-900 dark:text-white transition-colors duration-300">
+                  <CardTitle className="text-lg text-gray-900 dark:text-gray-100 transition-colors duration-300">
                     {music.title}
                   </CardTitle>
-                  <CardDescription className="text-gray-600 dark:text-gray-400 transition-colors duration-300">
+                  <CardDescription className="text-gray-600 dark:text-gray-300 transition-colors duration-300">
                     {music.artist}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Badge
                     variant="secondary"
-                    className="dark:bg-gray-700 dark:text-gray-300 transition-colors duration-300"
+                    className="dark:bg-gray-600 dark:text-gray-200 transition-colors duration-300"
                   >
                     {music.genre}
                   </Badge>
@@ -123,20 +125,20 @@ export default function RecommendationList({
             {activityRecommendations.map((activity, index) => (
               <Card
                 key={index}
-                className="hover:shadow-lg dark:hover:shadow-gray-900/20 transition-all duration-300 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                className="hover:shadow-lg dark:hover:shadow-gray-900/20 transition-all duration-300 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600"
               >
                 <CardHeader>
-                  <CardTitle className="text-lg text-gray-900 dark:text-white transition-colors duration-300">
+                  <CardTitle className="text-lg text-gray-900 dark:text-gray-100 transition-colors duration-300">
                     {activity.activity}
                   </CardTitle>
-                  <CardDescription className="text-gray-600 dark:text-gray-400 transition-colors duration-300">
+                  <CardDescription className="text-gray-600 dark:text-gray-300 transition-colors duration-300">
                     소요시간: {activity.duration}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Badge
                     variant="secondary"
-                    className="dark:bg-gray-700 dark:text-gray-300 transition-colors duration-300"
+                    className="dark:bg-gray-600 dark:text-gray-200 transition-colors duration-300"
                   >
                     {activity.type}
                   </Badge>
@@ -156,20 +158,20 @@ export default function RecommendationList({
             {bookRecommendations.map((book, index) => (
               <Card
                 key={index}
-                className="hover:shadow-lg dark:hover:shadow-gray-900/20 transition-all duration-300 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                className="hover:shadow-lg dark:hover:shadow-gray-900/20 transition-all duration-300 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600"
               >
                 <CardHeader>
-                  <CardTitle className="text-lg text-gray-900 dark:text-white transition-colors duration-300">
+                  <CardTitle className="text-lg text-gray-900 dark:text-gray-100 transition-colors duration-300">
                     {book.title}
                   </CardTitle>
-                  <CardDescription className="text-gray-600 dark:text-gray-400 transition-colors duration-300">
+                  <CardDescription className="text-gray-600 dark:text-gray-300 transition-colors duration-300">
                     {book.author}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Badge
                     variant="secondary"
-                    className="dark:bg-gray-700 dark:text-gray-300 transition-colors duration-300"
+                    className="dark:bg-gray-600 dark:text-gray-200 transition-colors duration-300"
                   >
                     {book.genre}
                   </Badge>

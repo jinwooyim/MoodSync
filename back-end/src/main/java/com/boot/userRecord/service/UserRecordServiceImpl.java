@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.boot.crawling.service.YoutubeService;
 import com.boot.userRecord.dao.UserRecordDAO;
 import com.boot.userRecord.dao.YoutubeVideoDAO;
 import com.boot.userRecord.dto.UserRecordDTO;
@@ -149,7 +148,7 @@ public class UserRecordServiceImpl implements UserRecordService {
 		dto.setRecommendedBooks(userRecordDAO.findInfoByBookNumbers(bookIds));
 		dto.setRecommendedMusics(userRecordDAO.findInfoByMusicNumbers(musicIds));
 		
-List<YoutubeVideoDTO> youtubeVideoDTOs = new ArrayList<>();
+		List<YoutubeVideoDTO> youtubeVideoDTOs = new ArrayList<>();
 		
 	    for (Long musicNumber : musicIds) {
 	        String videoId = youtubeVideoDAO.findVideoIdByMusicNumber(musicNumber); // 새 DAO 메서드

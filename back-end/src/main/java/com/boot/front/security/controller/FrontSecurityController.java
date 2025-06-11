@@ -67,11 +67,12 @@ public class FrontSecurityController {
             response.addHeader("Set-Cookie", cookieValue);
 
 //            PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+//            UserDTO authenticatedUser = userService.getUserInfo(loginRequest);
             
 //            log.info("2authenticatedUser=>"+authenticatedUser);
             return ResponseEntity.ok().body(new HashMap<String, Object>() {{
                 put("token", token);
-                put("user", authenticatedUser); // 인증된 UserDTO 정보 포함
+                put("jwt_token", authenticatedUser); // 인증된 UserDTO 정보 포함
             }});
 
         } catch (org.springframework.security.core.AuthenticationException e) {

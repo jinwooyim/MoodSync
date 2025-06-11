@@ -32,15 +32,17 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
       <div className="container mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Heart className="w-8 h-8 text-pink-500" />
-            <h1 className="text-3xl font-bold">문의하기</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white transition-colors duration-300">
+              문의하기
+            </h1>
           </div>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto transition-colors duration-300">
             MoodSync에 대한 궁금한 점이나 문의사항이 있으시면 언제든지 연락해주세요
           </p>
         </div>
@@ -48,28 +50,38 @@ export default function ContactPage() {
         <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {/* Contact Info */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-              <h2 className="text-xl font-semibold mb-6">연락처 정보</h2>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6 transition-colors duration-300">
+              <h2 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white transition-colors duration-300">
+                연락처 정보
+              </h2>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <Mail className="w-5 h-5 text-blue-500 mt-1" />
                   <div>
-                    <div className="font-medium">이메일</div>
-                    <div className="text-sm text-gray-600">support@moodsync.com</div>
+                    <div className="font-medium text-gray-900 dark:text-white transition-colors duration-300">
+                      이메일
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 transition-colors duration-300">
+                      support@moodsync.com
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Phone className="w-5 h-5 text-green-500 mt-1" />
                   <div>
-                    <div className="font-medium">전화번호</div>
-                    <div className="text-sm text-gray-600">02-1234-5678</div>
+                    <div className="font-medium text-gray-900 dark:text-white transition-colors duration-300">
+                      전화번호
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 transition-colors duration-300">
+                      02-1234-5678
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <MapPin className="w-5 h-5 text-red-500 mt-1" />
                   <div>
-                    <div className="font-medium">주소</div>
-                    <div className="text-sm text-gray-600">
+                    <div className="font-medium text-gray-900 dark:text-white transition-colors duration-300">주소</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 transition-colors duration-300">
                       서울특별시 강남구
                       <br />
                       테헤란로 123, 456호
@@ -79,9 +91,11 @@ export default function ContactPage() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-lg p-6">
-              <h3 className="font-semibold text-gray-900 mb-2">빠른 답변을 위한 팁</h3>
-              <ul className="text-sm text-gray-600 space-y-1">
+            <div className="bg-gradient-to-br from-pink-50 to-purple-50 dark:from-pink-900/20 dark:to-purple-900/20 rounded-lg p-6 border border-pink-100 dark:border-pink-800/30 transition-colors duration-300">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2 transition-colors duration-300">
+                빠른 답변을 위한 팁
+              </h3>
+              <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1 transition-colors duration-300">
                 <li>• 구체적인 문제 상황을 설명해주세요</li>
                 <li>• 사용 중인 기기와 브라우저를 알려주세요</li>
                 <li>• 스크린샷이 있다면 첨부해주세요</li>
@@ -91,12 +105,17 @@ export default function ContactPage() {
 
           {/* Contact Form */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold mb-6">문의 양식</h2>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300">
+              <h2 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white transition-colors duration-300">
+                문의 양식
+              </h2>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="name"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-300"
+                    >
                       이름 *
                     </label>
                     <Input
@@ -107,10 +126,14 @@ export default function ContactPage() {
                       value={formData.name}
                       onChange={handleChange}
                       placeholder="이름을 입력해주세요"
+                      className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-300"
                     />
                   </div>
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-300"
+                    >
                       이메일 *
                     </label>
                     <Input
@@ -121,12 +144,16 @@ export default function ContactPage() {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="이메일을 입력해주세요"
+                      className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-300"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="subject"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-300"
+                  >
                     제목 *
                   </label>
                   <Input
@@ -137,11 +164,15 @@ export default function ContactPage() {
                     value={formData.subject}
                     onChange={handleChange}
                     placeholder="문의 제목을 입력해주세요"
+                    className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-300"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="message"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-300"
+                  >
                     문의 내용 *
                   </label>
                   <Textarea
@@ -152,10 +183,14 @@ export default function ContactPage() {
                     onChange={handleChange}
                     placeholder="문의하실 내용을 자세히 작성해주세요"
                     rows={6}
+                    className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-300"
                   />
                 </div>
 
-                <Button type="submit" className="w-full bg-pink-500 hover:bg-pink-600">
+                <Button
+                  type="submit"
+                  className="w-full bg-pink-500 hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700 text-white transition-colors duration-300"
+                >
                   <Send className="w-4 h-4 mr-2" />
                   문의하기
                 </Button>

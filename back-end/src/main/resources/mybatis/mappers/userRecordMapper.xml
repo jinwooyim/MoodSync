@@ -43,13 +43,17 @@
     
     <select id="findLatestRecords" resultType="com.boot.userRecord.dto.UserRecordDTO">
     	<![CDATA[
-        SELECT *
-        FROM (
-            SELECT * FROM userRecord 
-            WHERE userNumber = #{userNumber}
-            ORDER BY created_at DESC
-        )
-        WHERE ROWNUM <= 7
+    	SELECT *
+    	FROM(
+	        SELECT *
+	        FROM (
+	            SELECT * FROM userRecord 
+	            WHERE userNumber = #{userNumber}
+	            ORDER BY created_at DESC
+	        )
+	        WHERE ROWNUM <= 7
+	    )
+	    ORDER BY created_at ASC
     	]]>
     </select>
     

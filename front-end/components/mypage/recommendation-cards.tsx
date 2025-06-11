@@ -8,15 +8,18 @@ interface RecommendationCardsProps {
 
 export function RecommendationCards({ record }: RecommendationCardsProps) {
   const findYoutubeVideo = (musicName: string) => {
-    if (!record.youtubeSearchResults) return null
+  if (!record.youtubeSearchResults) return null
 
-    return record.youtubeSearchResults.find((video) => {
+  return (
+    record.youtubeSearchResults.find((video) => {
       return (
         video.title.toLowerCase().includes(musicName.toLowerCase()) ||
         (video.channel && video.channel.toLowerCase().includes(musicName.toLowerCase()))
       )
-    })
-  }
+    }) ??
+    record.youtubeSearchResults.find((video) => video.title === "영상 없음")
+  )
+}
 
   return (
     <div className="grid grid-cols-1 gap-4">
@@ -31,6 +34,7 @@ export function RecommendationCards({ record }: RecommendationCardsProps) {
         <CardContent className="space-y-4">
           {record.recommendedMusics?.map((music) => {
             const video = findYoutubeVideo(music.musicName)
+            console.log("🎵 music:", music.musicName, "📹 video:", video)
 
             return (
               <div key={music.musicNumber} className="space-y-2">
@@ -40,8 +44,29 @@ export function RecommendationCards({ record }: RecommendationCardsProps) {
                     <div className="text-sm text-muted-foreground">{music.musicAuthor}</div>
                   </div>
                 </div>
-
                 {video && (
+                  <div className="flex items-center gap-3 p-3 rounded-lg border bg-gray-50">
+                    <img
+                      src={video.thumbnail || "/placeholder.svg"}
+                      alt={video.title}
+                      className="w-20 h-[60px] object-cover rounded"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium truncate">
+                        {video.title === "영상 없음" ? "관련 영상을 찾을 수 없습니다." : video.title}
+                      </div>
+                      <div className="text-xs text-muted-foreground truncate">
+                        {video.channel === "미등록" ? "채널 정보 없음" : `채널: ${video.channel}`}
+                      </div>
+                    </div>
+                    {video.videoUrl !== "#" && (
+                      <a href={video.videoUrl} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                      </a>
+                    )}
+                  </div>
+                )}
+                {/* {video && (
                   <a
                     href={video.videoUrl}
                     target="_blank"
@@ -61,7 +86,7 @@ export function RecommendationCards({ record }: RecommendationCardsProps) {
                     </div>
                     <ExternalLink className="h-4 w-4 text-muted-foreground" />
                   </a>
-                )}
+                )} */}
               </div>
             )
           })}

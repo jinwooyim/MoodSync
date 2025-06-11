@@ -55,24 +55,20 @@ export async function getUserRecord(): Promise<UserRecord | null> {
   }
 }
 
-// export async function getUserRecord(): Promise<UserRecord | null> {
-//   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8485"
-
-//   try {
-//     const token = localStorage.getItem("jwt_token") // or from cookie/session
-//     console.log("asdfasdf => " + token);
-//     const res = await fetch(`${API_BASE_URL}/test/record`, {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//       },
-//     })
-//     if (!res.ok) return null
-//     return await res.json()
-//   } catch (err) {
-//     console.error(err)
-//     return null
-//   }
-// }
+// mypage 일별 조회시
+export async function getUserRecordByDate(date: string): Promise<UserRecord | null> {
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8485"
+  console.log("Fetching user record for:", date)
+  
+  try {
+    const res = await fetch(`${API_BASE_URL}/test/userRecord?date=${date}`)
+    if (!res.ok) return null
+    return await res.json()
+  } catch (err) {
+    console.error(err)
+    return null
+  }
+}
 
 export async function getLatestRecords(): Promise<UserRecord[]> {
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8485"

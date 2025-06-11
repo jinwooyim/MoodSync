@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react"
 import {
-  getUserRecord,
+  // getUserRecord,
   getLatestRecords,
   type UserRecord,
 } from "@/lib/mypage/mypage-types"
@@ -48,7 +48,7 @@ const menuItems = [
 
 export function EmotionDashboard() {
   const [activeView, setActiveView] = useState("daily-emotions")
-  const [currentRecord, setCurrentRecord] = useState<UserRecord | null>(null)
+  // const [currentRecord, setCurrentRecord] = useState<UserRecord | null>(null)
   const [allRecords, setAllRecords] = useState<UserRecord[]>([])
   const [loading, setLoading] = useState(true)
   const hasFetched = useRef(false)
@@ -61,11 +61,13 @@ export function EmotionDashboard() {
     async function fetchData() {
       setLoading(true)
       try {
-        const [current, latest] = await Promise.all([
-          getUserRecord(),
-          getLatestRecords(),
-        ])
-        setCurrentRecord(current)
+        // const [current, latest] = await Promise.all([
+        //   getUserRecord(),
+        //   getLatestRecords(),
+        // ])
+        // setCurrentRecord(current)
+        // setAllRecords(latest)
+        const latest = await getLatestRecords()
         setAllRecords(latest)
       } catch (error) {
         console.error("데이터 로딩 실패:", error)
@@ -85,7 +87,7 @@ export function EmotionDashboard() {
       case "daily-emotions":
         return (
           <DailyEmotionView
-            currentRecord={currentRecord}
+            // currentRecord={currentRecord}
             allRecords={allRecords}
           />
         )
@@ -98,7 +100,7 @@ export function EmotionDashboard() {
           />
         )
       default:
-        return <DailyEmotionView currentRecord={currentRecord} allRecords={allRecords} />
+        return <DailyEmotionView /*currentRecord={currentRecord}*/ allRecords={allRecords} />
     }
   }
 

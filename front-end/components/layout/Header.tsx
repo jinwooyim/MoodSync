@@ -33,19 +33,20 @@ export default function Header() {
                 MoodSync
               </h1>
             </div>
-            <div className="mb-8 max-w-md mx-auto">
-              <input
-                type="text"
-                placeholder="검색어를 입력하세요..."
-                value={searchValue}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchValue(e.target.value)}
-              />
+            <div className="flex-1 flex justify-center items-center w-[400px] ml-24">
+            <input
+              type="text"
+              placeholder="검색어를 입력하세요."
+              value={searchValue}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchValue(e.target.value)}
+              className="w-[60%] border border-gray-300 rounded-md px-4 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+            />
             </div>
             <nav className="hidden md:flex items-center gap-6">
               <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">홈</Link>
-              <Link href="/recommendations" className="text-gray-600 hover:text-gray-900 transition-colors">추천</Link>
-              <Link href="/record" className="text-gray-600 hover:text-gray-900 transition-colors">내 기록</Link>
-              <span className="text-gray-400">인증 중...</span>
+              <Link href="/collections" className="text-gray-600 hover:text-gray-900 transition-colors">컬렉션</Link>
+              <Link href="/recordTest2" className="text-gray-600 hover:text-gray-900 transition-colors">내 기록</Link>
+              <span className="text-gray-400">인증 중</span>
               <Link href="/settings" className="text-gray-600 hover:text-gray-900 transition-colors">설정</Link>
             </nav>
           </div>
@@ -77,8 +78,8 @@ export default function Header() {
             <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
               홈
             </Link>
-            <Link href="/recommendations" className="text-gray-600 hover:text-gray-900 transition-colors">
-              추천
+            <Link href="/collections" className="text-gray-600 hover:text-gray-900 transition-colors">
+              컬렉션
             </Link>
             <Link href="/recordTest2" className="text-gray-600 hover:text-gray-900 transition-colors">
               내 기록

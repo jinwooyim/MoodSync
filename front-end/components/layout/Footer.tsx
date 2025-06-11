@@ -2,9 +2,23 @@
 
 import { Heart } from "lucide-react"; // 필요한 아이콘만 임포트
 import Link from 'next/link'; // Link 컴포넌트 사용 시 임포트
+import { useState } from "react"
+import { PrivacyModal } from "../modals/PrivacyModal"
+import { TermsModal } from "../modals/TermsModal"
+import { AboutModal } from "../modals/AboutModal"
 
 export default function Footer() {
+  const [openModal, setOpenModal] = useState<string | null>(null)
+
+  const handleModalOpen = (modalType: string) => {
+    setOpenModal(modalType)
+  }
+
+  const handleModalClose = () => {
+    setOpenModal(null)
+  }
   return (
+    <>
     <footer className="bg-white border-t " >
       <div className="container mx-auto px-4 py-8">
         <div className="grid md:grid-cols-4 gap-8">
@@ -33,17 +47,17 @@ export default function Footer() {
             <h4 className="font-semibold mb-4">지원</h4>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
-                <Link href="#" className="hover:text-gray-900">
+                <Link href="/help" className="hover:text-gray-900">
                   도움말
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-gray-900">
+                <Link href="/contact" className="hover:text-gray-900">
                   문의하기
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-gray-900">
+                <Link href="/feedback" className="hover:text-gray-900">
                   피드백
                 </Link>
               </li>
@@ -53,20 +67,20 @@ export default function Footer() {
             <h4 className="font-semibold mb-4">정보</h4>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
-                <Link href="/privacy" className="hover:text-gray-900">
-                  개인정보처리방침
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms" className="hover:text-gray-900">
-                  이용약관
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="hover:text-gray-900">
-                  회사소개
-                </Link>
-              </li>
+                  <button onClick={() => handleModalOpen("privacy")} className="hover:text-gray-900 text-left">
+                    개인정보처리방침
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => handleModalOpen("terms")} className="hover:text-gray-900 text-left">
+                    이용약관
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => handleModalOpen("about")} className="hover:text-gray-900 text-left">
+                    회사소개
+                  </button>
+                </li>
             </ul>
           </div>
         </div>
@@ -75,5 +89,10 @@ export default function Footer() {
         </div>
       </div>
     </footer>
+    {/* Modals */}
+      <PrivacyModal isOpen={openModal === "privacy"} onClose={handleModalClose} />
+      <TermsModal isOpen={openModal === "terms"} onClose={handleModalClose} />
+      <AboutModal isOpen={openModal === "about"} onClose={handleModalClose} />
+    </>
   );
 }

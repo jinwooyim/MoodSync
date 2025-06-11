@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.boot.crawling.service.YoutubeService;
 import com.boot.userRecord.dao.UserRecordDAO;
 import com.boot.userRecord.dao.YoutubeVideoDAO;
 import com.boot.userRecord.dto.UserRecordDTO;

@@ -18,11 +18,15 @@ export default async function emotion_data_handler(req, res) {
 
   console.log("@# tfResult =>", tfResult);
 
-  // Spring 서버로 전달
+  const requestData = {
+    tfResult: tfResult,
+    userEmotionData: userEmotionData
+  };
+
   const springResponse = await fetch('http://localhost:8485/api/emotion-result', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(tfResult),
+    body: JSON.stringify(requestData),
   });
 
   if (!springResponse.ok) {

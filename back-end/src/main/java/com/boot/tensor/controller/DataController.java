@@ -36,33 +36,50 @@ public class DataController {
 
 	@PostMapping("/emotion-result")
 	public ResponseEntity<?> executePredict(@RequestBody Map<String, Object> payload) {
-		log.info("@# 실행 emotion-result");
-		log.info("@# payload =>" + payload);
-		Map<String, Object> actMap = (Map<String, Object>) payload.get("act");
-		int actPredictedClass = (int) actMap.get("predictedClass");
-		log.info("@# actPredictedClass =>" + actPredictedClass);
+//	    log.info("@# 실행 emotion-result");
+//	    log.info("@# payload =>" + payload);
+	    
+	    // tfResult에서 데이터 추출
+	    Map<String, Object> tfResult = (Map<String, Object>) payload.get("tfResult");
+	    Object userEmotionData = payload.get("userEmotionData");
+	    
+	    log.info("@# userEmotionData =>" + userEmotionData);
+	    
+	    // null 체크
+	    if (tfResult == null) {
+	        return ResponseEntity.badRequest().body("tfResult 데이터가 없습니다.");
+	    }
+	    
+	    // tfResult에서 각 데이터 추출
+	    Map<String, Object> actMap = (Map<String, Object>) tfResult.get("act");
+	    Map<String, Object> musicMap = (Map<String, Object>) tfResult.get("music");
+	    Map<String, Object> bookMap = (Map<String, Object>) tfResult.get("book");
+	    
+	    // null 체크
+	    if (actMap == null || musicMap == null || bookMap == null) {
+	        return ResponseEntity.badRequest().body("값없노");
+	    }
+	    
+	    int actPredictedClass = (int) actMap.get("predictedClass");
+	    int musicPredictedClass = (int) musicMap.get("predictedClass");
+	    int bookPredictedClass = (int) bookMap.get("predictedClass");
+	    
+//	    log.info("@# actPredictedClass =>" + actPredictedClass);
+//	    log.info("@# musicPredictedClass =>" + musicPredictedClass);
+//	    log.info("@# bookPredictedClass =>" + bookPredictedClass);
 
-		Map<String, Object> musicMap = (Map<String, Object>) payload.get("music");
-		int musicPredictedClass = (int) musicMap.get("predictedClass");
-		log.info("@# musicPredictedClass =>" + musicPredictedClass);
+	    ArrayList<ActingDTO> act_dtos = getListActing(actPredictedClass + 1);
+	    ArrayList<MusicDTO> music_dtos = getListMusic(musicPredictedClass + 1);
+	    ArrayList<BookDTO> book_dtos = getListBook(bookPredictedClass + 1);
 
-		Map<String, Object> bookMap = (Map<String, Object>) payload.get("book");
-		int bookPredictedClass = (int) bookMap.get("predictedClass");
-		log.info("@# bookPredictedClass =>" + bookPredictedClass);
+	    Map<String, Object> result = new HashMap<>();
+	    result.put("act_dtos", act_dtos);
+	    result.put("music_dtos", music_dtos);
+	    result.put("book_dtos", book_dtos);
 
-		ArrayList<ActingDTO> act_dtos = getListActing(actPredictedClass + 1);
-		ArrayList<MusicDTO> music_dtos = getListMusic(musicPredictedClass + 1);
-		ArrayList<BookDTO> book_dtos = getListBook(bookPredictedClass + 1);
+//	    log.info("@# result =>" + result);
 
-		Map<String, Object> result = new HashMap<>();
-
-		result.put("act_dtos", act_dtos);
-		result.put("music_dtos", music_dtos);
-		result.put("book_dtos", book_dtos);
-
-		log.info("@# result =>" + result);
-
-		return ResponseEntity.ok(result);
+	    return ResponseEntity.ok(result);
 	}
 
 	// 해당 감정 통해서 랜덤 3개의 음악, 행동, 도서 추출

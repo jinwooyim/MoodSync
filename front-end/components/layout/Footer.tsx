@@ -27,7 +27,8 @@ export default function Footer() {
               <Heart className="w-6 h-6 text-pink-500" />
               <span className="font-bold text-lg">MoodSync</span>
             </div>
-            <p className="text-gray-600 text-sm">감정에 맞는 음악과 활동을 추천하여 더 나은 하루를 만들어갑니다.</p>
+            <p className="text-gray-600 text-sm">감정에 맞는 음악과 활동을 추천하여 </p>
+            <p className="text-gray-600 text-sm">더 나은 하루를 만들어갑니다.</p>
           </div>
           <div>
             <h4 className="font-semibold mb-4">서비스</h4>

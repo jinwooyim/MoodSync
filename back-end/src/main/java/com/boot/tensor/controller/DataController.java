@@ -37,13 +37,13 @@ public class DataController {
 	@PostMapping("/emotion-result")
 	public ResponseEntity<?> executePredict(@RequestBody Map<String, Object> payload) {
 //	    log.info("@# 실행 emotion-result");
-	    log.info("@# payload =>" + payload);
+//	    log.info("@# payload =>" + payload);
 	    
 	    // tfResult에서 데이터 추출
 	    Map<String, Object> tfResult = (Map<String, Object>) payload.get("tfResult");
 	    Object userEmotionData = payload.get("userEmotionData");
 	    
-	    log.info("@# userEmotionData =>" + userEmotionData);
+//	    log.info("@# userEmotionData =>" + userEmotionData);
 	    
 	    // null 체크
 	    if (tfResult == null) {
@@ -68,8 +68,8 @@ public class DataController {
 //	    log.info("@# musicPredictedClass =>" + musicPredictedClass);
 //	    log.info("@# bookPredictedClass =>" + bookPredictedClass);
 
-	    ArrayList<ActingDTO> act_dtos = actingService.getRandomActing(bookPredictedClass, userEmotionData);
-	    ArrayList<MusicDTO> music_dtos = getListMusic(musicPredictedClass + 1);
+	    ArrayList<ActingDTO> act_dtos = actingService.getRandomActing(actPredictedClass + 1, userEmotionData);
+	    ArrayList<MusicDTO> music_dtos = musicService.getRandomMusic(musicPredictedClass + 1, userEmotionData);
 	    ArrayList<BookDTO> book_dtos = bookService.getRandomBook(bookPredictedClass + 1, userEmotionData);
 
 	    Map<String, Object> result = new HashMap<>();
@@ -90,10 +90,10 @@ public class DataController {
 //	}
 
 	// 음악
-	public ArrayList<MusicDTO> getListMusic(int emotionNumber) {
-		ArrayList<MusicDTO> music_dtos = musicService.getRandomMusic(emotionNumber);
-		return music_dtos;
-	}
+//	public ArrayList<MusicDTO> getListMusic(int emotionNumber) {
+//		ArrayList<MusicDTO> music_dtos = musicService.getRandomMusic(emotionNumber);
+//		return music_dtos;
+//	}
 
 //	// 도서
 //	public ArrayList<BookDTO> getListBook(int emotionNumber) {

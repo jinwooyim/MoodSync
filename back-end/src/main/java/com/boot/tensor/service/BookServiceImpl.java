@@ -19,318 +19,170 @@ public class BookServiceImpl implements BookService {
     @Autowired
     private SqlSession session;
 
-    // 감정 매핑 상수
-    private static final Map<String, String> EMOTION_MAPPING = Map.of(
-            "happy", "happy", 
-            "sad", "sad", 
-            "stressed", "stress", 
-            "calm", "calm", 
-            "excited", "excited", 
-            "tired", "tired"
-    );
-
-    // 클러스터 중심점 (미리 정의된 감정 프로필)
-    private static final List<double[]> CLUSTER_CENTROIDS = Arrays.asList(
-            new double[]{0.8, 0.2, 0.2, 0.5, 0.7, 0.1},  // 행복 중심
-            new double[]{0.2, 0.8, 0.6, 0.3, 0.1, 0.5},  // 슬픔 중심
-            new double[]{0.3, 0.4, 0.8, 0.2, 0.3, 0.6},  // 스트레스 중심
-            new double[]{0.4, 0.2, 0.2, 0.8, 0.3, 0.2},  // 평온 중심
-            new double[]{0.6, 0.1, 0.3, 0.3, 0.9, 0.2},  // 흥분 중심
-            new double[]{0.2, 0.5, 0.4, 0.3, 0.1, 0.8}   // 피곤 중심
-    );
-
     @Override
     public ArrayList<BookDTO> getRandomBook(int bookSubNumber, Object userEmotionData) {
         BookDAO dao = session.getMapper(BookDAO.class);
+        
+        // 전체 책 풀을 먼저 가져오기
+        List<BookDTO> allBooks = getAllBooksFromDatabase(dao);
+        
+        log.info("@# BookService - bookSubNumber: {}, 전체 책 수: {}, userEmotionData: {}", 
+                bookSubNumber, allBooks.size(), userEmotionData);
+
+        if (userEmotionData != null && userEmotionData instanceof Map && allBooks.size() >= 3) {
+            // 개선된 추천 알고리즘 적용
+            List<BookDTO> smartRecommendations = generateSmartRecommendations(
+                    allBooks, (Map<String, Object>) userEmotionData);
+            
+            log.info("=== 스마트 추천 결과 ===");
+            for (int i = 0; i < smartRecommendations.size(); i++) {
+                BookDTO book = smartRecommendations.get(i);
+                log.info("{}위: 번호={}, 이름={}, 감정점수=[{},{},{},{},{},{}]", 
+                        i + 1, book.getBookNumber(), book.getBookName(),
+                        book.getHappy(), book.getSad(), book.getStress(),
+                        book.getCalm(), book.getExcited(), book.getTired());
+            }
+            
+            return new ArrayList<>(smartRecommendations);
+        }
+
+        // 폴백: 기존 방식
         ArrayList<BookDTO> dtos = dao.getRandomBook(bookSubNumber);
-
-        log.info("@# BookService - bookSubNumber: {}, 조회된 책 수: {}, userEmotionData: {}", 
-                bookSubNumber, dtos.size(), userEmotionData);
-
-        // 책이 충분하지 않은 경우 다른 감정의 책들도 추가로 가져오기
-        if (dtos.size() < 5) {
-            log.info("책이 부족합니다. 다른 감정의 책들도 추가로 조회합니다.");
-
-            // 모든 감정 번호에서 추가 책들 가져오기
-            for (int i = 1; i <= 6; i++) {
-                if (i != bookSubNumber && dtos.size() < 10) {
-                    ArrayList<BookDTO> additionalBooks = dao.getRandomBook(i);
-                    for (BookDTO book : additionalBooks) {
-                        // 중복 제거
-                        boolean isDuplicate = dtos.stream()
-                                .anyMatch(existingBook -> existingBook.getBookNumber() == book.getBookNumber());
-                        if (!isDuplicate) {
-                            dtos.add(book);
-                        }
-                    }
-                }
-            }
-            log.info("추가 조회 후 총 책 수: {}", dtos.size());
-        }
-
-        if (userEmotionData != null && userEmotionData instanceof Map && dtos.size() >= 3) {
-            // 하이브리드 추천 알고리즘 적용
-            List<BookRecommendation> recommendations = recommendBooks(
-                    dtos, (Map<String, Object>) userEmotionData);
-
-            List<BookDTO> topRecommendations = recommendations.stream()
-                    .map(BookRecommendation::getBook)
-                    .collect(Collectors.toList());
-
-            log.info("=== 하이브리드 추천 결과 ===");
-            for (int i = 0; i < recommendations.size(); i++) {
-                BookRecommendation rec = recommendations.get(i);
-                log.info("{}위: {} (점수: {:.4f}, 방법: {})", 
-                        i + 1, rec.getBook().getBookName(), rec.getScore(), rec.getMethod());
-            }
-
-            return new ArrayList<>(topRecommendations);
-        } else if (dtos.size() < 3) {
-            log.warn("책이 3개 미만입니다. 추천을 수행할 수 없습니다. 조회된 책 수: {}", dtos.size());
-        }
-
-        // 책이 부족하거나 userEmotionData가 없는 경우 원본 반환
         return dtos;
     }
 
     /**
-     * 하이브리드 추천 알고리즘
-     * - 클러스터링: 사용자 감정과 유사한 감정 클러스터 찾기
-     * - 콘텐츠 기반: 감정 벡터 유사도 계산
-     * - 다양성: 최종 추천 목록에서 다양성 확보
+     * 데이터베이스에서 모든 책을 가져오는 메서드
      */
-    private List<BookRecommendation> recommendBooks(List<BookDTO> books, Map<String, Object> userEmotionData) {
-        // 결과 저장용 리스트
-        List<BookRecommendation> recommendations = new ArrayList<>();
-        Set<String> usedBookNames = new HashSet<>();
+    private List<BookDTO> getAllBooksFromDatabase(BookDAO dao) {
+        List<BookDTO> allBooks = new ArrayList<>();
         
-        // 사용자 감정 벡터 생성
-        double[] userVector = convertUserEmotionToVector(userEmotionData);
+        // 모든 감정 번호에서 더 많은 책 가져오기
+        for (int i = 1; i <= 6; i++) {
+            try {
+                final int emotionNumber = i; // final 변수로 복사
+            
+                ArrayList<BookDTO> emotionBooks = dao.getBookDTO(); // 전체 책 조회
         
-        // 1. 클러스터링 기반 추천
-        int closestCluster = findClosestCluster(userVector);
-        BookRecommendation clusterRecommendation = recommendByCluster(books, closestCluster, usedBookNames);
-        
-        if (clusterRecommendation != null) {
-            recommendations.add(clusterRecommendation);
-            usedBookNames.add(clusterRecommendation.getBook().getBookName());
-            log.info("클러스터 {} 기반 추천: {}", closestCluster, clusterRecommendation.getBook().getBookName());
-        }
-        
-        // 2. 콘텐츠 기반 추천 (감정 유사도)
-        BookRecommendation contentRecommendation = recommendByContent(books, userVector, usedBookNames);
-        
-        if (contentRecommendation != null) {
-            recommendations.add(contentRecommendation);
-            usedBookNames.add(contentRecommendation.getBook().getBookName());
-            log.info("콘텐츠 기반 추천: {}", contentRecommendation.getBook().getBookName());
-        }
-        
-        // 3. 다양성 기반 추천
-        List<BookDTO> selectedBooks = recommendations.stream()
-                .map(BookRecommendation::getBook)
-                .collect(Collectors.toList());
+                // 해당 감정 번호의 책만 필터링
+                List<BookDTO> filteredBooks = emotionBooks.stream()
+                    .filter(book -> book.getEmotionNumber() == emotionNumber)
+                    .collect(Collectors.toList());
                 
-        BookRecommendation diversityRecommendation = recommendByDiversity(books, selectedBooks, usedBookNames);
-        
-        if (diversityRecommendation != null) {
-            recommendations.add(diversityRecommendation);
-            log.info("다양성 기반 추천: {}", diversityRecommendation.getBook().getBookName());
+                allBooks.addAll(filteredBooks);
+                log.info("감정 번호 {} 책 수: {}", emotionNumber, filteredBooks.size());
+            } catch (Exception e) {
+                log.warn("감정 번호 {} 조회 중 오류: {}", i, e.getMessage());
+            }
         }
+        
+        log.info("전체 조회된 책 수: {}", allBooks.size());
+        return removeDuplicates(allBooks);
+    }
+
+    /**
+     * 스마트 추천 알고리즘 - 사용자 감정과 책 감정 수치 직접 비교
+     */
+    private List<BookDTO> generateSmartRecommendations(
+            List<BookDTO> books, Map<String, Object> userEmotionData) {
+        
+        // 1. 사용자 감정 벡터 추출
+        double[] userEmotionVector = extractUserEmotionVector(userEmotionData);
+        log.info("사용자 감정 벡터: [{}, {}, {}, {}, {}, {}]", 
+                userEmotionVector[0], userEmotionVector[1], userEmotionVector[2], 
+                userEmotionVector[3], userEmotionVector[4], userEmotionVector[5]);
+        
+        // 2. 모든 책에 대해 사용자 감정과의 유사도 계산
+        List<BookScore> scoredBooks = new ArrayList<>();
+        
+        for (BookDTO book : books) {
+            // 책의 감정 벡터 추출
+            double[] bookVector = extractBookEmotionVector(book);
+            
+            // 사용자 감정과 책 감정 간의 유사도 계산
+            double similarity = calculateCosineSimilarity(userEmotionVector, bookVector);
+            
+            // 약간의 무작위성 추가 (5%)
+            double randomFactor = new Random().nextDouble() * 0.05;
+            double finalScore = similarity + randomFactor;
+            
+            scoredBooks.add(new BookScore(book, finalScore));
+        }
+        
+        // 3. 유사도 기준으로 정렬
+        scoredBooks.sort((a, b) -> Double.compare(b.getScore(), a.getScore()));
+        
+        // 4. 상위 10% 중에서 3개 선택
+        List<BookDTO> recommendations = selectFromTopPercent(scoredBooks, 0.1, 3);
         
         return recommendations;
     }
     
     /**
-     * 클러스터 기반 추천
-     * 특정 감정 클러스터에 가장 잘 맞는 책 추천
+     * 사용자 감정 벡터 추출 (0~1 범위로 정규화)
      */
-    private BookRecommendation recommendByCluster(List<BookDTO> books, int clusterIndex, Set<String> usedBookNames) {
-        double[] clusterCentroid = CLUSTER_CENTROIDS.get(clusterIndex);
+    private double[] extractUserEmotionVector(Map<String, Object> userEmotionData) {
+        double happy = getEmotionValue(userEmotionData, "happy");
+        double sad = getEmotionValue(userEmotionData, "sad");
+        double stressed = getEmotionValue(userEmotionData, "stressed");
+        double calm = getEmotionValue(userEmotionData, "calm");
+        double excited = getEmotionValue(userEmotionData, "excited");
+        double tired = getEmotionValue(userEmotionData, "tired");
         
-        BookDTO bestBook = null;
-        double bestScore = -1.0;
-        double jitter = new Random().nextDouble() * 0.1; // 약간의 무작위성 추가
-        
-        for (BookDTO book : books) {
-            if (usedBookNames.contains(book.getBookName())) {
-                continue;
-            }
-            
-            double[] bookVector = convertBookEmotionToVector(book);
-            double similarity = calculateCosineSimilarity(clusterCentroid, bookVector);
-            double score = similarity + jitter; // 무작위성 추가
-            
-            if (score > bestScore) {
-                bestScore = score;
-                bestBook = book;
-            }
-        }
-        
-        return bestBook != null ? new BookRecommendation(bestBook, bestScore, "클러스터링") : null;
+        // 이미 0~1 범위라고 가정
+        return new double[] {happy, sad, stressed, calm, excited, tired};
     }
     
     /**
-     * 콘텐츠 기반 추천
-     * 사용자 감정과 직접적으로 유사한 책 추천
+     * 책 감정 벡터 추출 (0~1 범위로 정규화)
      */
-    private BookRecommendation recommendByContent(List<BookDTO> books, double[] userVector, Set<String> usedBookNames) {
-        List<BookRecommendation> candidates = new ArrayList<>();
+    private double[] extractBookEmotionVector(BookDTO book) {
+        // 0~100 범위를 0~1로 정규화
+        double happy = book.getHappy() / 100.0;
+        double sad = book.getSad() / 100.0;
+        double stressed = book.getStress() / 100.0;
+        double calm = book.getCalm() / 100.0;
+        double excited = book.getExcited() / 100.0;
+        double tired = book.getTired() / 100.0;
         
-        for (BookDTO book : books) {
-            if (usedBookNames.contains(book.getBookName())) {
-                continue;
-            }
-            
-            double[] bookVector = convertBookEmotionToVector(book);
-            double similarity = calculateCosineSimilarity(userVector, bookVector);
-            candidates.add(new BookRecommendation(book, similarity, "콘텐츠"));
-        }
-        
-        // 상위 3개 중에서 랜덤 선택
-        candidates.sort((a, b) -> Double.compare(b.getScore(), a.getScore()));
-        int topN = Math.min(3, candidates.size());
-        
-        if (topN > 0) {
-            Random random = new Random();
-            int randomIndex = random.nextInt(topN);
-            return candidates.get(randomIndex);
-        }
-        
-        return null;
+        return new double[] {happy, sad, stressed, calm, excited, tired};
     }
     
     /**
-     * 다양성 기반 추천
-     * 이미 선택된 책들과 최대한 다른 책 추천
+     * 상위 퍼센트에서 추천 선택
      */
-    private BookRecommendation recommendByDiversity(
-            List<BookDTO> books, List<BookDTO> selectedBooks, Set<String> usedBookNames) {
-        
-        BookDTO mostDiverse = null;
-        double highestDiversityScore = -1.0;
-        
-        for (BookDTO book : books) {
-            if (usedBookNames.contains(book.getBookName())) {
-                continue;
-            }
-            
-            double diversityScore = calculateDiversityScore(book, selectedBooks);
-            
-            if (diversityScore > highestDiversityScore) {
-                highestDiversityScore = diversityScore;
-                mostDiverse = book;
-            }
+    private List<BookDTO> selectFromTopPercent(List<BookScore> scoredBooks, double percent, int count) {
+        if (scoredBooks.isEmpty()) {
+            return new ArrayList<>();
         }
         
-        return mostDiverse != null ? 
-                new BookRecommendation(mostDiverse, highestDiversityScore, "다양성") : null;
-    }
-    
-    /**
-     * 가장 가까운 감정 클러스터 찾기
-     */
-    private int findClosestCluster(double[] userVector) {
-        int closestCluster = 0;
-        double highestSimilarity = -1.0;
+        // 상위 퍼센트 계산 (최소 count개는 보장)
+        int topCount = Math.max(count, (int)(scoredBooks.size() * percent));
+        List<BookScore> topCandidates = scoredBooks.subList(0, 
+                Math.min(topCount, scoredBooks.size()));
         
-        for (int i = 0; i < CLUSTER_CENTROIDS.size(); i++) {
-            double similarity = calculateCosineSimilarity(userVector, CLUSTER_CENTROIDS.get(i));
+        log.info("상위 {}% 후보 수: {} (전체: {})", (int)(percent * 100), topCandidates.size(), scoredBooks.size());
+        
+        // 상위 후보들 중에서 가장 점수가 높은 count개 선택
+        List<BookDTO> selected = new ArrayList<>();
+        Set<String> usedNames = new HashSet<>();
+        
+        for (BookScore score : topCandidates) {
+            if (selected.size() >= count) break;
             
-            if (similarity > highestSimilarity) {
-                highestSimilarity = similarity;
-                closestCluster = i;
+            BookDTO book = score.getBook();
+            if (!usedNames.contains(book.getBookName())) {
+                selected.add(book);
+                usedNames.add(book.getBookName());
+                
+                log.info("선택: {} (유사도: {}, 감정번호: {})", 
+                        book.getBookName(), 
+                        String.format("%.4f", score.getScore()), 
+                        book.getEmotionNumber());
             }
         }
         
-        return closestCluster;
-    }
-    
-    /**
-     * 다양성 점수 계산
-     * 이미 선택된 책들과의 평균 거리 (1 - 유사도)
-     */
-    private double calculateDiversityScore(BookDTO candidate, List<BookDTO> selectedBooks) {
-        if (selectedBooks.isEmpty()) {
-            return 1.0;
-        }
-        
-        double[] candidateVector = convertBookEmotionToVector(candidate);
-        double totalDiversity = 0.0;
-        
-        for (BookDTO selected : selectedBooks) {
-            double[] selectedVector = convertBookEmotionToVector(selected);
-            double similarity = calculateCosineSimilarity(candidateVector, selectedVector);
-            totalDiversity += (1.0 - similarity); // 유사도의 반대 = 다양성
-        }
-        
-        return totalDiversity / selectedBooks.size();
-    }
-
-    /**
-     * 사용자 감정 데이터를 정규화된 벡터로 변환
-     */
-    private double[] convertUserEmotionToVector(Map<String, Object> userEmotionData) {
-        double[] vector = new double[6]; // happy, sad, stress, calm, excited, tired
-
-        // 사용자 감정 데이터에서 값 추출 (0.0 ~ 1.0 범위)
-        vector[0] = getEmotionValue(userEmotionData, "happy");
-        vector[1] = getEmotionValue(userEmotionData, "sad");
-        vector[2] = getEmotionValue(userEmotionData, "stressed");
-        vector[3] = getEmotionValue(userEmotionData, "calm");
-        vector[4] = getEmotionValue(userEmotionData, "excited");
-        vector[5] = getEmotionValue(userEmotionData, "tired");
-
-        return normalizeVector(vector);
-    }
-
-    /**
-     * 책의 감정 점수를 정규화된 벡터로 변환
-     */
-    private double[] convertBookEmotionToVector(BookDTO book) {
-        double[] vector = new double[6];
-
-        // 책의 감정 점수 (0 ~ 100 범위를 0.0 ~ 1.0으로 정규화)
-        vector[0] = book.getHappy() / 100.0;
-        vector[1] = book.getSad() / 100.0;
-        vector[2] = book.getStress() / 100.0;
-        vector[3] = book.getCalm() / 100.0;
-        vector[4] = book.getExcited() / 100.0;
-        vector[5] = book.getTired() / 100.0;
-
-        return normalizeVector(vector);
-    }
-
-    /**
-     * 감정 값 추출 (안전한 형변환)
-     */
-    private double getEmotionValue(Map<String, Object> emotionData, String key) {
-        Object value = emotionData.get(key);
-        if (value instanceof Number) {
-            return ((Number) value).doubleValue();
-        }
-        return 0.0;
-    }
-
-    /**
-     * 벡터 정규화 (L2 norm)
-     */
-    private double[] normalizeVector(double[] vector) {
-        double magnitude = 0.0;
-        for (double v : vector) {
-            magnitude += v * v;
-        }
-        magnitude = Math.sqrt(magnitude);
-
-        if (magnitude == 0.0) {
-            return vector; // 영벡터인 경우 그대로 반환
-        }
-
-        double[] normalized = new double[vector.length];
-        for (int i = 0; i < vector.length; i++) {
-            normalized[i] = vector[i] / magnitude;
-        }
-        return normalized;
+        return selected;
     }
 
     /**
@@ -362,30 +214,78 @@ public class BookServiceImpl implements BookService {
     }
 
     /**
-     * 책 추천 결과를 저장하는 내부 클래스
+     * 책 카테고리 분류
      */
-    private static class BookRecommendation {
+//    private String categorizeBook(BookDTO book) {
+//        String name = book.getBookName().toLowerCase();
+//        
+//        if (name.contains("소설") || name.contains("문학")) {
+//            return "소설";
+//        } else if (name.contains("자기계발") || name.contains("성공") || name.contains("동기")) {
+//            return "자기계발";
+//        } else if (name.contains("과학") || name.contains("기술")) {
+//            return "과학기술";
+//        } else if (name.contains("역사") || name.contains("전기")) {
+//            return "역사";
+//        } else if (name.contains("철학") || name.contains("사상")) {
+//            return "철학";
+//        } else if (name.contains("경제") || name.contains("경영")) {
+//            return "경제경영";
+//        } else if (name.contains("예술") || name.contains("미술")) {
+//            return "예술";
+//        } else {
+//            return "기타";
+//        }
+//    }
+
+    // 헬퍼 메서드들
+//    private double calculateEmotionBalance(double[] emotions) {
+//        double variance = calculateVariance(emotions);
+//        return Math.max(0, 1.0 - variance / 1000.0); // 분산이 낮을수록 균형적
+//    }
+
+//    private double calculateVariance(double[] values) {
+//        double mean = Arrays.stream(values).average().orElse(0.0);
+//        return Arrays.stream(values)
+//                .map(x -> Math.pow(x - mean, 2))
+//                .average().orElse(0.0);
+//    }
+
+    private List<BookDTO> removeDuplicates(List<BookDTO> books) {
+        Map<String, BookDTO> uniqueMap = new LinkedHashMap<>();
+    
+        for (BookDTO book : books) {
+            // 책 번호만으로 중복 체크 (이름은 유사할 수 있음)
+            String key = String.valueOf(book.getBookNumber());
+            if (!uniqueMap.containsKey(key)) {
+                uniqueMap.put(key, book);
+            }
+        }
+    
+        log.info("중복 제거 후 책 수: {} → {}", books.size(), uniqueMap.size());
+        return new ArrayList<>(uniqueMap.values());
+    }
+
+    private double getEmotionValue(Map<String, Object> emotionData, String key) {
+        Object value = emotionData.get(key);
+        if (value instanceof Number) {
+            return ((Number) value).doubleValue();
+        }
+        return 0.0;
+    }
+
+    // 내부 클래스들
+    private static class BookScore {
         private final BookDTO book;
         private final double score;
-        private final String method;
 
-        public BookRecommendation(BookDTO book, double score, String method) {
+        public BookScore(BookDTO book, double score) {
             this.book = book;
             this.score = score;
-            this.method = method;
         }
 
-        public BookDTO getBook() {
-            return book;
-        }
-
-        public double getScore() {
-            return score;
-        }
-
-        public String getMethod() {
-            return method;
-        }
+        public BookDTO getBook() { return book; }
+        public double getScore() { return score; }
     }
 
     @Override

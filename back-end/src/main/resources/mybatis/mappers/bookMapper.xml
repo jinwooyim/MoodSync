@@ -14,7 +14,7 @@ SELECT * FROM (
         WHERE bookSubNumber = #{bookSubNumber}
         ORDER BY DBMS_RANDOM.VALUE
     ) 
-    WHERE ROWNUM &lt;= 3
+    WHERE ROWNUM &lt;= 1
 
 <!--select * from emotionBook where bookSubNumber=#{bookSubNumber}AND ROWNUM = 1-->
 

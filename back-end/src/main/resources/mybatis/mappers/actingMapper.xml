@@ -15,8 +15,8 @@ SELECT * FROM (
         WHERE actingSubNumber = #{actingSubNumber}
         ORDER BY DBMS_RANDOM.VALUE
     ) 
-    WHERE ROWNUM &lt;= 3
-<!--SELECT * FROM emotionActing -->
+    WHERE ROWNUM &lt;= 1
+<!--SELECT * FROM emotionActing --> 
 <!--WHERE actingSubNumber = #{actingSubNumber} -->
 <!--AND ROWNUM = 1-->
 </select>

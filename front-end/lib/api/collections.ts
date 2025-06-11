@@ -1,6 +1,6 @@
 // lib/api/collections.ts
 import api from './base';
-import type { Collection } from '@/types/collection';
+import type { Collection, CollectionItem } from '@/types/collection'; // CollectionItem도 import
 
 export interface CreateCollectionParams {
   name: string;
@@ -31,20 +31,24 @@ export async function deleteCollection(collectionId: number) {
   return res.data;
 }
 
-// 백엔드에서 userId를 기반으로 필터링된 컬렉션을 가져오도록 수정 (가정)
-
 export async function fetchCollections(): Promise<Collection[]> {
-  // 백엔드에서 PrincipalDetails를 통해 사용자 ID를 가져오므로
-  // 프론트에서 별도로 userId를 쿼리 파라미터로 보낼 필요가 없습니다.
-  // 다만, 'api' 인스턴스가 JWT 토큰을 헤더에 잘 포함시켜 보내야 합니다.
-  const res = await api.get('/api/collections/user-collections'); // 백엔드 @GetMapping("/collections")를 호출
-  
+  const res = await api.get('/api/collections/user-collections');
+
   return res.data.map((dto: any) => ({
     id: String(dto.collectionId),
+    userId: dto.userId,
     name: dto.name,
     description: dto.description,
     isPublic: dto.isPublic,
-    items: [], // 아이템 연동은 추후 구현
+    createdAt: dto.createdAt,
+    updatedAt: dto.updatedAt,
+    items: dto.items ? dto.items.map((itemDto: any) => ({
+      id: String(itemDto.collectionItemId),
+      collectionId: String(itemDto.collectionId),
+      contentTitle: itemDto.contentTitle, // ★ contentTitle 매핑
+      contentType: itemDto.contentType,   // ★ contentType 매핑 유지
+      addedAt: itemDto.addedAt,
+    })) : [],
   }));
 }
 
@@ -53,9 +57,18 @@ export async function fetchCollection(id: string): Promise<Collection> {
   const dto = res.data;
   return {
     id: String(dto.collectionId),
+    userId: dto.userId,
     name: dto.name,
     description: dto.description,
     isPublic: dto.isPublic,
-    items: [],
+    createdAt: dto.createdAt,
+    updatedAt: dto.updatedAt,
+    items: dto.items ? dto.items.map((itemDto: any) => ({
+        id: String(itemDto.collectionItemId),
+        collectionId: String(itemDto.collectionId),
+        contentTitle: itemDto.contentTitle, // ★ contentTitle 매핑
+        contentType: itemDto.contentType,   // ★ contentType 매핑 유지
+        addedAt: itemDto.addedAt,
+    })) : [],
   };
 }

@@ -1,17 +1,20 @@
-import type { MusicRecommendation, ActivityRecommendation, BookRecommendation } from "@/types/index";
+// types/collection.d.ts
 
-// 컬렉션 및 컬렉션 아이템 타입 정의
-// 각 아이템에 id: string, type: 구분자만 추가하고, 나머지는 원본 타입 그대로 사용
+export interface CollectionItem {
+  id: string; // 백엔드의 collectionItemId에 해당
+  collectionId: string; // 백엔드의 collectionId에 해당
+  contentTitle: string; // ★ 새롭게 추가된 필드
+  contentType: string; // 기존에 있던 필드 유지
+  addedAt: string;
+}
 
-export type CollectionItem =
-  | (MusicRecommendation & { id: string; type: "music" })
-  | (ActivityRecommendation & { id: string; type: "activity" })
-  | (BookRecommendation & { id: string; type: "book" });
-
-export type Collection = {
-  id: string;
+export interface Collection {
+  id: string; // 백엔드의 collectionId에 해당
+  userId?: number;
   name: string;
   description?: string;
   isPublic: boolean;
+  createdAt?: string;
+  updatedAt?: string;
   items: CollectionItem[];
-};
+}

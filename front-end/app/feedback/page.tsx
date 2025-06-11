@@ -49,15 +49,15 @@ export default function FeedbackPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
       <div className="container mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Heart className="w-8 h-8 text-pink-500" />
-            <h1 className="text-3xl font-bold">피드백</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white transition-colors duration-300">피드백</h1>
           </div>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto transition-colors duration-300">
             MoodSync를 더 나은 서비스로 만들기 위해 여러분의 소중한 의견을 들려주세요
           </p>
         </div>
@@ -65,12 +65,12 @@ export default function FeedbackPage() {
         <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {/* Feedback Info */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6 transition-colors duration-300">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-gray-900 dark:text-white transition-colors duration-300">
                 <ThumbsUp className="w-5 h-5 text-green-500" />
                 피드백이 중요한 이유
               </h2>
-              <div className="space-y-3 text-sm text-gray-600">
+              <div className="space-y-3 text-sm text-gray-600 dark:text-gray-300 transition-colors duration-300">
                 <p>• 사용자 경험 개선에 직접적으로 반영됩니다</p>
                 <p>• 새로운 기능 개발의 우선순위를 결정합니다</p>
                 <p>• 버그 수정과 성능 최적화에 도움이 됩니다</p>
@@ -78,12 +78,12 @@ export default function FeedbackPage() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6">
-              <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-6 border border-blue-100 dark:border-blue-800/30 transition-colors duration-300">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2 transition-colors duration-300">
                 <MessageSquare className="w-4 h-4" />
                 피드백 작성 가이드
               </h3>
-              <ul className="text-sm text-gray-600 space-y-1">
+              <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1 transition-colors duration-300">
                 <li>• 구체적인 상황과 예시를 포함해주세요</li>
                 <li>• 개선되었으면 하는 점을 명확히 해주세요</li>
                 <li>• 긍정적인 부분도 함께 알려주세요</li>
@@ -94,12 +94,17 @@ export default function FeedbackPage() {
 
           {/* Feedback Form */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold mb-6">피드백 양식</h2>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300">
+              <h2 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white transition-colors duration-300">
+                피드백 양식
+              </h2>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="name"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-300"
+                    >
                       이름 (선택사항)
                     </label>
                     <Input
@@ -109,10 +114,14 @@ export default function FeedbackPage() {
                       value={formData.name}
                       onChange={handleChange}
                       placeholder="이름을 입력해주세요"
+                      className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-300"
                     />
                   </div>
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-300"
+                    >
                       이메일 (선택사항)
                     </label>
                     <Input
@@ -122,12 +131,16 @@ export default function FeedbackPage() {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="답변을 받고 싶다면 이메일을 입력해주세요"
+                      className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-300"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="category"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-300"
+                  >
                     피드백 카테고리 *
                   </label>
                   <select
@@ -136,7 +149,7 @@ export default function FeedbackPage() {
                     required
                     value={formData.category}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 dark:focus:ring-pink-400 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-300"
                   >
                     <option value="">카테고리를 선택해주세요</option>
                     {categories.map((category) => (
@@ -148,7 +161,9 @@ export default function FeedbackPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">전체적인 만족도 *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-300">
+                    전체적인 만족도 *
+                  </label>
                   <div className="flex gap-2">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button
@@ -156,18 +171,25 @@ export default function FeedbackPage() {
                         type="button"
                         onClick={() => handleRating(star)}
                         className={`p-1 rounded transition-colors ${
-                          star <= formData.rating ? "text-yellow-400" : "text-gray-300 hover:text-yellow-300"
+                          star <= formData.rating
+                            ? "text-yellow-400"
+                            : "text-gray-300 dark:text-gray-600 hover:text-yellow-300"
                         }`}
                       >
                         <Star className="w-6 h-6 fill-current" />
                       </button>
                     ))}
-                    <span className="ml-2 text-sm text-gray-600">{formData.rating > 0 && `${formData.rating}/5`}</span>
+                    <span className="ml-2 text-sm text-gray-600 dark:text-gray-400 transition-colors duration-300">
+                      {formData.rating > 0 && `${formData.rating}/5`}
+                    </span>
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="message"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-300"
+                  >
                     피드백 내용 *
                   </label>
                   <Textarea
@@ -178,10 +200,14 @@ export default function FeedbackPage() {
                     onChange={handleChange}
                     placeholder="MoodSync에 대한 솔직한 의견을 자유롭게 작성해주세요. 좋았던 점, 개선이 필요한 점, 새로운 아이디어 등 무엇이든 환영합니다."
                     rows={6}
+                    className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-300"
                   />
                 </div>
 
-                <Button type="submit" className="w-full bg-pink-500 hover:bg-pink-600">
+                <Button
+                  type="submit"
+                  className="w-full bg-pink-500 hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700 text-white transition-colors duration-300"
+                >
                   <Send className="w-4 h-4 mr-2" />
                   피드백 보내기
                 </Button>

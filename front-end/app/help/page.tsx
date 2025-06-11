@@ -47,34 +47,42 @@ export default function HelpPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
       <div className="container mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Heart className="w-8 h-8 text-pink-500" />
-            <h1 className="text-3xl font-bold">MoodSync 도움말</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white transition-colors duration-300">
+              MoodSync 도움말
+            </h1>
           </div>
-          <p className="text-gray-600 max-w-2xl mx-auto">MoodSync 사용법과 자주 묻는 질문들을 확인해보세요</p>
+          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto transition-colors duration-300">
+            MoodSync 사용법과 자주 묻는 질문들을 확인해보세요
+          </p>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Quick Guide */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8 transition-colors duration-300">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-gray-900 dark:text-white transition-colors duration-300">
                 <BookOpen className="w-5 h-5 text-blue-500" />
                 빠른 시작 가이드
               </h2>
               <div className="space-y-4">
                 {guides.map((guide, index) => (
                   <div key={index} className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center">
-                      <guide.icon className="w-4 h-4 text-pink-600" />
+                    <div className="flex-shrink-0 w-8 h-8 bg-pink-100 dark:bg-pink-900/30 rounded-full flex items-center justify-center transition-colors duration-300">
+                      <guide.icon className="w-4 h-4 text-pink-600 dark:text-pink-400 transition-colors duration-300" />
                     </div>
                     <div>
-                      <h3 className="font-medium text-sm">{guide.title}</h3>
-                      <p className="text-xs text-gray-600 mt-1">{guide.description}</p>
+                      <h3 className="font-medium text-sm text-gray-900 dark:text-white transition-colors duration-300">
+                        {guide.title}
+                      </h3>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 transition-colors duration-300">
+                        {guide.description}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -82,22 +90,33 @@ export default function HelpPage() {
             </div>
 
             {/* Contact Links */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-gray-900 dark:text-white transition-colors duration-300">
                 <MessageCircle className="w-5 h-5 text-green-500" />
                 추가 도움이 필요하신가요?
               </h2>
               <div className="space-y-3">
-                <Link href="/contact" className="block p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                  <div className="font-medium text-blue-900">문의하기</div>
-                  <div className="text-sm text-blue-700">직접 문의사항을 보내주세요</div>
+                <Link
+                  href="/contact"
+                  className="block p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800/50 transition-colors duration-300"
+                >
+                  <div className="font-medium text-blue-900 dark:text-blue-300 transition-colors duration-300">
+                    문의하기
+                  </div>
+                  <div className="text-sm text-blue-700 dark:text-blue-400 transition-colors duration-300">
+                    직접 문의사항을 보내주세요
+                  </div>
                 </Link>
                 <Link
                   href="/feedback"
-                  className="block p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
+                  className="block p-3 bg-green-50 dark:bg-green-900/30 rounded-lg hover:bg-green-100 dark:hover:bg-green-800/50 transition-colors duration-300"
                 >
-                  <div className="font-medium text-green-900">피드백 보내기</div>
-                  <div className="text-sm text-green-700">서비스 개선 의견을 알려주세요</div>
+                  <div className="font-medium text-green-900 dark:text-green-300 transition-colors duration-300">
+                    피드백 보내기
+                  </div>
+                  <div className="text-sm text-green-700 dark:text-green-400 transition-colors duration-300">
+                    서비스 개선 의견을 알려주세요
+                  </div>
                 </Link>
               </div>
             </div>
@@ -105,13 +124,22 @@ export default function HelpPage() {
 
           {/* FAQ */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold mb-6">자주 묻는 질문</h2>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300">
+              <h2 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white transition-colors duration-300">
+                자주 묻는 질문
+              </h2>
               <div className="space-y-6">
                 {faqs.map((faq, index) => (
-                  <div key={index} className="border-b border-gray-100 pb-6 last:border-b-0">
-                    <h3 className="font-medium text-gray-900 mb-3">{faq.question}</h3>
-                    <p className="text-gray-600 text-sm leading-relaxed">{faq.answer}</p>
+                  <div
+                    key={index}
+                    className="border-b border-gray-100 dark:border-gray-700 pb-6 last:border-b-0 transition-colors duration-300"
+                  >
+                    <h3 className="font-medium text-gray-900 dark:text-white mb-3 transition-colors duration-300">
+                      {faq.question}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed transition-colors duration-300">
+                      {faq.answer}
+                    </p>
                   </div>
                 ))}
               </div>

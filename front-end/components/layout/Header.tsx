@@ -16,7 +16,6 @@ export default function Header() {
   const logoutUser = useAuthStore((state) => state.logoutUser) // 스토어에서 로그아웃 함수 가져오기
   const router = useRouter()
 
-  const [searchValue, setSearchValue] = useState<string>("")
 
   const handleLogout = async () => {
     await logoutUser() // Zustand 스토어의 로그아웃 함수 호출
@@ -78,15 +77,6 @@ export default function Header() {
             <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               <Link href="/">MoodSync</Link>
             </h1>
-          </div>
-          <div className="flex-1 flex justify-center items-center w-[400px] ml-24">
-            <input
-              type="text"
-              placeholder="검색어를 입력하세요."
-              value={searchValue}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchValue(e.target.value)}
-              className="w-[60%] border border-gray-300 dark:border-gray-600 rounded-md px-4 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-400 dark:focus:ring-pink-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-300"
-            />
           </div>
           <nav className="hidden md:flex items-center gap-6">
             <Link

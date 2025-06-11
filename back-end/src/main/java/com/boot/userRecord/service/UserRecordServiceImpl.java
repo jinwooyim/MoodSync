@@ -149,7 +149,7 @@ public class UserRecordServiceImpl implements UserRecordService {
 		dto.setRecommendedBooks(userRecordDAO.findInfoByBookNumbers(bookIds));
 		dto.setRecommendedMusics(userRecordDAO.findInfoByMusicNumbers(musicIds));
 		
-List<YoutubeVideoDTO> youtubeVideoDTOs = new ArrayList<>();
+		List<YoutubeVideoDTO> youtubeVideoDTOs = new ArrayList<>();
 		
 	    for (Long musicNumber : musicIds) {
 	        String videoId = youtubeVideoDAO.findVideoIdByMusicNumber(musicNumber); // 새 DAO 메서드

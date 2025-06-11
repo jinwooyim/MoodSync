@@ -9,9 +9,9 @@ interface PrivacyModalProps {
 export function PrivacyModal({ isOpen, onClose }: PrivacyModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh]">
+      <DialogContent className="max-w-4xl max-h-[80vh] bg-white text-gray-900 [&>button]:text-gray-500">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">개인정보처리방침</DialogTitle>
+          <DialogTitle className="text-xl font-bold text-gray-900">개인정보처리방침</DialogTitle>
         </DialogHeader>
         <ScrollArea className="h-[60vh] pr-4">
           <div className="space-y-6 text-sm">

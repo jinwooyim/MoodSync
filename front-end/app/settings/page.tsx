@@ -8,8 +8,12 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useState, useEffect } from "react"
+import { useTheme } from "next-themes"
 
 export default function SettingsPage() {
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
   const [settings, setSettings] = useState({
     // 알림 설정
     pushNotifications: true,
@@ -22,7 +26,6 @@ export default function SettingsPage() {
     shareAnonymousData: true,
 
     // 앱 설정
-    darkMode: false,
     language: "ko",
 
     // 프로필 설정
@@ -32,11 +35,20 @@ export default function SettingsPage() {
 
   const [visibleItems, setVisibleItems] = useState<number[]>([])
 
+  // 다크모드 상태 동기화
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   const handleSettingChange = (key: string, value: boolean | string) => {
     setSettings((prev) => ({
       ...prev,
       [key]: value,
     }))
+  }
+
+  const handleDarkModeChange = (checked: boolean) => {
+    setTheme(checked ? "dark" : "light")
   }
 
   useEffect(() => {
@@ -54,7 +66,7 @@ export default function SettingsPage() {
   }, [])
 
   return (
-    <div className="min-h-screen  bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
+    <div className="min-h-screen">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
         <div className="mb-8">
@@ -62,7 +74,7 @@ export default function SettingsPage() {
             <Heart className="w-6 h-6 text-pink-500" />
             <h1 className="text-2xl font-bold">설정</h1>
           </div>
-          <p className="text-gray-600">MoodSync 서비스를 개인화하고 관리하세요</p>
+          <p className="text-muted-foreground">MoodSync 서비스를 개인화하고 관리하세요</p>
         </div>
 
         <div className="space-y-6">
@@ -131,7 +143,7 @@ export default function SettingsPage() {
                   <Label htmlFor="pushNotifications" className="text-sm font-medium">
                     푸시 알림
                   </Label>
-                  <p className="text-xs text-gray-500">앱 내 알림을 받습니다</p>
+                  <p className="text-xs text-muted-foreground">앱 내 알림을 받습니다</p>
                 </div>
                 <Switch
                   id="pushNotifications"
@@ -145,7 +157,7 @@ export default function SettingsPage() {
                   <Label htmlFor="emailNotifications" className="text-sm font-medium">
                     이메일 알림
                   </Label>
-                  <p className="text-xs text-gray-500">중요한 업데이트를 이메일로 받습니다</p>
+                  <p className="text-xs text-muted-foreground">중요한 업데이트를 이메일로 받습니다</p>
                 </div>
                 <Switch
                   id="emailNotifications"
@@ -159,7 +171,7 @@ export default function SettingsPage() {
                   <Label htmlFor="moodReminders" className="text-sm font-medium">
                     감정 기록 리마인더
                   </Label>
-                  <p className="text-xs text-gray-500">감정을 기록할 시간을 알려드립니다</p>
+                  <p className="text-xs text-muted-foreground">감정을 기록할 시간을 알려드립니다</p>
                 </div>
                 <Switch
                   id="moodReminders"
@@ -173,7 +185,7 @@ export default function SettingsPage() {
                   <Label htmlFor="weeklyReports" className="text-sm font-medium">
                     주간 감정 리포트
                   </Label>
-                  <p className="text-xs text-gray-500">매주 감정 분석 리포트를 받습니다</p>
+                  <p className="text-xs text-muted-foreground">매주 감정 분석 리포트를 받습니다</p>
                 </div>
                 <Switch
                   id="weeklyReports"
@@ -203,7 +215,7 @@ export default function SettingsPage() {
                   <Label htmlFor="autoMoodDetection" className="text-sm font-medium">
                     자동 감정 감지
                   </Label>
-                  <p className="text-xs text-gray-500">텍스트 입력을 통해 감정을 자동으로 분석합니다</p>
+                  <p className="text-xs text-muted-foreground">텍스트 입력을 통해 감정을 자동으로 분석합니다</p>
                 </div>
                 <Switch
                   id="autoMoodDetection"
@@ -257,7 +269,7 @@ export default function SettingsPage() {
                   <Label htmlFor="shareAnonymousData" className="text-sm font-medium">
                     익명 데이터 공유
                   </Label>
-                  <p className="text-xs text-gray-500">서비스 개선을 위해 익명화된 데이터를 공유합니다</p>
+                  <p className="text-xs text-muted-foreground">서비스 개선을 위해 익명화된 데이터를 공유합니다</p>
                 </div>
                 <Switch
                   id="shareAnonymousData"
@@ -299,13 +311,9 @@ export default function SettingsPage() {
                   <Label htmlFor="darkMode" className="text-sm font-medium">
                     다크 모드
                   </Label>
-                  <p className="text-xs text-gray-500">어두운 테마를 사용합니다</p>
+                  <p className="text-xs text-muted-foreground">어두운 테마를 사용합니다</p>
                 </div>
-                <Switch
-                  id="darkMode"
-                  checked={settings.darkMode}
-                  onCheckedChange={(checked) => handleSettingChange("darkMode", checked)}
-                />
+                <Switch id="darkMode" checked={mounted && theme === "dark"} onCheckedChange={handleDarkModeChange} />
               </div>
 
               <div className="space-y-2">
@@ -316,7 +324,7 @@ export default function SettingsPage() {
                   id="language"
                   value={settings.language}
                   onChange={(e) => handleSettingChange("language", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                 >
                   <option value="ko">한국어</option>
                   <option value="en">English</option>
@@ -353,17 +361,19 @@ export default function SettingsPage() {
 
               <Separator />
 
-              <div className="bg-red-50 p-4 rounded-lg">
-                <h4 className="font-semibold text-red-900 mb-2 flex items-center gap-2">
+              <div className="bg-destructive/10 p-4 rounded-lg">
+                <h4 className="font-semibold text-destructive mb-2 flex items-center gap-2">
                   <Trash2 className="w-4 h-4" />
                   위험 구역
                 </h4>
-                <p className="text-sm text-red-700 mb-3">아래 작업들은 되돌릴 수 없습니다. 신중하게 결정해주세요.</p>
+                <p className="text-sm text-destructive/80 mb-3">
+                  아래 작업들은 되돌릴 수 없습니다. 신중하게 결정해주세요.
+                </p>
                 <div className="space-y-2">
-                  <Button variant="outline" size="sm" className="text-red-600 border-red-200 hover:bg-red-50">
+                  <Button variant="outline" size="sm" className="text-destructive border-destructive/20">
                     모든 감정 데이터 삭제
                   </Button>
-                  <Button variant="outline" size="sm" className="text-red-600 border-red-200 hover:bg-red-50">
+                  <Button variant="outline" size="sm" className="text-destructive border-destructive/20">
                     계정 완전 삭제
                   </Button>
                 </div>
@@ -411,7 +421,7 @@ export default function SettingsPage() {
           }`}
         >
           <Button variant="outline">취소</Button>
-          <Button className="bg-pink-500 hover:bg-pink-600">설정 저장</Button>
+          <Button>설정 저장</Button>
         </div>
       </div>
     </div>

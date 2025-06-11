@@ -7,6 +7,8 @@ import useAuthStore from '@/store/authStore';
 import Header from './Header'; // Header 컴포넌트 임포트
 import Footer from './Footer'; // Footer 컴포넌트 임포트
 
+import { ThemeProvider } from "@/components/theme-provider"
+
 export default function AppProviders({ children }: { children: React.ReactNode }) {
   const { loading, checkAuthStatus } = useAuthStore();
 
@@ -26,11 +28,13 @@ export default function AppProviders({ children }: { children: React.ReactNode }
   return (
     <>
       {/* Header는 여기서 로딩 상태를 직접 확인하며 렌더링됩니다. */}
-      <Header />
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
-          {children}
-      </div>
-      <Footer />
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <Header />
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
+            {children}
+        </div>
+        <Footer />
+      </ThemeProvider>
     </>
   );
 }

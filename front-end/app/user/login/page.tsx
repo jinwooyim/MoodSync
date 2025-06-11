@@ -55,11 +55,13 @@ export default function UserLoginPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 flex justify-center items-center">
-        <Card className="w-full max-w-md mx-4 shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
+      <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex justify-center items-center transition-colors duration-300">
+        <Card className="w-full max-w-md mx-4 shadow-2xl border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm transition-colors duration-300">
           <CardContent className="flex flex-col items-center justify-center p-8">
-            <Loader2 className="h-8 w-8 animate-spin text-violet-600 mb-4" />
-            <p className="text-lg text-gray-600 font-medium">로그인 상태 확인 중...</p>
+            <Loader2 className="h-8 w-8 animate-spin text-violet-600 dark:text-violet-400 mb-4 transition-colors duration-300" />
+            <p className="text-lg text-gray-600 dark:text-gray-400 font-medium transition-colors duration-300">
+              로그인 상태 확인 중...
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -71,13 +73,12 @@ export default function UserLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 relative overflow-hidden">
-    {/* <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 relative overflow-hidden">  */}
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden transition-colors duration-300">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-violet-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-pink-400/20 to-rose-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-indigo-400/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-violet-400/20 to-purple-400/20 dark:from-violet-600/10 dark:to-purple-600/10 rounded-full blur-3xl animate-pulse transition-colors duration-300"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-pink-400/20 to-rose-400/20 dark:from-pink-600/10 dark:to-rose-600/10 rounded-full blur-3xl animate-pulse delay-1000 transition-colors duration-300"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-indigo-400/10 dark:from-blue-600/5 dark:to-indigo-600/5 rounded-full blur-3xl animate-pulse delay-500 transition-colors duration-300"></div>
       </div>
 
       <div className="container max-w-md mx-auto py-8 px-4 relative z-10">
@@ -87,16 +88,13 @@ export default function UserLoginPage() {
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-20 h-20 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full blur-xl opacity-30 animate-pulse"></div>
             </div>
-            {/* <div className="relative bg-gradient-to-br from-violet-500 to-purple-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto shadow-2xl transform hover:scale-105 transition-transform duration-300">
-              <Train className="w-10 h-10 text-white" />
-            </div> */}
           </div>
 
           <div className="space-y-2 mb-6">
             <h1 className="text-5xl font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
               MoodSync
             </h1>
-            <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+            <div className="flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">
               <Heart className="w-4 h-4 text-pink-500" />
               <Music className="w-4 h-4 text-blue-500" />
               <BookOpen className="w-4 h-4 text-green-500" />
@@ -104,8 +102,10 @@ export default function UserLoginPage() {
           </div>
 
           <div className="space-y-2">
-            <h2 className="text-2xl font-semibold text-gray-800">환영합니다!</h2>
-            <p className="text-gray-600 leading-relaxed">
+            <h2 className="text-2xl font-semibold text-gray-800 dark:text-white transition-colors duration-300">
+              환영합니다!
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 leading-relaxed transition-colors duration-300">
               감정 기반 맞춤 추천 서비스로
               <br />
               당신만의 특별한 경험을 시작하세요
@@ -114,19 +114,24 @@ export default function UserLoginPage() {
         </div>
 
         {/* Login Form Card */}
-        <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm animate-slide-up">
+        <Card className="shadow-2xl border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm animate-slide-up transition-colors duration-300">
           <CardHeader className="text-center pb-4">
-            <CardTitle className="text-xl font-semibold text-gray-800 flex items-center justify-center gap-2">
+            <CardTitle className="text-xl font-semibold text-gray-800 dark:text-white flex items-center justify-center gap-2 transition-colors duration-300">
               <Sparkles className="w-5 h-5 text-violet-500" />
               로그인
             </CardTitle>
-            <CardDescription className="text-gray-600">계정 정보를 입력해주세요</CardDescription>
+            <CardDescription className="text-gray-600 dark:text-gray-400 transition-colors duration-300">
+              계정 정보를 입력해주세요
+            </CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="userId" className="text-sm font-semibold text-gray-700">
+                <Label
+                  htmlFor="userId"
+                  className="text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-300"
+                >
                   아이디
                 </Label>
                 <Input
@@ -136,13 +141,16 @@ export default function UserLoginPage() {
                   required
                   value={userId}
                   onChange={(e) => setUserId(e.target.value)}
-                  className="h-12 border-gray-200 focus:border-violet-500 focus:ring-violet-500 transition-all duration-200 bg-white/50"
+                  className="h-12 border-gray-200 dark:border-gray-600 focus:border-violet-500 dark:focus:border-violet-400 focus:ring-violet-500 dark:focus:ring-violet-400 transition-all duration-200 bg-white/50 dark:bg-gray-700/50 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                   placeholder="아이디를 입력하세요"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="userPw" className="text-sm font-semibold text-gray-700">
+                <Label
+                  htmlFor="userPw"
+                  className="text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-300"
+                >
                   비밀번호
                 </Label>
                 <Input
@@ -152,14 +160,16 @@ export default function UserLoginPage() {
                   required
                   value={userPw}
                   onChange={(e) => setUserPw(e.target.value)}
-                  className="h-12 border-gray-200 focus:border-violet-500 focus:ring-violet-500 transition-all duration-200 bg-white/50"
+                  className="h-12 border-gray-200 dark:border-gray-600 focus:border-violet-500 dark:focus:border-violet-400 focus:ring-violet-500 dark:focus:ring-violet-400 transition-all duration-200 bg-white/50 dark:bg-gray-700/50 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                   placeholder="비밀번호를 입력하세요"
                 />
               </div>
 
               {error && (
-                <Alert className="border-red-200 bg-red-50/80 animate-shake">
-                  <AlertDescription className="text-red-600 font-medium">{error}</AlertDescription>
+                <Alert className="border-red-200 dark:border-red-800 bg-red-50/80 dark:bg-red-900/20 animate-shake transition-colors duration-300">
+                  <AlertDescription className="text-red-600 dark:text-red-400 font-medium transition-colors duration-300">
+                    {error}
+                  </AlertDescription>
                 </Alert>
               )}
 
@@ -185,12 +195,14 @@ export default function UserLoginPage() {
         </Card>
 
         {/* Sign Up Link */}
-        <Card className="mt-6 shadow-lg border-0 bg-white/60 backdrop-blur-sm animate-slide-up delay-200">
+        <Card className="mt-6 shadow-lg border-0 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm animate-slide-up delay-200 transition-colors duration-300">
           <CardContent className="text-center p-6">
-            <p className="text-gray-600 mb-4 font-medium">MoodSync 회원이 아니신가요?</p>
+            <p className="text-gray-600 dark:text-gray-400 mb-4 font-medium transition-colors duration-300">
+              MoodSync 회원이 아니신가요?
+            </p>
             <Link
               href="/user/join"
-              className="inline-flex items-center gap-2 text-violet-600 font-semibold hover:text-violet-700 transition-all duration-200 hover:gap-3 group"
+              className="inline-flex items-center gap-2 text-violet-600 dark:text-violet-400 font-semibold hover:text-violet-700 dark:hover:text-violet-300 transition-all duration-200 hover:gap-3 group"
             >
               회원가입하기
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
@@ -200,17 +212,23 @@ export default function UserLoginPage() {
 
         {/* Feature Highlights */}
         <div className="mt-8 grid grid-cols-3 gap-4 animate-fade-in delay-300">
-          <div className="text-center p-4 bg-white/40 backdrop-blur-sm rounded-xl">
+          <div className="text-center p-4 bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-xl transition-colors duration-300">
             <Heart className="w-6 h-6 text-pink-500 mx-auto mb-2" />
-            <p className="text-xs text-gray-600 font-medium">감정 분석</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400 font-medium transition-colors duration-300">
+              감정 분석
+            </p>
           </div>
-          <div className="text-center p-4 bg-white/40 backdrop-blur-sm rounded-xl">
+          <div className="text-center p-4 bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-xl transition-colors duration-300">
             <Music className="w-6 h-6 text-blue-500 mx-auto mb-2" />
-            <p className="text-xs text-gray-600 font-medium">음악 추천</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400 font-medium transition-colors duration-300">
+              음악 추천
+            </p>
           </div>
-          <div className="text-center p-4 bg-white/40 backdrop-blur-sm rounded-xl">
+          <div className="text-center p-4 bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-xl transition-colors duration-300">
             <BookOpen className="w-6 h-6 text-green-500 mx-auto mb-2" />
-            <p className="text-xs text-gray-600 font-medium">도서 추천</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400 font-medium transition-colors duration-300">
+              도서 추천
+            </p>
           </div>
         </div>
       </div>

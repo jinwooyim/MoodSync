@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor 
 public class CollectionDTO {
     private Long collectionId;
-    private int userId;
+    private String userId;
     private String name;
     private String description;
     private Boolean isPublic;

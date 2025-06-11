@@ -9,9 +9,9 @@ interface TermsModalProps {
 export function TermsModal({ isOpen, onClose }: TermsModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh]">
+      <DialogContent className="max-w-4xl max-h-[80vh] bg-white text-gray-900 [&>button]:text-gray-500">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">이용약관</DialogTitle>
+          <DialogTitle className="text-xl font-bold text-gray-900">이용약관</DialogTitle>
         </DialogHeader>
         <ScrollArea className="h-[60vh] pr-4">
           <div className="space-y-6 text-sm">
@@ -39,7 +39,7 @@ export function TermsModal({ isOpen, onClose }: TermsModalProps) {
             <section>
               <h3 className="font-semibold text-base mb-3">제3조 (약관의 효력 및 변경)</h3>
               <p className="text-gray-700 leading-relaxed">
-                이 약관은 서비스 화면에 게시하거나 기타의 방법으로 이용자에게 공지함으로써 효력을 발생합��다. 회사는
+                이 약관은 서비스 화면에 게시하거나 기타의 방법으로 이용자에게 공지함으로써 효력을 발생합니다. 회사는
                 합리적인 사유가 발생할 경우에는 이 약관을 변경할 수 있으며, 약관이 변경되는 경우 변경된 약관의 내용과
                 시행일을 명시하여 현행약관과 함께 서비스의 초기화면에 그 시행일 7일 이전부터 시행일 후 상당한 기간 동안
                 공지합니다.

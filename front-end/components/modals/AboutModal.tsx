@@ -10,9 +10,9 @@ interface AboutModalProps {
 export function AboutModal({ isOpen, onClose }: AboutModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh]">
+      <DialogContent className="max-w-4xl max-h-[80vh] bg-white text-gray-900 [&>button]:text-gray-500">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold flex items-center gap-2">
+          <DialogTitle className="text-xl font-bold flex items-center gap-2 text-gray-900">
             <Heart className="w-6 h-6 text-pink-500" />
             MoodSync 회사소개
           </DialogTitle>

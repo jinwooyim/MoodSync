@@ -28,7 +28,6 @@ import {
   Phone,
   Eye,
   EyeOff,
-  Sparkles,
   Heart,
   Music,
   BookOpen,
@@ -326,11 +325,11 @@ export default function UserJoinPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden transition-colors duration-300">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-purple-400/20 to-blue-400/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-pink-400/20 to-rose-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-purple-400/20 to-blue-400/20 dark:from-purple-600/10 dark:to-blue-600/10 rounded-full blur-3xl animate-pulse transition-colors duration-300"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-pink-400/20 to-rose-400/20 dark:from-pink-600/10 dark:to-rose-600/10 rounded-full blur-3xl animate-pulse delay-1000 transition-colors duration-300"></div>
       </div>
 
       <div className="container max-w-2xl mx-auto py-8 px-4 relative z-10">
@@ -340,17 +339,16 @@ export default function UserJoinPage() {
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full blur-xl opacity-30 animate-pulse"></div>
             </div>
-            {/* <div className="relative bg-gradient-to-br from-purple-500 to-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto shadow-2xl transform hover:scale-105 transition-transform duration-300">
-              <Sparkles className="w-8 h-8 text-white" />
-            </div> */}
           </div>
 
           <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-pink-600 bg-clip-text text-transparent mb-2">
             MoodSync 회원가입
           </h1>
-          <p className="text-gray-600">감정 기반 맞춤 추천 서비스에 가입하세요</p>
+          <p className="text-gray-600 dark:text-gray-400 transition-colors duration-300">
+            감정 기반 맞춤 추천 서비스에 가입하세요
+          </p>
 
-          <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-500">
+          <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">
             <Heart className="w-4 h-4 text-pink-500" />
             <Music className="w-4 h-4 text-blue-500" />
             <BookOpen className="w-4 h-4 text-green-500" />
@@ -373,14 +371,18 @@ export default function UserJoinPage() {
                         ? "bg-gradient-to-r from-purple-500 to-blue-600 text-white"
                         : isActive
                           ? "bg-purple-500 text-white"
-                          : "bg-gray-200 text-gray-400"
+                          : "bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500"
                     }`}
                   >
                     {isCompleted ? <CheckCircle className="w-6 h-6" /> : <Icon className="w-6 h-6" />}
                   </div>
                   <span
-                    className={`text-xs font-medium ${
-                      isActive ? "text-purple-600" : isCompleted ? "text-purple-600" : "text-gray-400"
+                    className={`text-xs font-medium transition-colors duration-300 ${
+                      isActive
+                        ? "text-purple-600 dark:text-purple-400"
+                        : isCompleted
+                          ? "text-purple-600 dark:text-purple-400"
+                          : "text-gray-400 dark:text-gray-500"
                     }`}
                   >
                     {step.title}
@@ -391,7 +393,7 @@ export default function UserJoinPage() {
           </div>
 
           {/* 커스텀 프로그레스 바 */}
-          <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="relative w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden transition-colors duration-300">
             <div
               className="absolute top-0 left-0 h-full bg-gradient-to-r from-purple-500 to-blue-600 rounded-full transition-all duration-500 ease-out"
               style={{ width: `${progress}%` }}
@@ -402,10 +404,12 @@ export default function UserJoinPage() {
         </div>
 
         {/* Step Content */}
-        <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm animate-slide-up delay-300">
+        <Card className="shadow-2xl border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm animate-slide-up delay-300 transition-colors duration-300">
           <CardHeader className="text-center">
-            <CardTitle className="text-xl font-semibold text-gray-800">{steps[currentStep - 1]?.title}</CardTitle>
-            <CardDescription className="text-gray-600">
+            <CardTitle className="text-xl font-semibold text-gray-800 dark:text-white transition-colors duration-300">
+              {steps[currentStep - 1]?.title}
+            </CardTitle>
+            <CardDescription className="text-gray-600 dark:text-gray-400 transition-colors duration-300">
               {currentStep === 1 && "서비스 이용약관에 동의해주세요"}
               {currentStep === 2 && "이메일 인증을 완료해주세요"}
               {currentStep === 3 && "회원 정보를 입력해주세요"}
@@ -424,12 +428,15 @@ export default function UserJoinPage() {
                       checked={agreements.allAgree}
                       onCheckedChange={(checked) => handleAgreementChange("allAgree", checked as boolean)}
                     />
-                    <Label htmlFor="allAgree" className="font-semibold text-gray-800 text-lg">
+                    <Label
+                      htmlFor="allAgree"
+                      className="font-semibold text-gray-800 dark:text-white text-lg transition-colors duration-300"
+                    >
                       전체 동의
                     </Label>
                   </div>
 
-                  <div className="border-t pt-6 space-y-6">
+                  <div className="border-t border-gray-200 dark:border-gray-700 pt-6 space-y-6 transition-colors duration-300">
                     {/* 서비스 이용약관 */}
                     <div className="space-y-3">
                       <div className="flex items-center space-x-2">
@@ -438,11 +445,14 @@ export default function UserJoinPage() {
                           checked={agreements.terms}
                           onCheckedChange={(checked) => handleAgreementChange("terms", checked as boolean)}
                         />
-                        <Label htmlFor="terms" className="text-gray-700 font-medium">
+                        <Label
+                          htmlFor="terms"
+                          className="text-gray-700 dark:text-gray-300 font-medium transition-colors duration-300"
+                        >
                           서비스 이용약관 동의 <span className="text-red-500">*</span>
                         </Label>
                       </div>
-                      <div className="bg-gray-50 p-4 rounded-lg max-h-32 overflow-y-auto text-sm text-gray-600 border">
+                      <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg max-h-32 overflow-y-auto text-sm text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 transition-colors duration-300">
                         <h4 className="font-semibold mb-2">제1조 (목적)</h4>
                         <p className="mb-3">
                           본 약관은 MoodSync(이하 "회사")가 제공하는 감정 기반 맞춤 추천 서비스(이하 "서비스")의 이용과
@@ -486,11 +496,14 @@ export default function UserJoinPage() {
                           checked={agreements.privacy}
                           onCheckedChange={(checked) => handleAgreementChange("privacy", checked as boolean)}
                         />
-                        <Label htmlFor="privacy" className="text-gray-700 font-medium">
+                        <Label
+                          htmlFor="privacy"
+                          className="text-gray-700 dark:text-gray-300 font-medium transition-colors duration-300"
+                        >
                           개인정보 처리방침 동의 <span className="text-red-500">*</span>
                         </Label>
                       </div>
-                      <div className="bg-gray-50 p-4 rounded-lg max-h-32 overflow-y-auto text-sm text-gray-600 border">
+                      <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg max-h-32 overflow-y-auto text-sm text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 transition-colors duration-300">
                         <h4 className="font-semibold mb-2">1. 개인정보의 수집 및 이용목적</h4>
                         <p className="mb-3">
                           회사는 다음의 목적을 위하여 개인정보를 처리합니다:
@@ -530,11 +543,14 @@ export default function UserJoinPage() {
                           checked={agreements.marketing}
                           onCheckedChange={(checked) => handleAgreementChange("marketing", checked as boolean)}
                         />
-                        <Label htmlFor="marketing" className="text-gray-700 font-medium">
+                        <Label
+                          htmlFor="marketing"
+                          className="text-gray-700 dark:text-gray-300 font-medium transition-colors duration-300"
+                        >
                           마케팅 정보 수신 동의 (선택)
                         </Label>
                       </div>
-                      <div className="bg-gray-50 p-4 rounded-lg max-h-32 overflow-y-auto text-sm text-gray-600 border">
+                      <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg max-h-32 overflow-y-auto text-sm text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 transition-colors duration-300">
                         <h4 className="font-semibold mb-2">마케팅 정보 수신 동의</h4>
                         <p className="mb-3">
                           회사는 다음과 같은 마케팅 정보를 제공합니다:
@@ -563,7 +579,10 @@ export default function UserJoinPage() {
             {currentStep === 2 && (
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="userEmail" className="text-sm font-semibold text-gray-700">
+                  <Label
+                    htmlFor="userEmail"
+                    className="text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-300"
+                  >
                     이메일 주소 <span className="text-red-500">*</span>
                   </Label>
                   <div className="flex gap-2">
@@ -575,7 +594,7 @@ export default function UserJoinPage() {
                         value={form.userEmail}
                         onChange={handleChange}
                         placeholder="example@email.com"
-                        className="h-12 pr-10"
+                        className="h-12 pr-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-300"
                         disabled={emailLocked}
                       />
                       {emailLocked ? (
@@ -597,7 +616,10 @@ export default function UserJoinPage() {
 
                 {showVerificationInput && !verificationLocked && (
                   <div className="space-y-2">
-                    <Label htmlFor="verificationCode" className="text-sm font-semibold text-gray-700">
+                    <Label
+                      htmlFor="verificationCode"
+                      className="text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-300"
+                    >
                       인증번호
                     </Label>
                     <div className="flex gap-2">
@@ -606,7 +628,7 @@ export default function UserJoinPage() {
                         value={verificationCode}
                         onChange={(e) => setVerificationCode(e.target.value)}
                         placeholder="인증번호 8자리 입력"
-                        className="h-12"
+                        className="h-12 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-300"
                         maxLength={8}
                       />
                       <Button
@@ -622,23 +644,27 @@ export default function UserJoinPage() {
                 )}
 
                 {emailVerified && (
-                  <Alert className="border-green-200 bg-green-50">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <AlertDescription className="text-green-600 font-medium">
+                  <Alert className="border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20 transition-colors duration-300">
+                    <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    <AlertDescription className="text-green-600 dark:text-green-400 font-medium transition-colors duration-300">
                       이메일 인증이 완료되었습니다!
                     </AlertDescription>
                   </Alert>
                 )}
 
                 {emailError && (
-                  <Alert className="border-red-200 bg-red-50">
-                    <AlertDescription className="text-red-600">{emailError}</AlertDescription>
+                  <Alert className="border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 transition-colors duration-300">
+                    <AlertDescription className="text-red-600 dark:text-red-400 transition-colors duration-300">
+                      {emailError}
+                    </AlertDescription>
                   </Alert>
                 )}
 
                 {emailSuccess && !emailError && (
-                  <Alert className="border-blue-200 bg-blue-50">
-                    <AlertDescription className="text-blue-600">{emailSuccess}</AlertDescription>
+                  <Alert className="border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20 transition-colors duration-300">
+                    <AlertDescription className="text-blue-600 dark:text-blue-400 transition-colors duration-300">
+                      {emailSuccess}
+                    </AlertDescription>
                   </Alert>
                 )}
               </div>
@@ -649,7 +675,10 @@ export default function UserJoinPage() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="userId" className="text-sm font-semibold text-gray-700">
+                    <Label
+                      htmlFor="userId"
+                      className="text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-300"
+                    >
                       아이디 <span className="text-red-500">*</span>
                     </Label>
                     <Input
@@ -658,13 +687,16 @@ export default function UserJoinPage() {
                       value={form.userId}
                       onChange={handleChange}
                       placeholder="영문, 숫자 4~12자"
-                      className="h-12"
+                      className="h-12 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-300"
                       required
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="userName" className="text-sm font-semibold text-gray-700">
+                    <Label
+                      htmlFor="userName"
+                      className="text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-300"
+                    >
                       이름 <span className="text-red-500">*</span>
                     </Label>
                     <Input
@@ -673,14 +705,17 @@ export default function UserJoinPage() {
                       value={form.userName}
                       onChange={handleChange}
                       placeholder="한글 2~4자"
-                      className="h-12"
+                      className="h-12 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-300"
                       required
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="userPw" className="text-sm font-semibold text-gray-700">
+                  <Label
+                    htmlFor="userPw"
+                    className="text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-300"
+                  >
                     비밀번호 <span className="text-red-500">*</span>
                   </Label>
                   <div className="relative">
@@ -691,7 +726,7 @@ export default function UserJoinPage() {
                       value={form.userPw}
                       onChange={handleChange}
                       placeholder="영문, 숫자, 특수문자 포함 8~16자"
-                      className="h-12 pr-10"
+                      className="h-12 pr-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-300"
                       required
                     />
                     <Button
@@ -711,7 +746,10 @@ export default function UserJoinPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="pwdConfirm" className="text-sm font-semibold text-gray-700">
+                  <Label
+                    htmlFor="pwdConfirm"
+                    className="text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-300"
+                  >
                     비밀번호 확인 <span className="text-red-500">*</span>
                   </Label>
                   <div className="relative">
@@ -722,7 +760,7 @@ export default function UserJoinPage() {
                       value={form.pwdConfirm}
                       onChange={handleChange}
                       placeholder="비밀번호를 다시 입력"
-                      className="h-12 pr-10"
+                      className="h-12 pr-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-300"
                       required
                     />
                     <Button
@@ -739,12 +777,19 @@ export default function UserJoinPage() {
                       )}
                     </Button>
                   </div>
-                  {passwordMatchError && <p className="text-sm text-red-500">{passwordMatchError}</p>}
+                  {passwordMatchError && (
+                    <p className="text-sm text-red-500 dark:text-red-400 transition-colors duration-300">
+                      {passwordMatchError}
+                    </p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="userTel" className="text-sm font-semibold text-gray-700">
+                    <Label
+                      htmlFor="userTel"
+                      className="text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-300"
+                    >
                       전화번호 <span className="text-red-500">*</span>
                     </Label>
                     <div className="relative">
@@ -755,14 +800,17 @@ export default function UserJoinPage() {
                         value={form.userTel}
                         onChange={handleTelChange}
                         placeholder="010-0000-0000"
-                        className="h-12 pl-10"
+                        className="h-12 pl-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-300"
                         required
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="userBirth" className="text-sm font-semibold text-gray-700">
+                    <Label
+                      htmlFor="userBirth"
+                      className="text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-300"
+                    >
                       생년월일 <span className="text-red-500">*</span>
                     </Label>
                     <div className="relative">
@@ -773,7 +821,7 @@ export default function UserJoinPage() {
                         type="date"
                         value={form.userBirth}
                         onChange={handleChange}
-                        className="h-12 pl-10"
+                        className="h-12 pl-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white transition-colors duration-300"
                         required
                       />
                     </div>
@@ -781,7 +829,7 @@ export default function UserJoinPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-semibold text-gray-700">
+                  <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors duration-300">
                     주소 <span className="text-red-500">*</span>
                   </Label>
                   <div className="space-y-2">
@@ -790,7 +838,7 @@ export default function UserJoinPage() {
                         name="userZipCode"
                         value={form.userZipCode}
                         placeholder="우편번호"
-                        className="h-12"
+                        className="h-12 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-300"
                         readOnly
                         required
                       />
@@ -808,7 +856,7 @@ export default function UserJoinPage() {
                       name="userAddress"
                       value={form.userAddress}
                       placeholder="도로명 또는 지번 주소"
-                      className="h-12"
+                      className="h-12 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-300"
                       readOnly
                       required
                     />
@@ -817,14 +865,16 @@ export default function UserJoinPage() {
                       value={form.userDetailAddress}
                       onChange={handleChange}
                       placeholder="상세 주소 (선택사항)"
-                      className="h-12"
+                      className="h-12 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-300"
                     />
                   </div>
                 </div>
 
                 {error && (
-                  <Alert className="border-red-200 bg-red-50">
-                    <AlertDescription className="text-red-600">{error}</AlertDescription>
+                  <Alert className="border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 transition-colors duration-300">
+                    <AlertDescription className="text-red-600 dark:text-red-400 transition-colors duration-300">
+                      {error}
+                    </AlertDescription>
                   </Alert>
                 )}
               </form>
@@ -833,18 +883,20 @@ export default function UserJoinPage() {
             {/* Step 4: 완료 */}
             {currentStep === 4 && (
               <div className="text-center space-y-6">
-                <div className="w-20 h-20 bg-gradient-to-r from-purple-100 to-blue-100 rounded-full flex items-center justify-center mx-auto">
-                  <CheckCircle className="w-10 h-10 text-purple-600" />
+                <div className="w-20 h-20 bg-gradient-to-r from-purple-100 to-blue-100 dark:from-purple-900/30 dark:to-blue-900/30 rounded-full flex items-center justify-center mx-auto transition-colors duration-300">
+                  <CheckCircle className="w-10 h-10 text-purple-600 dark:text-purple-400" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-800 mb-2">회원가입 완료!</h3>
-                  <p className="text-gray-600">
+                  <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-2 transition-colors duration-300">
+                    회원가입 완료!
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 transition-colors duration-300">
                     MoodSync에 오신 것을 환영합니다.
                     <br />
                     잠시 후 로그인 페이지로 이동합니다.
                   </p>
                 </div>
-                <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+                <div className="flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">
                   <Heart className="w-4 h-4 text-pink-500" />
                   <span>감정 기반 맞춤 추천 서비스</span>
                   <Music className="w-4 h-4 text-blue-500" />
@@ -860,7 +912,7 @@ export default function UserJoinPage() {
                   variant="outline"
                   onClick={handlePrev}
                   disabled={currentStep === 1}
-                  className="h-12 px-6 border-purple-300 text-purple-600 hover:bg-purple-50"
+                  className="h-12 px-6 border-purple-300 dark:border-purple-600 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors duration-300"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   이전
@@ -903,9 +955,12 @@ export default function UserJoinPage() {
 
         {/* Login Link */}
         <div className="text-center mt-6 animate-slide-up delay-400">
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-400 transition-colors duration-300">
             이미 계정이 있으신가요?{" "}
-            <Link href="/user/login" className="text-purple-600 font-semibold hover:text-purple-700">
+            <Link
+              href="/user/login"
+              className="text-purple-600 dark:text-purple-400 font-semibold hover:text-purple-700 dark:hover:text-purple-300 transition-colors duration-300"
+            >
               로그인하기
             </Link>
           </p>

@@ -1,30 +1,32 @@
-// components/Header.tsx
-'use client';
+"use client"
 
-import { useState } from "react";
+import type React from "react"
 
-import { Heart } from "lucide-react";
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import useAuthStore from '@/store/authStore'; // Zustand 스토어 임포트
+import { useState } from "react"
+
+import { Heart } from "lucide-react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import useAuthStore from "@/store/authStore" // Zustand 스토어 임포트
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export default function Header() {
-  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-  const loading = useAuthStore((state) => state.loading); // 스토어에서 로딩 상태 가져오기
-  const logoutUser = useAuthStore((state) => state.logoutUser); // 스토어에서 로그아웃 함수 가져오기
-  const router = useRouter();
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn)
+  const loading = useAuthStore((state) => state.loading) // 스토어에서 로딩 상태 가져오기
+  const logoutUser = useAuthStore((state) => state.logoutUser) // 스토어에서 로그아웃 함수 가져오기
+  const router = useRouter()
 
-  const [searchValue, setSearchValue] = useState<string>("");
+  const [searchValue, setSearchValue] = useState<string>("")
 
   const handleLogout = async () => {
-    await logoutUser(); // Zustand 스토어의 로그아웃 함수 호출
-    router.push('/user/login'); // 로그인 페이지로 리다이렉트
-  };
+    await logoutUser() // Zustand 스토어의 로그아웃 함수 호출
+    router.push("/user/login") // 로그인 페이지로 리다이렉트
+  }
 
   if (loading) {
     // 로딩 중일 때 표시할 내용 (헤더는 고정하고 링크만 다르게)
     return (
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50 transition-colors duration-300">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -33,30 +35,42 @@ export default function Header() {
                 MoodSync
               </h1>
             </div>
-            <div className="flex-1 flex justify-center items-center w-[400px] ml-24">
-            <input
-              type="text"
-              placeholder="검색어를 입력하세요."
-              value={searchValue}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchValue(e.target.value)}
-              className="w-[60%] border border-gray-300 rounded-md px-4 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-            />
-            </div>
             <nav className="hidden md:flex items-center gap-6">
-              <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">홈</Link>
-              <Link href="/collections" className="text-gray-600 hover:text-gray-900 transition-colors">컬렉션</Link>
-              <Link href="/recordTest2" className="text-gray-600 hover:text-gray-900 transition-colors">내 기록</Link>
-              <span className="text-gray-400">인증 중</span>
-              <Link href="/settings" className="text-gray-600 hover:text-gray-900 transition-colors">설정</Link>
+              <Link
+                href="/"
+                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+              >
+                홈
+              </Link>
+              <Link
+                href="/collections"
+                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+              >
+                컬렉션
+              </Link>
+              <Link
+                href="/recordTest2"
+                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+              >
+                내 기록
+              </Link>
+              <span className="text-gray-400 dark:text-gray-500">인증 중</span>
+              <Link
+                href="/settings"
+                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+              >
+                설정
+              </Link>
+              <ThemeToggle />
             </nav>
           </div>
         </div>
       </header>
-    );
+    )
   }
 
   return (
-    <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+    <header className="border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50 transition-colors duration-300">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -71,39 +85,55 @@ export default function Header() {
               placeholder="검색어를 입력하세요."
               value={searchValue}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchValue(e.target.value)}
-              className="w-[60%] border border-gray-300 rounded-md px-4 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+              className="w-[60%] border border-gray-300 dark:border-gray-600 rounded-md px-4 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-400 dark:focus:ring-pink-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-300"
             />
           </div>
           <nav className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <Link
+              href="/"
+              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
               홈
             </Link>
-            <Link href="/collections" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <Link
+              href="/collections"
+              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
               컬렉션
             </Link>
-            <Link href="/recordTest2" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <Link
+              href="/recordTest2"
+              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
               내 기록
             </Link>
 
             {isLoggedIn ? (
               <button
                 onClick={handleLogout}
-                className="text-gray-600 hover:text-gray-900 transition-colors bg-transparent border-none cursor-pointer p-0"
+                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors bg-transparent border-none cursor-pointer p-0"
               >
                 로그아웃
               </button>
             ) : (
-              <Link href="/user/login" className="text-gray-600 hover:text-gray-900 transition-colors">
+              <Link
+                href="/user/login"
+                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+              >
                 로그인
               </Link>
             )}
 
-            <Link href="/settings" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <Link
+              href="/settings"
+              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
               설정
             </Link>
+            <ThemeToggle />
           </nav>
         </div>
       </div>
     </header>
-  );
+  )
 }

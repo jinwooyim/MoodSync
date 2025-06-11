@@ -39,4 +39,9 @@ public class CollectionServiceImpl implements CollectionService {
     	CollectionDAO dao = sqlSession.getMapper(CollectionDAO.class);
         return dao.selectAllCollections();
     }
+	@Override
+	public List<CollectionDTO> getCollectionsByUserId(String userId) {
+		CollectionDAO dao = sqlSession.getMapper(CollectionDAO.class);
+		return dao.findCollectionsByUserId(userId);
+	}
 }

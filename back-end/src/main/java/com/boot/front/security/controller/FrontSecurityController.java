@@ -109,6 +109,7 @@ public class FrontSecurityController {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         UserDTO user = principal.getUser();
         // DB에서 최신 사용자 정보 조회
+//        log.info("UserDTO user = principal.getUser();"+principal.getUser());
         HashMap<String, String> param = new HashMap<>();
         param.put("userId", user.getUserId());
         UserDTO fullUser = userService.getUserInfo(param);

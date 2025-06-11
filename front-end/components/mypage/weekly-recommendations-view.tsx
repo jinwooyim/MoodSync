@@ -44,33 +44,37 @@ export function WeeklyRecommendationsView({ allRecords }: WeeklyRecommendationsV
                   </span>
                 </div>
                 <div className="space-y-2">
-                  {record.recommendedMusics?.slice(0, 2).map((music) => {
-                    const video = record.youtubeSearchResults?.find((video) => {
-                      return (
-                        video.title.toLowerCase().includes(music.musicName.toLowerCase()) ||
-                        (video.channel && video.channel.toLowerCase().includes(music.musicName.toLowerCase()))
-                      )
-                    })
-
+                  {record.recommendedMusics?.slice(0, 3).map((music) => {
+                  const video = record.youtubeSearchResults?.find((video) => {
                     return (
-                      <div key={music.musicNumber} className="space-y-1">
-                        <div className="text-sm">
-                          🎵 {music.musicName} - {music.musicAuthor}
-                        </div>
-                        {video && (
-                          <a
-                            href={video.videoUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-xs text-blue-600 hover:text-blue-800"
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                            YouTube에서 듣기
-                          </a>
-                        )}
-                      </div>
+                      video.title.toLowerCase().includes(music.musicName.toLowerCase()) ||
+                      (video.channel && video.channel.toLowerCase().includes(music.musicName.toLowerCase()))
                     )
-                  })}
+                  })
+
+                  return (
+                    <div key={music.musicNumber} className="space-y-1">
+                      <div className="text-sm">
+                        🎵 {music.musicName} - {music.musicAuthor}
+                      </div>
+                      {video ? (
+                        <a
+                          href={video.videoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-xs text-blue-600 hover:text-blue-800"
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                          YouTube에서 듣기
+                        </a>
+                      ) : (
+                        <div className="text-xs text-muted-foreground">
+                          관련 유튜브 영상을 찾을 수 없습니다.
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
                 </div>
               </div>
             ))}
@@ -95,7 +99,7 @@ export function WeeklyRecommendationsView({ allRecords }: WeeklyRecommendationsV
                   </span>
                 </div>
                 <ul className="space-y-1">
-                  {record.recommendedActions?.slice(0, 2).map((action) => (
+                  {record.recommendedActions?.slice(0, 3).map((action) => (
                     <li key={action.actingNumber} className="text-sm text-muted-foreground">
                       🧘 {action.actingName}
                     </li>
@@ -124,7 +128,7 @@ export function WeeklyRecommendationsView({ allRecords }: WeeklyRecommendationsV
                   </span>
                 </div>
                 <ul className="space-y-1">
-                  {record.recommendedBooks?.slice(0, 2).map((book) => (
+                  {record.recommendedBooks?.slice(0, 3).map((book) => (
                     <li key={book.bookNumber} className="text-sm text-muted-foreground">
                       📖 {book.bookName} - {book.bookAuthor}
                     </li>

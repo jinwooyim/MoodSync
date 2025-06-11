@@ -93,6 +93,39 @@ public class YoutubeServiceImpl implements YoutubeService {
 			}
 		}
 	}
+	
+	//test videoId로 조회
+	public Map<String, String> getVideoDetailsById(String videoId) throws IOException {
+	    String apiUrl = "https://www.googleapis.com/youtube/v3/videos"
+	        + "?part=snippet"
+	        + "&id=" + videoId
+	        + "&key=" + API_KEY;
+
+	    URL url = new URL(apiUrl);
+	    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+	    conn.setRequestMethod("GET");
+
+	    try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+	        String json = reader.lines().collect(Collectors.joining());
+	        JSONObject jsonObj = new JSONObject(json);
+	        JSONArray items = jsonObj.getJSONArray("items");
+
+	        if (items.length() > 0) {
+	            JSONObject item = items.getJSONObject(0);
+	            JSONObject snippet = item.getJSONObject("snippet");
+
+	            Map<String, String> data = new HashMap<>();
+	            data.put("title", snippet.getString("title"));
+	            data.put("channel", snippet.getString("channelTitle"));
+	            data.put("thumbnail", snippet.getJSONObject("thumbnails").getJSONObject("high").getString("url"));
+	            data.put("videoUrl", "https://www.youtube.com/watch?v=" + videoId);
+	            return data;
+	        } else {
+	            return null;
+	        }
+	    }
+	}
+
     
     // test YouTube RSS Feed 방식 <- 503 error
 //    @Override

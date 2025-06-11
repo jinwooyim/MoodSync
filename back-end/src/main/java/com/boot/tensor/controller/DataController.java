@@ -37,7 +37,7 @@ public class DataController {
 	@PostMapping("/emotion-result")
 	public ResponseEntity<?> executePredict(@RequestBody Map<String, Object> payload) {
 //	    log.info("@# 실행 emotion-result");
-//	    log.info("@# payload =>" + payload);
+	    log.info("@# payload =>" + payload);
 	    
 	    // tfResult에서 데이터 추출
 	    Map<String, Object> tfResult = (Map<String, Object>) payload.get("tfResult");
@@ -57,7 +57,7 @@ public class DataController {
 	    
 	    // null 체크
 	    if (actMap == null || musicMap == null || bookMap == null) {
-	        return ResponseEntity.badRequest().body("값없노");
+	        return ResponseEntity.badRequest().body("필요한 데이터가 누락되었습니다.");
 	    }
 	    
 	    int actPredictedClass = (int) actMap.get("predictedClass");
@@ -68,26 +68,26 @@ public class DataController {
 //	    log.info("@# musicPredictedClass =>" + musicPredictedClass);
 //	    log.info("@# bookPredictedClass =>" + bookPredictedClass);
 
-	    ArrayList<ActingDTO> act_dtos = getListActing(actPredictedClass + 1);
+	    ArrayList<ActingDTO> act_dtos = actingService.getRandomActing(bookPredictedClass, userEmotionData);
 	    ArrayList<MusicDTO> music_dtos = getListMusic(musicPredictedClass + 1);
-	    ArrayList<BookDTO> book_dtos = getListBook(bookPredictedClass + 1);
+	    ArrayList<BookDTO> book_dtos = bookService.getRandomBook(bookPredictedClass + 1, userEmotionData);
 
 	    Map<String, Object> result = new HashMap<>();
 	    result.put("act_dtos", act_dtos);
 	    result.put("music_dtos", music_dtos);
 	    result.put("book_dtos", book_dtos);
 
-//	    log.info("@# result =>" + result);
+	    log.info("@# result =>" + result);
 
 	    return ResponseEntity.ok(result);
 	}
 
 	// 해당 감정 통해서 랜덤 3개의 음악, 행동, 도서 추출
 	// 행동
-	public ArrayList<ActingDTO> getListActing(int emotionNumber) {
-		ArrayList<ActingDTO> acting_dtos = actingService.getRandomActing(emotionNumber);
-		return acting_dtos;
-	}
+//	public ArrayList<ActingDTO> getListActing(int emotionNumber) {
+//		ArrayList<ActingDTO> acting_dtos = actingService.getRandomActing(emotionNumber);
+//		return acting_dtos;
+//	}
 
 	// 음악
 	public ArrayList<MusicDTO> getListMusic(int emotionNumber) {
@@ -95,10 +95,10 @@ public class DataController {
 		return music_dtos;
 	}
 
-	// 도서
-	public ArrayList<BookDTO> getListBook(int emotionNumber) {
-
-		ArrayList<BookDTO> book_dtos = bookService.getRandomBook(emotionNumber);
-		return book_dtos;
-	}
+//	// 도서
+//	public ArrayList<BookDTO> getListBook(int emotionNumber) {
+//
+//		ArrayList<BookDTO> book_dtos = bookService.getRandomBook(emotionNumber);
+//		return book_dtos;
+//	}
 }

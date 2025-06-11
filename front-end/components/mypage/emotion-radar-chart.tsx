@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react"
 import { Chart, RadarController, RadialLinearScale, PointElement, LineElement, Tooltip, Legend } from "chart.js"
-import type { UserRecord } from "@/lib/api-types"
+import type { UserRecord } from "@/lib/mypage/mypage-types"
 
 Chart.register(RadarController, RadialLinearScale, PointElement, LineElement, Tooltip, Legend)
 

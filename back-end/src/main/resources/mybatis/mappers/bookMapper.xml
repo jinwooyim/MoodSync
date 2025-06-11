@@ -9,7 +9,19 @@ select * from EMOTIONBOOK
 </select>
 
 <select id="getRandomBook" resultType="com.boot.tensor.dto.BookDTO">
-select * from emotionBook where bookSubNumber=#{bookSubNumber}AND ROWNUM = 1
+SELECT * FROM (
+        SELECT * FROM emotionBook 
+        WHERE bookSubNumber = #{bookSubNumber}
+        ORDER BY DBMS_RANDOM.VALUE
+    ) 
+    WHERE ROWNUM &lt;= 3
+
+<!--select * from emotionBook where bookSubNumber=#{bookSubNumber}AND ROWNUM = 1-->
+
+<!--select * from emotionBook -->
+<!--where emotionNumber = #{emotionNumber} -->
+<!--AND bookSubNumber = #{bookSubNumber}-->
+<!--AND ROWNUM = 1-->
 </select>
 </mapper>
 

@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useState } from "react"
 import { createContact } from "@/lib/api/contact"
 import { SuccessModal } from "@/components/contact/success-modal"
-// import { MyContactsModal } from "@/components/contact/my-contacts-modal"
+import {MyContactsModal} from "@/components/contact/my-contacts-modal"
 
 export default function ContactPage() {
   const router = useRouter()
@@ -250,7 +250,7 @@ export default function ContactPage() {
       />
 
       {/* 나의 문의 모달 */}
-      {/* <MyContactsModal isOpen={showMyContactsModal} onClose={handleCloseMyContacts} /> */}
+      <MyContactsModal isOpen={showMyContactsModal} onClose={handleCloseMyContacts} />
     </div>
   )
 }

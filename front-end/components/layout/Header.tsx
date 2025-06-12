@@ -1,29 +1,56 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
-
-import { Heart } from "lucide-react"
+import { Heart, Shield, RefreshCw } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import useAuthStore from "@/store/authStore" // Zustand 스토어 임포트
+import { useEffect, useState } from "react"
+import useAuthStore from "@/store/authStore"
 import { ThemeToggle } from "@/components/theme-toggle"
 
 export default function Header() {
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn)
-  const loading = useAuthStore((state) => state.loading) // 스토어에서 로딩 상태 가져오기
-  const logoutUser = useAuthStore((state) => state.logoutUser) // 스토어에서 로그아웃 함수 가져오기
+  const loading = useAuthStore((state) => state.loading)
+  const user = useAuthStore((state) => state.user)
+  const isAdmin = useAuthStore((state) => state.isAdmin)
+  const logoutUser = useAuthStore((state) => state.logoutUser)
+  const refreshUserInfo = useAuthStore((state) => state.refreshUserInfo)
   const router = useRouter()
+  const [refreshing, setRefreshing] = useState(false)
 
+  // 컴포넌트 마운트 시 관리자 상태 확인
+  useEffect(() => {
+    if (isLoggedIn && user) {
+      const adminStatus = isAdmin()
+      console.log("Header: 관리자 상태 확인:", {
+        isLoggedIn,
+        user,
+        adminStatus,
+      })
+    }
+  }, [isLoggedIn, user, isAdmin])
 
   const handleLogout = async () => {
-    await logoutUser() // Zustand 스토어의 로그아웃 함수 호출
-    router.push("/user/login") // 로그인 페이지로 리다이렉트
+    await logoutUser()
+    router.push("/user/login")
   }
 
+  // 사용자 정보 새로고침 함수
+  const handleRefreshUserInfo = async () => {
+    setRefreshing(true)
+    try {
+      await refreshUserInfo()
+      console.log("사용자 정보 새로고침 완료")
+    } catch (error) {
+      console.error("사용자 정보 새로고침 실패:", error)
+    } finally {
+      setRefreshing(false)
+    }
+  }
+
+  // 관리자 상태를 실시간으로 확인
+  const adminStatus = isLoggedIn ? isAdmin() : false
+
   if (loading) {
-    // 로딩 중일 때 표시할 내용 (헤더는 고정하고 링크만 다르게)
     return (
       <header className="border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50 transition-colors duration-300">
         <div className="container mx-auto px-4 py-4">
@@ -79,6 +106,35 @@ export default function Header() {
             </h1>
           </div>
           <nav className="hidden md:flex items-center gap-6">
+            {/* 관리자 전용 버튼 */}
+            {isLoggedIn && adminStatus && (
+              <Link
+                href="/admin"
+                className="flex items-center gap-1 px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors text-sm font-medium shadow-sm"
+                title="관리자 대시보드"
+              >
+                <Shield className="w-4 h-4" />
+                관리자
+              </Link>
+            )}
+
+            {/* 디버깅용 임시 정보 표시 (개발 환경에서 관리자만) */}
+            {process.env.NODE_ENV === "development" && isLoggedIn && user && adminStatus && (
+              <div className="flex items-center gap-2">
+                {/* <div className="text-xs text-gray-500 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                  Admin: {adminStatus ? "YES" : "NO"} | userAdmin: {user.userAdmin} | useradmin: {user.useradmin}
+                </div> */}
+                <button
+                  onClick={handleRefreshUserInfo}
+                  className="text-xs text-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-300 px-2 py-1 rounded flex items-center gap-1"
+                  disabled={refreshing}
+                >
+                  <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} />
+                  {refreshing ? "새로고침 중..." : "정보 새로고침"}
+                </button>
+              </div>
+            )}
+
             <Link
               href="/"
               className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"

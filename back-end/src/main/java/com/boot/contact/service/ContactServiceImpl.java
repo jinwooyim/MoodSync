@@ -53,4 +53,17 @@ public class ContactServiceImpl implements ContactService {
 		return dao.getTotalCount(criteriaDTO);
 	}
 
+	@Override
+	public ArrayList<ContactDTO> onlyUserContact(CriteriaDTO criteriaDTO) {
+		ContactDAO dao = sqlsession.getMapper(ContactDAO.class);
+		ArrayList<ContactDTO> list = dao.onlyUserContact(criteriaDTO);
+		return list;
+	}
+
+	@Override
+	public int getUserContactCount(CriteriaDTO criteriaDTO) {
+		ContactDAO dao = sqlsession.getMapper(ContactDAO.class);
+		return dao.getUserContactCount(criteriaDTO);
+	}
+
 }

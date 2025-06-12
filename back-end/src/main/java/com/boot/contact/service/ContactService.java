@@ -30,4 +30,10 @@ public interface ContactService {
 
 	// 전체 불러오기 (페이징용)
 	public int getTotalCount(CriteriaDTO criteriaDTO);
+
+	// 사용자 본인꺼만 불러오기(일단 페이징 처리)
+	public ArrayList<ContactDTO> onlyUserContact(CriteriaDTO criteriaDTO);
+
+	// 사용자 본인꺼 전체 갯수
+	public int getUserContactCount(CriteriaDTO criteriaDTO);
 }

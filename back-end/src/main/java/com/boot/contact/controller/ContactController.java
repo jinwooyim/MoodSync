@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,6 +29,10 @@ public class ContactController {
     @Autowired
     private ContactService contactService;
 
+    /**
+     * 문의 생성
+     * GET /api/create_contact
+     */
     @GetMapping("/create_contact")
     public ResponseEntity<?> createContact(@RequestParam HashMap<String, String> param, HttpServletRequest request) {
         try {
@@ -86,6 +89,10 @@ public class ContactController {
         }
     }
 
+    /**
+     * 특정 문의 조회
+     * GET /api/read_contact
+     */
     @GetMapping("/read_contact")
     public ResponseEntity<?> readContact(@RequestParam HashMap<String, String> param, HttpServletRequest request) {
         try {
@@ -127,6 +134,10 @@ public class ContactController {
         }
     }
 
+    /**
+     * 문의 수정
+     * GET /api/update_contact
+     */
     @GetMapping("/update_contact")
     public ResponseEntity<?> updateContact(@RequestParam HashMap<String, String> param, HttpServletRequest request) {
         try {
@@ -182,6 +193,10 @@ public class ContactController {
         }
     }
 
+    /**
+     * 문의 삭제
+     * GET /api/delete_contact
+     */
     @GetMapping("/delete_contact")
     public ResponseEntity<?> deleteContact(@RequestParam HashMap<String, String> param, HttpServletRequest request) {
         try {
@@ -222,19 +237,157 @@ public class ContactController {
         }
     }
 
+    /**
+     * 전체 문의 조회 (페이징)
+     * GET /api/all_contacts
+     */
     @GetMapping("/all_contacts")
     public ResponseEntity<?> getAllContacts(
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "10") int amount,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String type,
             HttpServletRequest request) {
-    	return null;
+        try {
+            BasicUserDTO userDTO = (BasicUserDTO) request.getAttribute("user");
+            
+            if (userDTO == null) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("status", "error");
+                errorResponse.put("message", "로그인이 필요합니다.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+            }
+
+            log.info("전체 문의 조회 요청: pageNum={}, amount={}", pageNum, amount);
+
+            // CriteriaDTO 생성
+            CriteriaDTO criteriaDTO = new CriteriaDTO(pageNum, amount);
+
+            // 문의 목록 조회
+            ArrayList<ContactDTO> contactList = contactService.allReadContact(criteriaDTO);
+
+            // 총 개수 조회
+            int totalCount = contactService.getTotalCount(criteriaDTO);
+
+            // 페이징 정보 계산
+            int totalPages = (int) Math.ceil((double) totalCount / amount);
+            boolean hasNext = pageNum < totalPages;
+            boolean hasPrevious = pageNum > 1;
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("data", contactList);
+            response.put("pagination", Map.of(
+                "currentPage", pageNum,
+                "pageSize", amount,
+                "totalCount", totalCount,
+                "totalPages", totalPages,
+                "hasNext", hasNext,
+                "hasPrevious", hasPrevious
+            ));
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("전체 문의 조회 중 오류 발생: ", e);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", "서버 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
     }
 
-    // 문의 통계 어케 만들지
+    /**
+     * 문의 통계 조회
+     * GET /api/contact_stats
+     */
     @GetMapping("/contact_stats")
     public ResponseEntity<?> getContactStats(HttpServletRequest request) {
-    	return null;
+        try {
+            BasicUserDTO userDTO = (BasicUserDTO) request.getAttribute("user");
+            
+            if (userDTO == null) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("status", "error");
+                errorResponse.put("message", "로그인이 필요합니다.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+            }
+
+            log.info("문의 통계 조회 요청");
+
+            CriteriaDTO criteriaDTO = new CriteriaDTO();
+            int totalCount = contactService.getTotalCount(criteriaDTO);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("totalContacts", totalCount);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("문의 통계 조회 중 오류 발생: ", e);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", "서버 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    /**
+     * 사용자 본인의 문의 조회 (페이징)
+     * GET /api/my_contacts
+     */
+    @GetMapping("/my_contacts")
+    public ResponseEntity<?> getMyContacts(
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int amount,
+            HttpServletRequest request) {
+        try {
+            BasicUserDTO userDTO = (BasicUserDTO) request.getAttribute("user");
+            
+            if (userDTO == null) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("status", "error");
+                errorResponse.put("message", "로그인이 필요합니다.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+            }
+
+            int userNumber = userDTO.getUserNumber();
+            log.info("사용자 본인 문의 조회 요청: userNumber={}, pageNum={}, amount={}", userNumber, pageNum, amount);
+
+            // CriteriaDTO 생성 및 사용자 번호 설정
+            CriteriaDTO criteriaDTO = new CriteriaDTO(pageNum, amount);
+            criteriaDTO.setUserNumber(userNumber); // CriteriaDTO에 userNumber 필드 추가 필요
+
+            // 사용자 문의 목록 조회
+            ArrayList<ContactDTO> contactList = contactService.onlyUserContact(criteriaDTO);
+
+            // 사용자 문의 총 개수 조회
+            int totalCount = contactService.getUserContactCount(criteriaDTO);
+
+            // 페이징 정보 계산
+            int totalPages = (int) Math.ceil((double) totalCount / amount);
+            boolean hasNext = pageNum < totalPages;
+            boolean hasPrevious = pageNum > 1;
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("data", contactList);
+            response.put("pagination", Map.of(
+                "currentPage", pageNum,
+                "pageSize", amount,
+                "totalCount", totalCount,
+                "totalPages", totalPages,
+                "hasNext", hasNext,
+                "hasPrevious", hasPrevious
+            ));
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("사용자 문의 조회 중 오류 발생: ", e);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", "서버 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
     }
 }

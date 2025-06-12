@@ -9,6 +9,7 @@ public class CriteriaDTO {
     private int amount; // 페이지당 글 갯수
     private String type;
     private String keyword;
+    private int userNumber;
 
     public CriteriaDTO() {
         this(1, 1, 10);

@@ -68,45 +68,58 @@ async function loadModelPureJS(dirPath) {
 // ========== 모델 학습 함수 ===========
 // 훈련 API
 async function ModelTraining(response, modelType = 'default') {
-    console.log(`🎯 ${modelType} 모델 학습 시작`);
+    console.log(`${modelType} 모델 학습 시작`);
     
     // 1. 데이터 불러오기
     const { features, labels } = response.data;
-    console.log(`📊 ${modelType} 데이터 크기: ${features.length}개`);
+    console.log(`${modelType} 데이터 크기: ${features.length}개`);
 
+    // 늘리면
+    // epochs장점 => 높히면 패턴학습 더 잘됨
+    // epochs단점 => 해당 훈련데이터에만 특화, 불필요한 컴퓨팅까지 사용
+
+    // batchSize장점 => GPU메모리 사용량 감소, 최솟값 탈출 도움
+    // batchSize단점 => 업데이트 많이 필요, 최적점 찾기 힘듬
+
+    // learningRate장점 => 천천히 정확하게 학습, 최적점 찾기 좋음
+    // learningRate단점 => 오래걸림, 충분히 학습 못할수도
+
+    // hiddenUnits장점 => 복잡한 패턴 학습 가능, 정교하게 학습
+    // hiddenUnits단점 => 메모리 많이 사용, 새로운 데이터에 약함, 최적화 어려움움
     // 2. 모델별 최적화된 설정
     const configs = {
         act: { 
-            epochs: 120, 
+            epochs: 140, 
             batchSize: 16, 
             learningRate: 0.0001,
             patience: 200,
             hiddenUnits: [64, 32]
         },
         music: { 
-            epochs: 120, 
+            epochs: 140, 
             batchSize: 16, 
             learningRate: 0.0001,
             patience: 200,
             hiddenUnits: [64, 32]
         },
         book: { 
-            epochs: 120, 
+            epochs: 140, 
             batchSize: 16, 
             learningRate: 0.0001,
             patience: 200,
             hiddenUnits: [64, 32]
         },
         default: { 
-            epochs: 600, 
-            batchSize: 24, 
+            epochs: 140, 
+            batchSize: 16, 
+            learningRate: 0.0001,
             patience: 200,
-            hiddenUnits: [32, 16]
+            hiddenUnits: [64, 32]
         }
     };
     
     const config = configs[modelType] || configs.default;
-    console.log(`⚙️ ${modelType} 설정: epochs=${config.epochs}, batch=${config.batchSize}`);
+    console.log(`${modelType} 설정: epochs=${config.epochs}, batch=${config.batchSize}`);
 
     // 3. Tensor로 변환
     const xs = tf.tensor2d(features);
@@ -158,7 +171,7 @@ async function ModelTraining(response, modelType = 'default') {
             
             // 5초마다 또는 마지막 에포크에서만 로그 출력
             if (currentTime - lastLogTime > 5000 || epoch === config.epochs - 1) {
-                console.log(`📈 ${modelType} Epoch ${epoch + 1}/${config.epochs}: ` +
+                console.log(`${modelType} Epoch ${epoch + 1}/${config.epochs}: ` +
                           `loss=${logs.loss.toFixed(4)}, acc=${logs.acc.toFixed(4)}, ` +
                           `val_loss=${logs.val_loss.toFixed(4)}, val_acc=${logs.val_acc.toFixed(4)}`);
                 lastLogTime = currentTime;
@@ -171,7 +184,7 @@ async function ModelTraining(response, modelType = 'default') {
             } else {
                 patienceCounter++;
                 if (patienceCounter >= config.patience) {
-                    console.log(`🛑 ${modelType} 조기 종료 (patience=${config.patience})`);
+                    console.log(`${modelType} 조기 종료 (patience=${config.patience})`);
                     model.stopTraining = true;
                 }
             }
@@ -193,7 +206,7 @@ async function ModelTraining(response, modelType = 'default') {
     const endTime = Date.now();
     const duration = ((endTime - startTime) / 1000).toFixed(2);
     
-    console.log(`✅ ${modelType} 학습 완료 (${duration}초, 최고 검증 정확도: ${bestValAcc.toFixed(4)})`);
+    console.log(`=============== ${modelType} 학습 완료 (${duration}초, 최고 검증 정확도: ${bestValAcc.toFixed(4)})`);
 
     // 9. 메모리 정리
     xs.dispose();
@@ -228,12 +241,12 @@ async function getCachedData(type, url) {
   // 캐시가 유효한지 확인
   if (dataCache[type] && dataCache.lastUpdated && 
       (now - dataCache.lastUpdated) < CACHE_DURATION) {
-    console.log(`📋 ${type} 캐시된 데이터 사용`);
+    console.log(`${type} 캐시된 데이터 사용`);
     return dataCache[type];
   }
   
   // 새로운 데이터 가져오기
-  console.log(`🔄 ${type} 새로운 데이터 로딩`);
+  console.log(`${type} 새로운 데이터 로딩`);
   const response = await axios.get(url);
   dataCache[type] = response;
   dataCache.lastUpdated = now;
@@ -246,7 +259,7 @@ async function getCachedData(type, url) {
 app.get('/train', async (req, res) => {
   try {
     const startTime = Date.now();
-    console.log('🚀 모든 모델 병렬 학습 시작');
+    console.log('모든 모델 병렬 학습 시작');
     
     // 데이터 병렬 로딩
     const [act_response, music_response, book_response] = await Promise.all([
@@ -255,7 +268,7 @@ app.get('/train', async (req, res) => {
       axios.get('http://localhost:8485/api/book-data')
     ]);
     
-    console.log('📊 모든 데이터 로딩 완료');
+    console.log('모든 데이터 로딩 완료');
     
     // 모델 병렬 학습 (타입 지정)
     const [act_model, music_model, book_model] = await Promise.all([
@@ -274,20 +287,20 @@ app.get('/train', async (req, res) => {
     const endTime = Date.now();
     const totalDuration = ((endTime - startTime) / 1000).toFixed(2);
     
-    console.log(`🎉 전체 학습 완료! 총 소요시간: ${totalDuration}초`);
+    console.log(`전체 학습 완료! 총 소요시간: ${totalDuration}초`);
     
     res.send({ 
       message: 'Training completed successfully!',
       duration: totalDuration,
       models: {
-        act: '✅ 완료',
-        music: '✅ 완료', 
-        book: '✅ 완료'
+        act: '완료',
+        music: '완료', 
+        book: '완료'
       }
     });
 
   } catch (error) {
-    console.error('❌ Training failed:', error);
+    console.error('Training failed:', error);
     res.status(500).send({ error: error.message });
   }
 });
@@ -358,7 +371,7 @@ app.post('/predict', express.json(), async (req, res) => {
       },
     };
 
-    console.log("🎯 예측 결과 응답 데이터 =>", JSON.stringify(responseData, null, 2)); // 보기 좋게 출력
+    console.log("예측 결과 응답 데이터 =>", JSON.stringify(responseData, null, 2)); // 보기 좋게 출력
 
     res.json(responseData);
 

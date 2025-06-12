@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 public class ContactDTO {
 	private int contactId;
 	private int userNumber;
-	private String contact_title;
-	private String contact_content;
+	private String contactTitle;
+	private String contactContent;
 }

@@ -5,7 +5,8 @@ import { useState, useEffect } from "react";
 import type { Collection } from "@/types/collection";
 import { fetchCollections, createCollection, updateCollection, deleteCollection } from "@/lib/api/collections";
 
-// 분리된 컴포넌트 임포트
+import { useSearchParams, useRouter } from "next/navigation";
+
 import CollectionCard from "@/components/Collection/CollectionCard";
 import CollectionFormModal from "@/components/Collection/CollectionFormModal";
 import CollectionDetailModal from "@/components/Collection/CollectionDetailModal";
@@ -15,6 +16,7 @@ export default function CollectionPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    const router = useRouter();
     // 컬렉션 생성/수정 모달 관련 상태
     const [showFormModal, setShowFormModal] = useState(false); // 이름을 showModal -> showFormModal로 변경
     const [editingCollection, setEditingCollection] = useState<Collection | null>(null);
@@ -22,6 +24,9 @@ export default function CollectionPage() {
     // 컬렉션 상세 보기 모달 관련 상태
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [selectedCollection, setSelectedCollection] = useState<Collection | null>(null);
+    
+    // URL 에서 생성을 타고 온 경우에는 바로 생성 핸들러 실행 
+    const searchParams = useSearchParams();
 
     useEffect(() => {
         const loadCollections = async () => {
@@ -29,15 +34,27 @@ export default function CollectionPage() {
             try {
                 const fetchedCollections = await fetchCollections();
                 setCollections(fetchedCollections);
+                
+                const action = searchParams?.get('action');
+                if (action === 'create') {
+                    setShowFormModal(true);
+                    setEditingCollection(null); // 새 컬렉션 생성이므로 editingCollection은 null
+                }
             } catch (e) {
-                setError("컬렉션 목록을 불러오지 못했습니다.");
-                console.error("Failed to fetch collections:", e);
+                if (e instanceof Error && e.message === 'Unauthorized') {
+                    alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+                    router.push('/user/login');
+                    return;
+
+                }
+                // setError("컬렉션 목록을 불러오지 못했습니다.");
+                // console.error("Failed to fetch collections:", e);
             } finally {
                 setLoading(false);
             }
         };
         loadCollections();
-    }, []);
+    }, [searchParams]);
 
     // 컬렉션 생성/수정 제출 핸들러 (CollectionFormModal로 전달)
     const handleFormSubmit = async (
@@ -69,9 +86,14 @@ export default function CollectionPage() {
             setEditingCollection(null); // 수정 중인 컬렉션 초기화
             const newCollections = await fetchCollections(); // 데이터 새로고침
             setCollections(newCollections);
-        } catch (err: any) {
-            console.error("API 호출 중 오류 발생:", err);
-            const errorMessage = err.response?.data?.message || err.message || '알 수 없는 오류';
+        } catch (e: any) {
+            console.error("API 호출 중 오류 발생:", e);
+            if (e instanceof Error && e.message === 'Unauthorized') {
+                alert('로그인이 만료되었습니다. 다시 로그인 해주세요.');
+                router.push('/user/login');
+                return;
+            }
+            const errorMessage = e.response?.data?.message || e.message || '알 수 없는 오류';
             alert(`작업에 실패했습니다: ${errorMessage}`);
         }
     };

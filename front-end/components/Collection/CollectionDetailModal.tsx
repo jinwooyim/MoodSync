@@ -1,7 +1,7 @@
 // components/CollectionDetailModal.tsx
 import React from 'react';
 import type { Collection } from '@/types/collection';
-import { Music, CheckSquare, Book } from "lucide-react"
+import { Music, Activity , Book } from "lucide-react"
 
 interface CollectionDetailModalProps {
     isOpen: boolean;
@@ -40,7 +40,7 @@ const CollectionDetailModal: React.FC<CollectionDetailModalProps> = ({
                             <li key={item.id} className="bg-gray-50 p-3 rounded-md flex items-center gap-3">
                                 <span className="text-xl">
                                     {item.contentType === 'music' && <Music className="w-4 h-4" />}
-                                    {item.contentType === 'acting' && <CheckSquare className="w-4 h-4" />}
+                                    {item.contentType === 'activity' && <Activity  className="w-4 h-4" />}
                                     {item.contentType === 'book' && <Book className="w-4 h-4" />}
                                 </span>
                                 <div className="flex-1">

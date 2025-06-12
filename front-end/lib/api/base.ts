@@ -26,13 +26,14 @@ api.interceptors.response.use(
   (error) => {
     // 401 Unauthorized 에러 발생 시 로그인 페이지로 리디렉션
     if (error.response && error.response.status === 401) {
-      console.error('Unauthorized: 사용자 인증이 필요합니다. 로그인 페이지로 리디렉션.');
+      // console.error('Unauthorized: 사용자 인증이 필요합니다. 로그인 페이지로 리디렉션.');
       // Next.js 라우터 인스턴스가 필요하므로, 호출하는 컴포넌트에서 직접 리디렉션을 처리하는 것이 더 안전할 수 있습니다.
       // 또는 이곳에서 next/navigation의 useRouter를 사용하려면, 이 파일을 'use client'로 바꾸고 클라이언트 컴포넌트로 만들어야 하지만,
       // API 모듈은 서버에서도 사용될 수 있으므로 직접 라우터에 의존하지 않는 것이 일반적입니다.
       // 대신, 각 컴포넌트에서 에러를 catch하여 처리하는 것을 권장합니다.
       // window.location.href = '/user/login'; // 긴급 리디렉션 (Next.js 라우터가 아닌 브라우저 API 사용)
-      return Promise.reject(new Error('Unauthorized')); // 에러를 발생시켜 컴포넌트의 catch 블록으로 전달
+      return Promise.reject(new Error('Unauthorized')); 
+      // return Promise.reject(error);
     }
     return Promise.reject(error);
   }

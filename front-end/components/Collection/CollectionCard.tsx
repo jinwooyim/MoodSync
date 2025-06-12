@@ -1,7 +1,7 @@
 // components/CollectionCard.tsx
 import React from 'react';
 import type { Collection } from '@/types/collection';
-import { Music, CheckSquare, Book } from "lucide-react"
+import { Music, Activity , Book } from "lucide-react"
 
 interface CollectionCardProps {
     collection: Collection;
@@ -49,7 +49,7 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
                                 >
                                     <span className="font-bold">
                                         {item.contentType === 'music' && <Music className="w-4 h-4" />}
-                                        {item.contentType === 'acting' && <CheckSquare className="w-4 h-4" />}
+                                        {item.contentType === 'activity' && <Activity className="w-4 h-4" />}
                                         {item.contentType === 'book' && <Book className="w-4 h-4" />}
                                     </span>
                                     <span>{item.contentTitle}</span>

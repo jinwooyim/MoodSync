@@ -18,7 +18,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
 import type { MusicRecommendation, ActivityRecommendation, BookRecommendation } from "@/types";
-
+import { useRouter } from 'next/navigation';
 interface CollectionSelectModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -38,7 +38,7 @@ export default function CollectionSelectModal({
 }: CollectionSelectModalProps) {
   // selectedCollectionId는 number 타입.
   const [selectedCollectionId, setSelectedCollectionId] = useState<number | null>(null);
-
+  const router = useRouter();
   useEffect(() => {
     if (isOpen) {
       setSelectedCollectionId(null);
@@ -74,6 +74,11 @@ export default function CollectionSelectModal({
     }
   }, [isOpen, collections, selectedCollectionId]);
 
+ const handleGoToCreateCollection = () => {
+    onClose(); // 모달 닫기
+    router.push('/collections?action=create'); // 컬렉션 생성 페이지로 이동 (예시 경로)
+    // 실제 컬렉션 생성 페이지의 경로로 변경해야 합니다.
+  };
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
@@ -86,9 +91,14 @@ export default function CollectionSelectModal({
         </AlertDialogHeader>
         <div className="max-h-60 overflow-y-auto pr-4">
           {collections.length === 0 ? (
+            <div className="text-center">
             <p className="text-center text-gray-500 dark:text-gray-400">
               추가할 컬렉션이 없습니다. 먼저 컬렉션을 생성해 주세요.
             </p>
+              <Button onClick={handleGoToCreateCollection} className="mt-2">
+                컬렉션 생성 페이지로 이동
+              </Button>
+            </div>
           ) : (
             <RadioGroup
               value={selectedCollectionId !== null ? String(selectedCollectionId) : ""}

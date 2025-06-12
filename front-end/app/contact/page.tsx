@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useRouter } from "next/navigation"
-import { Heart, Mail, Phone, MapPin, Send, Loader2 } from "lucide-react"
+import { Heart, Mail, Phone, MapPin, Send, Loader2, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useState } from "react"
 import { createContact } from "@/lib/api/contact"
 import { SuccessModal } from "@/components/contact/success-modal"
+// import { MyContactsModal } from "@/components/contact/my-contacts-modal"
 
 export default function ContactPage() {
   const router = useRouter()
@@ -19,6 +20,7 @@ export default function ContactPage() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [showMyContactsModal, setShowMyContactsModal] = useState(false)
   const { toast } = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -75,6 +77,14 @@ export default function ContactPage() {
     setShowSuccessModal(false)
     // 메인 페이지로 이동
     router.push("/")
+  }
+
+  const handleOpenMyContacts = () => {
+    setShowMyContactsModal(true)
+  }
+
+  const handleCloseMyContacts = () => {
+    setShowMyContactsModal(false)
   }
 
   return (
@@ -152,9 +162,21 @@ export default function ContactPage() {
           {/* Contact Form */}
           <div className="lg:col-span-2">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300">
-              <h2 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white transition-colors duration-300">
-                문의 양식
-              </h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white transition-colors duration-300">
+                  문의 양식
+                </h2>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleOpenMyContacts}
+                  className="flex items-center gap-2 text-pink-600 border-pink-200 hover:bg-pink-50 dark:text-pink-400 dark:border-pink-800 dark:hover:bg-pink-900/20"
+                >
+                  <FileText className="w-4 h-4" />
+                  나의 문의
+                </Button>
+              </div>
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label
@@ -226,6 +248,9 @@ export default function ContactPage() {
         title="문의가 등록되었습니다"
         description="문의사항이 성공적으로 등록되었습니다. 빠른 시일 내에 답변드리겠습니다."
       />
+
+      {/* 나의 문의 모달 */}
+      {/* <MyContactsModal isOpen={showMyContactsModal} onClose={handleCloseMyContacts} /> */}
     </div>
   )
 }

@@ -97,6 +97,44 @@ export async function fetchContacts(
   }
 }
 
+// 🆕 나의 문의 조회 함수 추가
+export async function fetchMyContacts(
+  pageNum = 1,
+  amount = 5,
+): Promise<{
+  contacts: Contact[]
+  pagination: {
+    currentPage: number
+    pageSize: number
+    totalCount: number
+    totalPages: number
+    hasNext: boolean
+    hasPrevious: boolean
+  }
+}> {
+  const res = await api.get("/api/my_contacts", {
+    params: {
+      pageNum,
+      amount,
+    },
+  })
+
+  if (res.data.status === "success") {
+    return {
+      contacts: res.data.data.map((dto: any) => ({
+        contactId: String(dto.contactId),
+        userNumber: dto.userNumber,
+        contactTitle: dto.contactTitle,
+        contactContent: dto.contactContent,
+        createdDate: dto.createdDate,
+      })),
+      pagination: res.data.pagination,
+    }
+  } else {
+    throw new Error(res.data.message || "나의 문의 목록 조회에 실패했습니다.")
+  }
+}
+
 export async function fetchContactStats(): Promise<{ totalContacts: number }> {
   const res = await api.get("/api/contact_stats")
 

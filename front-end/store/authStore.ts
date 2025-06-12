@@ -20,11 +20,12 @@ interface User {
 
 interface AuthState {
   isLoggedIn: boolean
-  user: User | null
+  // user: User | null
+  user: any | null; // 사용자 정보 (필요하다면)
   loading: boolean
-  checkAuthStatus: () => Promise<void>
-  loginSuccess: (userData: any) => void // 기존 시그니처 유지
-  logoutUser: () => Promise<void>
+  checkAuthStatus: () => Promise<void>; // 로그인 상태 확인 함수
+  loginSuccess: (userData: any) => void; // 로그인 성공 시 호출 함수
+  logoutUser: () => Promise<void>; // 로그아웃 함수
   isAdmin: () => boolean
   refreshUserInfo: () => Promise<void>
 }
@@ -38,10 +39,12 @@ const useAuthStore = create<AuthState>((set, get) => ({
   checkAuthStatus: async () => {
     set({ loading: true })
     try {
-      const user = await getCurrentUser()
+      const user = await getCurrentUser();
+      // user가 null이 아니고, 빈 객체도 아니며, 로그인된 사용자임을 나타내는 특정 필드가 있는지 확인
+      // 예: user.id가 존재하는지, user.username이 비어있지 않은지 등
       console.log("AuthStore: 백엔드 사용자 정보:", user)
 
-      if (user && Object.keys(user).length > 0) {
+      if (user && Object.keys(user).length > 0 && user.userId) { // <-- 이 조건을 더 엄격하게
         // 사용자 정보 구조 확인 및 처리
         let processedUser = user
 
@@ -71,13 +74,19 @@ const useAuthStore = create<AuthState>((set, get) => ({
         }
 
         console.log("AuthStore: 처리된 사용자 정보:", processedUser)
+        
+  // // 로그인 성공 시 호출
+  // loginSuccess: (userData) => {
+  //   set({ isLoggedIn: true, user: userData, loading: false });
         set({ isLoggedIn: true, user: processedUser, loading: false })
       } else {
+        // user가 없거나, 빈 객체이거나, 로그인된 사용자 정보가 아닐 때
         set({ isLoggedIn: false, user: null, loading: false })
       }
     } catch (error) {
-      console.log("AuthStore: 인증 상태 확인 실패", error)
-      set({ isLoggedIn: false, user: null, loading: false })
+      console.log("AuthStore: 인증 상태 확인 실패 (토큰 없음 또는 서버 오류)", error);
+      // 에러 발생 시 무조건 로그아웃 상태로 처리
+      set({ isLoggedIn: false, user: null, loading: false });
     }
   },
 
@@ -138,7 +147,8 @@ const useAuthStore = create<AuthState>((set, get) => ({
     console.log("AuthStore: 최종 처리된 사용자 정보:", processedUser)
     console.log("AuthStore: userAdmin 값:", processedUser.userAdmin, "타입:", typeof processedUser.userAdmin)
 
-    set({ isLoggedIn: true, user: processedUser, loading: false })
+    // set({ isLoggedIn: true, user: processedUser, loading: false })
+    
   },
 
   // 로그아웃 함수
@@ -148,6 +158,7 @@ const useAuthStore = create<AuthState>((set, get) => ({
     } catch (error) {
       console.error("AuthStore: 로그아웃 API 호출 실패", error)
     } finally {
+      set({ isLoggedIn: false, user: null, loading: false });
       // localStorage에서 토큰 제거
       if (typeof window !== "undefined") {
         localStorage.removeItem("token")

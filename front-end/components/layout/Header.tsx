@@ -3,16 +3,17 @@
 import { Heart, Shield, RefreshCw } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import type React from "react"
 import { useEffect, useState } from "react"
-import useAuthStore from "@/store/authStore"
+import useAuthStore from "@/store/authStore" // Zustand 스토어 임포트
 import { ThemeToggle } from "@/components/theme-toggle"
 
 export default function Header() {
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn)
-  const loading = useAuthStore((state) => state.loading)
+  const loading = useAuthStore((state) => state.loading) // 스토어에서 로딩 상태 가져오기
+  const logoutUser = useAuthStore((state) => state.logoutUser) // 스토어에서 로그아웃 함수 가져오기
   const user = useAuthStore((state) => state.user)
   const isAdmin = useAuthStore((state) => state.isAdmin)
-  const logoutUser = useAuthStore((state) => state.logoutUser)
   const refreshUserInfo = useAuthStore((state) => state.refreshUserInfo)
   const router = useRouter()
   const [refreshing, setRefreshing] = useState(false)
@@ -30,8 +31,8 @@ export default function Header() {
   }, [isLoggedIn, user, isAdmin])
 
   const handleLogout = async () => {
-    await logoutUser()
-    router.push("/user/login")
+    await logoutUser() // Zustand 스토어의 로그아웃 함수 호출
+    router.push("/user/login") // 로그인 페이지로 리다이렉트
   }
 
   // 사용자 정보 새로고침 함수

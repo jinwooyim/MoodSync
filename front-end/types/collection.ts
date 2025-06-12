@@ -18,3 +18,4 @@ export interface Collection {
   updatedAt?: string;
   items: CollectionItem[];
 }
+

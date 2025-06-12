@@ -13,6 +13,8 @@ public interface CollectionService {
     List<CollectionDTO> getAllCollections();
     List<CollectionDTO> getCollectionsByUserId(int userNumber);
     
+    //컬렉션에 아이템 추가하기 위해 컬렉션 리스트 가져옴
+    public List<CollectionDTO> getCollectionsOnlyByUserId(int userId);
     
     public int insertCollectionItem(CollectionItemDTO collectionItem);
 //    public CollectionDTO updateCollectionItem(CollectionItemDTO collectionItem);

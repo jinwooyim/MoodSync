@@ -53,23 +53,17 @@
     </select>
 
     <!-- collectionItem 삽입 -->
-    <insert id="insertCollectionItem" parameterType="com.boot.collection.dto.CollectionItemDTO" useGeneratedKeys="true" keyProperty="collectionItemId">
-        <!-- Oracle의 경우 시퀀스를 사용하여 ID를 생성하고 반환받는 방법 -->
-        <selectKey keyProperty="collectionItemId" resultType="int" order="BEFORE">
-            SELECT COLLECTION_ITEMS_SEQ.NEXTVAL FROM DUAL
-        </selectKey>
+    <insert id="insertCollectionItem" parameterType="com.boot.collection.dto.CollectionItemDTO">
         INSERT INTO COLLECTION_ITEMS (
             collectionItemId,
             collectionId,
             contentTitle,
-            contentType,
-            addedAt
+            contentType
         ) VALUES (
-            #{collectionItemId},
+            (SELECT NVL(MAX(collectionItemId), 0) + 1 FROM COLLECTION_ITEMS),
             #{collectionId},
             #{contentTitle},
-            #{contentType},
-            #{addedAt, jdbcType=TIMESTAMP}
+            #{contentType}
         )
     </insert>
 

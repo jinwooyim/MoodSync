@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class ContactDTO {
 	private int contactId;
 	private int userNumber;
+	private String userName;
 	private String contactTitle;
 	private String contactContent;
     private Date createdDate;

@@ -1,6 +1,18 @@
 import api from "./base"
 import type { Contact } from "@/types/contact"
 
+export async function fetchPendingContactsCount(): Promise<{ pendingContacts: number }> {
+  const res = await api.get("/api/pending_contacts_count")
+
+  if (res.data.status === "success") {
+    return {
+      pendingContacts: res.data.pendingContacts,
+    }
+  } else {
+    throw new Error(res.data.message || "대기 중인 문의 수 조회에 실패했습니다.")
+  }
+}
+
 export interface CreateContactParams {
   contact_title: string
   contact_content: string
@@ -155,7 +167,9 @@ export async function fetchContacts(
       contacts: res.data.data.map((dto: any) => ({
         contactId: String(dto.contactId),
         userNumber: dto.userNumber,
+        userName: dto.userName,
         contactTitle: dto.contactTitle,
+        createdDate: dto.createdDate, 
         contactContent: dto.contactContent,
       })),
       pagination: res.data.pagination,
@@ -165,7 +179,7 @@ export async function fetchContacts(
   }
 }
 
-// 🆕 나의 문의 조회 함수 추가
+// 나의 문의 조회
 export async function fetchMyContacts(
   pageNum = 1,
   amount = 5,
@@ -192,6 +206,7 @@ export async function fetchMyContacts(
       contacts: res.data.data.map((dto: any) => ({
         contactId: String(dto.contactId),
         userNumber: dto.userNumber,
+        userName: dto.userName,
         contactTitle: dto.contactTitle,
         contactContent: dto.contactContent,
         createdDate: dto.createdDate,

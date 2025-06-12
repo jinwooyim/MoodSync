@@ -29,6 +29,43 @@ public class ContactController {
 	@Autowired
 	private ContactService contactService;
 
+	@GetMapping("/pending_contacts_count")
+	public ResponseEntity<?> getPendingContactsCount(HttpServletRequest request) {
+		try {
+			BasicUserDTO userDTO = (BasicUserDTO) request.getAttribute("user");
+
+			if (userDTO == null) {
+				Map<String, Object> errorResponse = new HashMap<>();
+				errorResponse.put("status", "error");
+				errorResponse.put("message", "로그인이 필요합니다.");
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+			}
+
+			// 관리자 권한 확인 (필요한 경우)
+			if (userDTO.getUserAdmin() != 1) {
+				Map<String, Object> errorResponse = new HashMap<>();
+				errorResponse.put("status", "error");
+				errorResponse.put("message", "관리자 권한이 필요합니다.");
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+			}
+
+			int pendingCount = contactService.getNotyetAnswer();
+
+			Map<String, Object> response = new HashMap<>();
+			response.put("status", "success");
+			response.put("pendingContacts", pendingCount);
+
+			return ResponseEntity.ok(response);
+
+		} catch (Exception e) {
+			log.error("대기 중인 문의 수 조회 중 오류 발생: ", e);
+			Map<String, Object> errorResponse = new HashMap<>();
+			errorResponse.put("status", "error");
+			errorResponse.put("message", "서버 오류가 발생했습니다.");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+		}
+	}
+
 	@GetMapping("/create_contact")
 	public ResponseEntity<?> createContact(@RequestParam HashMap<String, String> param, HttpServletRequest request) {
 		try {
@@ -143,7 +180,6 @@ public class ContactController {
 			String contactTitle = param.get("contact_title");
 			String contactContent = param.get("contact_content");
 
-
 			// 입력값 검증
 			if (contactTitle == null || contactTitle.trim().isEmpty()) {
 				Map<String, Object> errorResponse = new HashMap<>();
@@ -159,7 +195,8 @@ public class ContactController {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
 			}
 
-            log.info("문의 수정 요청: userNumber={}, contactId={}, title={}, COMNENT={}", userNumber, contactId, contactTitle, contactContent);
+			log.info("문의 수정 요청: userNumber={}, contactId={}, title={}, COMNENT={}", userNumber, contactId, contactTitle,
+					contactContent);
 			int result = contactService.updateContact(userNumber, contactId, contactTitle, contactContent);
 
 			Map<String, Object> response = new HashMap<>();
@@ -246,6 +283,7 @@ public class ContactController {
 
 			// 총 개수 조회
 			int totalCount = contactService.getTotalCount(criteriaDTO);
+			System.out.println(contactList);
 
 			// 페이징 정보 계산
 			int totalPages = (int) Math.ceil((double) totalCount / amount);

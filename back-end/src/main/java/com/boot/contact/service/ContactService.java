@@ -35,4 +35,7 @@ public interface ContactService {
 
 	// 사용자 본인꺼 전체 갯수
 	public int getUserContactCount(CriteriaDTO criteriaDTO);
+
+	// 답변 안한거 가져오기
+	public int getNotyetAnswer();
 }

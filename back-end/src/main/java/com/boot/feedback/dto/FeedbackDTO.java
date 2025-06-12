@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class FeedbackDTO {
 	private int feedbackId;
 	private int userNumber;
+	private String userName;
 	private String feedbackCategory;
 	private int feedbackScore;
 	private String feedbackContent;

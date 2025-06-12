@@ -40,26 +40,29 @@
         AND contactId = #{contactId}
     </update>
 
-    <!-- 전체 문의 조회 (페이징) - boardView 스타일로 수정 -->
-    <select id="allReadContact" parameterType="com.boot.z_page.criteria.CriteriaDTO" resultType="com.boot.contact.dto.ContactDTO">
-        <![CDATA[
-        SELECT contactId, userNumber, contactTitle, contactContent
-        FROM (
-            SELECT rownum as rn, contactId, userNumber, contactTitle, contactContent
-            FROM (
-                SELECT CONTACTID as contactId,
-                       USERNUMBER as userNumber,
-                       CONTACT_TITLE as contactTitle,
-                       CONTACT_CONTENT as contactContent
-                FROM user_contact
-                WHERE NVL(STATUS, 'ACTIVE') != 'DELETED'
-                ORDER BY created_date
-            ) a
-            WHERE rownum <= (#{pageNum} * #{amount})
-        ) aa
-        WHERE rn > (#{pageNum} - 1) * #{amount}
-        ]]>
-    </select>
+    <!-- 전체 문의 조회 -->
+		<select id="allReadContact" parameterType="com.boot.z_page.criteria.CriteriaDTO" resultType="com.boot.contact.dto.ContactDTO">
+		    SELECT contactId, userNumber, userName, contactTitle, contactContent, createdDate
+		    FROM (
+		        SELECT rownum as rn, contactId, userNumber, userName, contactTitle, contactContent, createdDate
+		        FROM (
+		            SELECT 
+		                uc.CONTACTID as contactId,
+		                uc.USERNUMBER as userNumber,
+		                ui.USERNAME as userName,
+		                uc.CONTACT_TITLE as contactTitle,
+		                uc.CONTACT_CONTENT as contactContent,
+		                uc.CREATED_DATE as createdDate
+		            FROM user_contact uc
+		            LEFT JOIN user_info ui ON uc.USERNUMBER = ui.USERNUMBER
+		            WHERE NVL(uc.STATUS, 'ACTIVE') != 'DELETED'
+		            ORDER BY uc.CREATED_DATE DESC
+		        ) a
+		        WHERE rownum <![CDATA[<=]]> (#{pageNum} * #{amount})
+		    ) aa
+		    WHERE rn > (#{pageNum} - 1) * #{amount}
+		</select>
+
 
     <!-- 전체 개수 조회 (페이징용) -->
     <select id="getTotalCount" parameterType="com.boot.z_page.criteria.CriteriaDTO" resultType="int">
@@ -98,5 +101,7 @@
         WHERE USERNUMBER = #{userNumber}
         AND NVL(STATUS, 'ACTIVE') != 'DELETED'
     </select>
-
+    <select id="getNotyetAnswer" resultType="int">
+    	select count(*) from user_contact where status = 'ACTIVE'
+    </select>
 </mapper>

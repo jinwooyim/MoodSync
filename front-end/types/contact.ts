@@ -1,6 +1,7 @@
 export interface Contact {
   contactId: string
   userNumber: number
+  userName: string
   contactTitle: string
   contactContent: string
   createdDate?: string

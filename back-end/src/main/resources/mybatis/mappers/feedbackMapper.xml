@@ -95,5 +95,37 @@
         AND NVL(STATUS, 'ACTIVE') != 'DELETED'
     </select>
     -->
+<!-- 총 피드백 개수 -->
+<select id="getTotalFeedbacks" resultType="int">
+    SELECT COUNT(*) 
+    FROM user_feedback 
+    WHERE NVL(STATUS, 'ACTIVE') != 'DELETED'
+</select>
 
+<!-- 평균 점수 -->
+<select id="getAverageScore" resultType="double">
+    SELECT AVG(FEEDBACK_SCORE) 
+    FROM user_feedback 
+    WHERE NVL(STATUS, 'ACTIVE') != 'DELETED'
+    AND FEEDBACK_SCORE IS NOT NULL
+</select>
+
+<!-- 카테고리별 통계 -->
+<select id="getFeedbackByCategory" resultType="map">
+    SELECT FEEDBACK_CATEGORY as category, COUNT(*) as count
+    FROM user_feedback 
+    WHERE NVL(STATUS, 'ACTIVE') != 'DELETED'
+    GROUP BY FEEDBACK_CATEGORY
+    ORDER BY COUNT(*) DESC
+</select>
+
+<!-- 점수별 통계 -->
+<select id="getFeedbackByScore" resultType="map">
+    SELECT FEEDBACK_SCORE as score, COUNT(*) as count
+    FROM user_feedback 
+    WHERE NVL(STATUS, 'ACTIVE') != 'DELETED'
+    AND FEEDBACK_SCORE IS NOT NULL
+    GROUP BY FEEDBACK_SCORE
+    ORDER BY FEEDBACK_SCORE
+</select>
 </mapper>

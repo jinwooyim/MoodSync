@@ -67,4 +67,10 @@ public class ContactServiceImpl implements ContactService {
 		return dao.getUserContactCount(criteriaDTO);
 	}
 
+	@Override
+	public int getNotyetAnswer() {
+		ContactDAO dao = sqlsession.getMapper(ContactDAO.class);
+		return dao.getNotyetAnswer();
+	}
+
 }

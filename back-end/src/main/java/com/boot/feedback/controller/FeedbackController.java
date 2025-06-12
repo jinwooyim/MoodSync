@@ -252,14 +252,30 @@ public class FeedbackController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
             }
 
+            // 관리자 권한 확인 (필요한 경우)
+            if (userDTO.getUserAdmin() != 1) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("status", "error");
+                errorResponse.put("message", "관리자 권한이 필요합니다.");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+            }
+
             log.info("피드백 통계 조회 요청");
 
-            CriteriaDTO criteriaDTO = new CriteriaDTO();
-            int totalCount = feedbackService.getTotalCount(criteriaDTO);
+            // 기본 통계
+            int totalFeedbacks = feedbackService.getTotalFeedbacks();
+            Double averageScore = feedbackService.getAverageScore();
+            
+            // 상세 통계
+            ArrayList<Map<String, Object>> categoryStats = feedbackService.getFeedbackByCategory();
+            ArrayList<Map<String, Object>> scoreStats = feedbackService.getFeedbackByScore();
 
             Map<String, Object> response = new HashMap<>();
             response.put("status", "success");
-            response.put("totalFeedbacks", totalCount);
+            response.put("totalFeedbacks", totalFeedbacks);
+            response.put("averageScore", averageScore != null ? Math.round(averageScore * 100.0) / 100.0 : 0.0);
+            response.put("categoryStats", categoryStats);
+            response.put("scoreStats", scoreStats);
 
             return ResponseEntity.ok(response);
 

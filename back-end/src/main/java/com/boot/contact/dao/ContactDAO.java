@@ -8,7 +8,6 @@ import com.boot.contact.dto.ContactDTO;
 import com.boot.z_page.criteria.CriteriaDTO;
 
 public interface ContactDAO {
-
 	// 문의하기 C
 	public int createContact(@Param("userNumber") int userNumber, @Param("contact_title") String contactTitle,
 			@Param("contact_content") String contactContent);
@@ -35,4 +34,7 @@ public interface ContactDAO {
 
 	// 사용자 본인꺼 전체 갯수
 	public int getUserContactCount(CriteriaDTO criteriaDTO);
+
+	// 답변 안한거 가져오기
+	public int getNotyetAnswer();
 }

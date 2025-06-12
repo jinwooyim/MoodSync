@@ -19,5 +19,9 @@ public class CollectionDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     
+    //컬렉션에 포함된 아이템 리스트
     private List<CollectionItemDTO> items;
+    
+    // userId에 해당하는 유저의 이름
+    private String userName;
 }

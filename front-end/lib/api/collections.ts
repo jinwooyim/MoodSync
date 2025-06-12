@@ -22,7 +22,7 @@ export interface AddToCollectionPayload {
 }
 
 export interface CollectionItemDTO {
-  collectionId: number;
+  collectionItemId: number;
   contentTitle: string;
   contentType: "music" | "activity" | "book";
   // addedAt, collectionItemId 등은 백엔드에서 생성하므로 클라이언트에서 보낼 필요 없음.
@@ -50,7 +50,7 @@ export async function fetchCollections(): Promise<Collection[]> {
   const res = await api.get('/api/collections/user-collections');
 
   return res.data.map((dto: any) => ({
-    id: String(dto.collectionId),
+    collectionId: String(dto.collectionId),
     userId: dto.userId,
     name: dto.name,
     description: dto.description,
@@ -58,11 +58,12 @@ export async function fetchCollections(): Promise<Collection[]> {
     createdAt: dto.createdAt,
     updatedAt: dto.updatedAt,
     items: dto.items ? dto.items.map((itemDto: any) => ({
-      id: String(itemDto.collectionItemId),
+      collectionItemId: itemDto.collectionItemId,
       collectionId: String(itemDto.collectionId),
       contentTitle: itemDto.contentTitle,
       contentType: itemDto.contentType,
       addedAt: itemDto.addedAt,
+      itemOrder: itemDto.itemOrder, 
     })) : [],
   }));
 }
@@ -72,7 +73,7 @@ export async function fetchCollection(id: string): Promise<Collection> {
   const res = await api.get(`/api/collections/${id}`);
   const dto = res.data;
   return {
-    id: String(dto.collectionId),
+    collectionId: String(dto.collectionId),
     userId: dto.userId,
     name: dto.name,
     description: dto.description,
@@ -80,12 +81,14 @@ export async function fetchCollection(id: string): Promise<Collection> {
     createdAt: dto.createdAt,
     updatedAt: dto.updatedAt,
     items: dto.items ? dto.items.map((itemDto: any) => ({
-        id: String(itemDto.collectionItemId),
-        collectionId: String(itemDto.collectionId),
-        contentTitle: itemDto.contentTitle, 
-        contentType: itemDto.contentType,   
-        addedAt: itemDto.addedAt,
+      collectionItemId: itemDto.collectionItemId,
+      collectionId: String(itemDto.collectionId),
+      contentTitle: itemDto.contentTitle, 
+      contentType: itemDto.contentType,   
+      addedAt: itemDto.addedAt,
+      itemOrder: itemDto.itemOrder, 
     })) : [],
+    userName: dto.userName,
   };
 }
 
@@ -96,5 +99,37 @@ export async function addToCollection(payload: AddToCollectionPayload) {
 }
 export async function addCollectionItemToSelectedCollection(payload: CollectionItemDTO) {
   const res = await api.post('/api/collections/add-item', payload); // 백엔드의 `/api/collections/add-item` 엔드포인트 호출
-  return res.data; // 백엔드에서 반환하는 성공 메시지 등을 받을 수 있습니다.
+  return res.data; 
+
+}
+// deleteCollectionItem 
+export async function deleteCollectionItem(collectionId: number, itemId: number) {
+    if (!confirm('정말로 이 아이템을 컬렉션에서 삭제하시겠습니까?')) {
+        throw new Error('Deletion cancelled by user.'); 
+    }
+
+    const res = await api.delete(`/api/collections/${collectionId}/items/${itemId}`);
+    return res.data;
+}
+
+
+// 컬렉션 아이템 순서 업데이트 API 함수
+export async function updateCollectionItemsOrder(
+    collectionId: string,
+    itemIdsInOrder: string[] // 순서대로 정렬된 아이템 ID 리스트
+): Promise<void> {
+    // 이 함수도 api 인스턴스를 사용하는 것이 좋습니다.
+    const res = await api.put(`/api/collections/${collectionId}/items/reorder`, itemIdsInOrder);
+    return res.data;
+}
+
+// 이 함수가 updateCollectionItemsOrder보다 onDragEnd에서 newItems를 바로 전달하기 편리
+export async function updateCollectionItemsFull(
+    collectionId: string,
+    updatedItems: Array<{ id: number; itemOrder: number }> // 또는 CollectionItem[]
+): Promise<void> {
+    // === 여기가 핵심 변경사항입니다: fetch 대신 api.put 사용 ===
+    const res = await api.put(`/api/collections/${collectionId}/items/full-update`, updatedItems);
+    // axios는 응답 상태가 2xx가 아니면 자동으로 에러를 던지므로, response.ok 체크는 필요 없습니다.
+    return res.data; 
 }

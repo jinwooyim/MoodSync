@@ -2,8 +2,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { Collection } from "@/types/collection";
-import { fetchCollections, createCollection, updateCollection, deleteCollection } from "@/lib/api/collections";
+import type { Collection, CollectionItem  } from "@/types/collection";
+import { fetchCollections, createCollection, updateCollection, deleteCollection,deleteCollectionItem,updateCollectionItemsFull } from "@/lib/api/collections";
 
 import { useSearchParams, useRouter } from "next/navigation";
 
@@ -114,7 +114,7 @@ export default function CollectionPage() {
             await deleteCollection(collectionIdAsNumber);
             alert("컬렉션이 성공적으로 삭제되었습니다.");
             setCollections(prevCollections =>
-                prevCollections.filter(col => col.id !== collectionId)
+                prevCollections.filter(col => col.collectionId !== collectionId)
             );
         } catch (err: any) {
             console.error("컬렉션 삭제 중 오류 발생:", err);
@@ -125,7 +125,7 @@ export default function CollectionPage() {
 
     // 컬렉션 상세보기 핸들러 (CollectionCard로 전달)
     const handleViewDetails = (collectionId: string) => {
-        const foundCollection = collections.find(col => col.id === collectionId);
+        const foundCollection = collections.find(col => col.collectionId === collectionId);
         
         if (foundCollection) {
             setSelectedCollection(foundCollection);
@@ -136,6 +136,65 @@ export default function CollectionPage() {
         }
     };
 
+     const handleItemDeleteFromCollection = async (collectionId: number, itemId: number) => {
+        try {
+            // deleteCollectionItem 함수가 이미 confirm 로직을 가지고 있으므로, 여기서는 바로 호출
+            await deleteCollectionItem(collectionId, itemId); 
+            // alert("아이템이 컬렉션에서 성공적으로 삭제되었습니다.");
+
+            // 아이템 삭제 후 현재 상세 정보를 업데이트하여 모달에 반영
+            setCollections(prevCollections =>
+                prevCollections.map(col =>
+                    col.collectionId === String(collectionId) // collectionId는 string으로 저장되어 있으므로 String으로 변환
+                        ? { ...col, items: col.items.filter(item => item.collectionItemId !== itemId) }
+                        : col
+                )
+            );
+            // 만약 현재 열려있는 모달의 컬렉션이 삭제된 아이템을 포함하고 있다면, 그 정보도 업데이트
+            setSelectedCollection(prevSelected => {
+                if (prevSelected && prevSelected.collectionId === String(collectionId)) { // prevSelected.id도 string
+                    return { ...prevSelected, items: prevSelected.items.filter(item => item.collectionItemId !== itemId) };
+                }
+                return prevSelected;
+            });
+
+        } catch (err: any) {
+            // 사용자가 취소한 경우 (deleteCollectionItem에서 throw한 에러)는 alert하지 않습니다.
+            if (err.message === 'Deletion cancelled by user.') {
+                console.log('Item deletion cancelled by user.');
+            } else {
+                console.error("컬렉션 아이템 삭제 중 오류 발생:", err);
+                if (err instanceof Error  && err.message === 'Unauthorized') {
+                    alert('로그인이 만료되었습니다. 다시 로그인 해주세요.');
+                    router.push('/user/login');
+                    return;
+                }
+                const errorMessage = err.response?.data?.message || err.message || '알 수 없는 오류';
+                alert(`아이템 삭제에 실패했습니다: ${errorMessage}`);
+            }
+        }
+    };
+
+    const handleReorderItems = async (collectionId: string, newItems: CollectionItem[]) => {
+        // Map CollectionItem[] to { id: string; itemOrder: number }[]
+        const itemsForUpdate = newItems.map((item, idx) => ({
+            id: item.collectionItemId,
+            itemOrder: idx
+        }));
+        await updateCollectionItemsFull(collectionId, itemsForUpdate);
+        // 순서 변경 후 UI 업데이트 로직
+        if (selectedCollection) {
+            setSelectedCollection(prev => {
+                if (!prev) return null;
+                return {
+                    ...prev,
+                    items: newItems // 새 순서로 업데이트된 아이템 목록
+                };
+            });
+        }
+    };
+
+    
     return (
         <div className="container mx-auto px-4 py-8">
             <div className="flex items-center justify-between mb-8">
@@ -156,9 +215,10 @@ export default function CollectionPage() {
 
             {!loading && !error && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    
                     {collections.map((col) => (
                         <CollectionCard
-                            key={col.id}
+                            key={col.collectionId}
                             collection={col}
                             onViewDetails={handleViewDetails}
                             onEdit={(collectionToEdit) => {
@@ -190,6 +250,8 @@ export default function CollectionPage() {
                     setSelectedCollection(null);
                 }}
                 collection={selectedCollection}
+                onDeleteItem={(collectionIdStr, itemId) => handleItemDeleteFromCollection(Number(collectionIdStr), Number(itemId))} 
+                onReorderItems={handleReorderItems} 
             />
         </div>
     );

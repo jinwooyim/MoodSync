@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.boot.contact.dto.ContactDTO;
+import com.boot.contact.service.AnswerService;
 import com.boot.contact.service.ContactService;
 import com.boot.user.dto.BasicUserDTO;
 import com.boot.z_page.criteria.CriteriaDTO;
@@ -28,6 +29,8 @@ public class ContactController {
 
 	@Autowired
 	private ContactService contactService;
+	@Autowired
+	private AnswerService answerService;
 
 	@GetMapping("/pending_contacts_count")
 	public ResponseEntity<?> getPendingContactsCount(HttpServletRequest request) {
@@ -71,12 +74,12 @@ public class ContactController {
 		try {
 			BasicUserDTO userDTO = (BasicUserDTO) request.getAttribute("user");
 
-			if (userDTO == null) {
-				Map<String, Object> errorResponse = new HashMap<>();
-				errorResponse.put("status", "error");
-				errorResponse.put("message", "로그인이 필요합니다.");
-				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
-			}
+//			if (userDTO == null) {
+//				Map<String, Object> errorResponse = new HashMap<>();
+//				errorResponse.put("status", "error");
+//				errorResponse.put("message", "로그인이 필요합니다.");
+//				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+//			}
 
 			int userNumber = userDTO.getUserNumber();
 			String contactTitle = param.get("contact_title");
@@ -283,7 +286,7 @@ public class ContactController {
 
 			// 총 개수 조회
 			int totalCount = contactService.getTotalCount(criteriaDTO);
-			System.out.println(contactList);
+//			System.out.println(contactList);
 
 			// 페이징 정보 계산
 			int totalPages = (int) Math.ceil((double) totalCount / amount);

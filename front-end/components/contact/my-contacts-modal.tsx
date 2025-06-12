@@ -19,7 +19,7 @@ import {
   Save,
   X,
 } from "lucide-react"
-import { fetchMyContacts, updateContact, deleteContact } from "@/lib/api/contact"
+import { fetchMyContacts, updateContact, deleteContact, fetchContactAnswer } from "@/lib/api/contact"
 import { useToast } from "@/hooks/use-toast"
 import type { Contact } from "@/types/contact"
 
@@ -52,16 +52,18 @@ export function MyContactsModal({ isOpen, onClose }: MyContactsModalProps) {
     hasPrevious: false,
   })
 
+  // 답변 상태 추가
+  const [answer, setAnswer] = useState<string | null>(null)
+  const [answerLoading, setAnswerLoading] = useState(false)
+
   const loadContacts = async (page = 1) => {
     setLoading(true)
     try {
       const response = await fetchMyContacts(page, 8)
-      console.log("Loaded contacts:", response.contacts) // 디버깅용 로그
       setContacts(response.contacts)
       setPagination(response.pagination)
       setCurrentPage(page)
     } catch (error) {
-      console.error("Failed to load contacts:", error)
       setContacts([])
     } finally {
       setLoading(false)
@@ -76,6 +78,23 @@ export function MyContactsModal({ isOpen, onClose }: MyContactsModalProps) {
     }
   }, [isOpen])
 
+  // 문의 상세 진입 시 답변 불러오기
+  useEffect(() => {
+    if (viewMode === "detail" && selectedContact) {
+      setAnswerLoading(true)
+      fetchContactAnswer(Number(selectedContact.contactId))
+        .then((res) => {
+          if (res.status === "success" && res.data) {
+            setAnswer(res.data.answerContent)
+          } else {
+            setAnswer(null)
+          }
+        })
+        .catch(() => setAnswer(null))
+        .finally(() => setAnswerLoading(false))
+    }
+  }, [viewMode, selectedContact])
+
   const handlePrevPage = () => {
     if (pagination.hasPrevious) {
       loadContacts(currentPage - 1)
@@ -89,7 +108,6 @@ export function MyContactsModal({ isOpen, onClose }: MyContactsModalProps) {
   }
 
   const handleContactClick = (contact: Contact) => {
-    console.log("Selected contact:", contact) // 디버깅용 로그
     setSelectedContact(contact)
     setViewMode("detail")
   }
@@ -118,20 +136,8 @@ export function MyContactsModal({ isOpen, onClose }: MyContactsModalProps) {
   }
 
   const handleSaveEdit = async () => {
-    if (!selectedContact) {
-      console.error("selectedContact가 null입니다")
-      return
-    }
-
-    console.log("=== handleSaveEdit 시작 ===")
-    console.log("selectedContact:", selectedContact)
-    console.log("contactId:", selectedContact.contactId, "타입:", typeof selectedContact.contactId)
-    console.log("editForm:", editForm)
-    console.log("contact_title:", editForm.contact_title, "길이:", editForm.contact_title?.length)
-    console.log("contact_content:", editForm.contact_content, "길이:", editForm.contact_content?.length)
-
+    if (!selectedContact) return
     if (!selectedContact.contactId) {
-      console.error("contactId가 없습니다:", selectedContact.contactId)
       toast({
         title: "오류",
         description: "문의 ID가 없습니다. 페이지를 새로고침 후 다시 시도해주세요.",
@@ -139,11 +145,7 @@ export function MyContactsModal({ isOpen, onClose }: MyContactsModalProps) {
       })
       return
     }
-
     if (!editForm.contact_title.trim() || !editForm.contact_content.trim()) {
-      console.error("제목 또는 내용이 비어있음")
-      console.error("제목:", editForm.contact_title)
-      console.error("내용:", editForm.contact_content)
       toast({
         title: "입력 오류",
         description: "제목과 내용을 모두 입력해주세요.",
@@ -151,38 +153,28 @@ export function MyContactsModal({ isOpen, onClose }: MyContactsModalProps) {
       })
       return
     }
-
     setIsSubmitting(true)
     try {
-      console.log("updateContact 호출 전 최종 파라미터:")
       const updateParams = {
         contactId: selectedContact.contactId,
         contact_title: editForm.contact_title.trim(),
         contact_content: editForm.contact_content.trim(),
       }
-      console.log("updateParams:", updateParams)
-
       const response = await updateContact(updateParams)
-
       if (response.status === "success") {
         toast({
           title: "수정 완료",
           description: "문의가 성공적으로 수정되었습니다.",
         })
-
-        // 선택된 문의 정보 업데이트
         const updatedContact = {
           ...selectedContact,
           contactTitle: editForm.contact_title.trim(),
           contactContent: editForm.contact_content.trim(),
         }
         setSelectedContact(updatedContact)
-
-        // 목록도 업데이트
         setContacts(
           contacts.map((contact) => (contact.contactId === selectedContact.contactId ? updatedContact : contact)),
         )
-
         setViewMode("detail")
       } else {
         toast({
@@ -192,7 +184,6 @@ export function MyContactsModal({ isOpen, onClose }: MyContactsModalProps) {
         })
       }
     } catch (error) {
-      console.error("Update error:", error)
       toast({
         title: "오류 발생",
         description: error instanceof Error ? error.message : "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
@@ -205,7 +196,6 @@ export function MyContactsModal({ isOpen, onClose }: MyContactsModalProps) {
 
   const handleDelete = async () => {
     if (!selectedContact) return
-
     if (!selectedContact.contactId) {
       toast({
         title: "오류",
@@ -214,29 +204,20 @@ export function MyContactsModal({ isOpen, onClose }: MyContactsModalProps) {
       })
       return
     }
-
     if (!confirm("정말로 이 문의를 삭제하시겠습니까?")) return
-
     setIsSubmitting(true)
     try {
       const response = await deleteContact({
         contactId: selectedContact.contactId,
       })
-
       if (response.status === "success") {
         toast({
           title: "삭제 완료",
           description: "문의가 성공적으로 삭제되었습니다.",
         })
-
-        // 목록에서 제거
         setContacts(contacts.filter((contact) => contact.contactId !== selectedContact.contactId))
-
-        // 목록으로 돌아가기
         setViewMode("list")
         setSelectedContact(null)
-
-        // 페이지 새로고침 (페이지네이션 정보 업데이트)
         loadContacts(currentPage)
       } else {
         toast({
@@ -246,7 +227,6 @@ export function MyContactsModal({ isOpen, onClose }: MyContactsModalProps) {
         })
       }
     } catch (error) {
-      console.error("Delete error:", error)
       toast({
         title: "오류 발생",
         description: error instanceof Error ? error.message : "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
@@ -277,7 +257,6 @@ export function MyContactsModal({ isOpen, onClose }: MyContactsModalProps) {
         </DialogTitle>
         <DialogDescription>등록하신 문의 내역을 확인할 수 있습니다.</DialogDescription>
       </DialogHeader>
-
       <div className="space-y-3">
         {loading ? (
           <div className="flex items-center justify-center py-6">
@@ -324,17 +303,14 @@ export function MyContactsModal({ isOpen, onClose }: MyContactsModalProps) {
                   총 {pagination.totalCount}개 중 {(currentPage - 1) * pagination.pageSize + 1}~
                   {Math.min(currentPage * pagination.pageSize, pagination.totalCount)}개 표시
                 </div>
-
                 <div className="flex items-center gap-2">
                   <Button variant="outline" size="sm" onClick={handlePrevPage} disabled={!pagination.hasPrevious}>
                     <ChevronLeft className="h-4 w-4" />
                     이전
                   </Button>
-
                   <span className="text-xs text-gray-600 dark:text-gray-400">
                     {currentPage} / {pagination.totalPages}
                   </span>
-
                   <Button variant="outline" size="sm" onClick={handleNextPage} disabled={!pagination.hasNext}>
                     다음
                     <ChevronRight className="h-4 w-4" />
@@ -366,7 +342,10 @@ export function MyContactsModal({ isOpen, onClose }: MyContactsModalProps) {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <Badge variant="outline" className="text-xs">
-              문의 #{selectedContact.contactId}
+              <div className="flex items-center text-xs text-gray-500">
+                <Calendar className="h-3 w-3 mr-1" />
+                작성일: {selectedContact.createdDate}
+              </div>
             </Badge>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={handleEditClick}>
@@ -403,9 +382,18 @@ export function MyContactsModal({ isOpen, onClose }: MyContactsModalProps) {
               </div>
             </div>
 
-            <div className="flex items-center text-xs text-gray-500">
-              <Calendar className="h-3 w-3 mr-1" />
-              작성일: {selectedContact.createdDate}
+            {/* 답변 영역 추가 */}
+            <div>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">답변</label>
+              <div className="mt-1 p-3 bg-gray-50 dark:bg-gray-700 rounded-md min-h-[64px]">
+                {answerLoading ? (
+                  <span className="text-xs text-gray-400">답변을 불러오는 중...</span>
+                ) : answer ? (
+                  <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">{answer}</p>
+                ) : (
+                  <span className="text-xs text-gray-400">아직 답변이 등록되지 않았습니다.</span>
+                )}
+              </div>
             </div>
           </div>
         </div>

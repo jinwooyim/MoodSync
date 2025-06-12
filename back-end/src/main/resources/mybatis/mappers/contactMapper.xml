@@ -55,8 +55,8 @@
 		                uc.CREATED_DATE as createdDate
 		            FROM user_contact uc
 		            LEFT JOIN user_info ui ON uc.USERNUMBER = ui.USERNUMBER
-		            WHERE NVL(uc.STATUS, 'ACTIVE') != 'DELETED'
-		            ORDER BY uc.CREATED_DATE DESC
+		            WHERE uc.STATUS = 'ACTIVE'
+		            ORDER BY uc.CREATED_DATE
 		        ) a
 		        WHERE rownum <![CDATA[<=]]> (#{pageNum} * #{amount})
 		    ) aa

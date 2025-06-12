@@ -13,5 +13,6 @@
 		<mapper resource="mybatis/mappers/collectionMapper.xml"/>
 		<mapper resource="mybatis/mappers/contactMapper.xml"/>
 		<mapper resource="mybatis/mappers/feedbackMapper.xml"/>
+		<mapper resource="mybatis/mappers/answerMapper.xml"/>
 	</mappers>
 </configuration>

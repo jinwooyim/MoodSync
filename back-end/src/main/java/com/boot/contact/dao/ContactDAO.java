@@ -18,22 +18,21 @@ public interface ContactDAO {
 			@Param("contact_content") String contactContent);
 
 	// 문의하기 U
-	public int updateContact(@Param("userNumber") int userNumber, @Param("contact_title") String contactTitle,
-			@Param("contact_content") String contactContent);
+	public int updateContact(@Param("userNumber") int userNumber, @Param("contactId") int contactId,
+			@Param("contact_title") String contactTitle, @Param("contact_content") String contactContent);
 
 	// 문의하기 D
-	public int deleteContact(@Param("userNumber") int userNumber, @Param("contact_title") String contactTitle,
-			@Param("contact_content") String contactContent);
+	public int deleteContact(@Param("userNumber") int userNumber, @Param("contactId") int contactId);
 
 	// 문의하기 R(전체 / 페이징필요)
 	public ArrayList<ContactDTO> allReadContact(CriteriaDTO criteriaDTO);
 
 	// 전체 불러오기 (페이징용)
 	public int getTotalCount(CriteriaDTO criteriaDTO);
-	
+
 	// 사용자 본인꺼만 불러오기(일단 페이징 처리)
 	public ArrayList<ContactDTO> onlyUserContact(CriteriaDTO criteriaDTO);
-	
+
 	// 사용자 본인꺼 전체 갯수
 	public int getUserContactCount(CriteriaDTO criteriaDTO);
 }

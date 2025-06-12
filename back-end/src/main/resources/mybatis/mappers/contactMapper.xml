@@ -28,8 +28,7 @@
             CONTACT_CONTENT = #{contact_content},
             UPDATED_DATE = SYSDATE
         WHERE USERNUMBER = #{userNumber} 
-        AND CONTACT_TITLE = #{contact_title} 
-        AND CONTACT_CONTENT = #{contact_content}
+        AND contactId = #{contactId}
     </update>
 
     <!-- 문의 삭제 (실제로는 상태 변경) -->
@@ -38,8 +37,7 @@
         SET STATUS = 'DELETED',
             DELETED_DATE = SYSDATE
         WHERE USERNUMBER = #{userNumber} 
-        AND CONTACT_TITLE = #{contact_title} 
-        AND CONTACT_CONTENT = #{contact_content}
+        AND contactId = #{contactId}
     </update>
 
     <!-- 전체 문의 조회 (페이징) - boardView 스타일로 수정 -->
@@ -55,7 +53,7 @@
                        CONTACT_CONTENT as contactContent
                 FROM user_contact
                 WHERE NVL(STATUS, 'ACTIVE') != 'DELETED'
-                ORDER BY CONTACTID DESC
+                ORDER BY created_date
             ) a
             WHERE rownum <= (#{pageNum} * #{amount})
         ) aa
@@ -85,7 +83,7 @@
                 FROM user_contact
                 WHERE USERNUMBER = #{userNumber}
                 AND NVL(STATUS, 'ACTIVE') != 'DELETED'
-                ORDER BY CONTACTID DESC
+                ORDER BY created_date DESC
             ) a
             WHERE rownum <= (#{pageNum} * #{amount})
         ) aa

@@ -18,12 +18,11 @@ public interface ContactService {
 			@Param("contactContent") String contactContent);
 
 	// 문의하기 U
-	public int updateContact(@Param("userNumber") int userNumber, @Param("contactTitle") String contactTitle,
-			@Param("contactContent") String contactContent);
+	public int updateContact(@Param("userNumber") int userNumber, @Param("contactId") int contactId,
+			@Param("contactTitle") String contactTitle, @Param("contactContent") String contactContent);
 
 	// 문의하기 D
-	public int deleteContact(@Param("userNumber") int userNumber, @Param("contactTitle") String contactTitle,
-			@Param("contactContent") String contactContent);
+	public int deleteContact(@Param("userNumber") int userNumber, @Param("contactId") int contactId);
 
 	// 문의하기 R(전체 / 페이징필요)
 	public ArrayList<ContactDTO> allReadContact(CriteriaDTO criteriaDTO);

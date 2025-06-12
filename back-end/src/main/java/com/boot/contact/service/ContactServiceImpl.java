@@ -2,6 +2,7 @@ package com.boot.contact.service;
 
 import java.util.ArrayList;
 
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,15 +30,15 @@ public class ContactServiceImpl implements ContactService {
 	}
 
 	@Override
-	public int updateContact(int userNumber, String contactTitle, String contactContent) {
+	public int updateContact(int userNumber, int contactId, String contactTitle, String contactContent) {
 		ContactDAO dao = sqlsession.getMapper(ContactDAO.class);
-		return dao.updateContact(userNumber, contactTitle, contactContent);
+		return dao.updateContact(userNumber, contactId, contactTitle, contactContent);
 	}
 
 	@Override
-	public int deleteContact(int userNumber, String contactTitle, String contactContent) {
+	public int deleteContact(int userNumber, int contactId) {
 		ContactDAO dao = sqlsession.getMapper(ContactDAO.class);
-		return dao.deleteContact(userNumber, contactTitle, contactContent);
+		return dao.deleteContact(userNumber, contactId);
 	}
 
 	@Override

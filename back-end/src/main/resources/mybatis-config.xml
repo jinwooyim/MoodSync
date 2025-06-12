@@ -12,5 +12,6 @@
 		<mapper resource="mybatis/mappers/YoutubeVideoMapper.xml"/>
 		<mapper resource="mybatis/mappers/collectionMapper.xml"/>
 		<mapper resource="mybatis/mappers/contactMapper.xml"/>
+		<mapper resource="mybatis/mappers/feedbackMapper.xml"/>
 	</mappers>
 </configuration>

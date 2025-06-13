@@ -52,7 +52,7 @@
 		                ui.USERNAME as userName,
 		                uc.CONTACT_TITLE as contactTitle,
 		                uc.CONTACT_CONTENT as contactContent,
-		                uc.CREATED_DATE as createdDate
+		                to_char(uc.created_date, 'YYYY-MM-DD HH24:MI') as createdDate
 		            FROM user_contact uc
 		            LEFT JOIN user_info ui ON uc.USERNUMBER = ui.USERNUMBER
 		            WHERE uc.STATUS = 'ACTIVE'
@@ -82,7 +82,7 @@
                        USERNUMBER as userNumber,
                        CONTACT_TITLE as contactTitle,
                        CONTACT_CONTENT as contactContent,
-                       CREATED_DATE as createdDate
+                       to_char(created_date, 'YYYY-MM-DD HH24:MI') as createdDate
                 FROM user_contact
                 WHERE USERNUMBER = #{userNumber}
                 AND NVL(STATUS, 'ACTIVE') != 'DELETED'

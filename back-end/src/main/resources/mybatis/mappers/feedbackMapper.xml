@@ -33,7 +33,7 @@
     <!-- 전체 피드백 조회 (페이징) -->
     <select id="allReadFeedback" parameterType="com.boot.z_page.criteria.CriteriaDTO" resultType="com.boot.feedback.dto.FeedbackDTO">
         <![CDATA[
-        SELECT feedbackId, userNumber, userName, feedbackCategory, feedbackScore, feedbackContent, createdDate
+       	SELECT feedbackId, userNumber, userName, feedbackCategory, feedbackScore, feedbackContent, createdDate
         FROM (
             SELECT rownum as rn, feedbackId, userNumber, userName, feedbackCategory, feedbackScore, feedbackContent, createdDate
             FROM (
@@ -43,7 +43,7 @@
                        uf.FEEDBACK_CATEGORY as feedbackCategory,
                        uf.FEEDBACK_SCORE as feedbackScore,
                        uf.FEEDBACK_CONTENT as feedbackContent,
-                       uf.CREATED_DATE as createdDate
+                       to_char(uf.created_date, 'YYYY-MM-DD HH24:MI') as createdDate
                 FROM user_feedback uf
                 LEFT JOIN user_info ui ON uf.USERNUMBER = ui.USERNUMBER
                 WHERE uf.status = 'ACTIVE'

@@ -15,8 +15,8 @@ public class ContactDTO {
 	private String userName;
 	private String contactTitle;
 	private String contactContent;
-    private Date createdDate;
-    private Date updatedDate; 
-    private Date deletedDate;
+    private String createdDate;
+    private String updatedDate; 
+    private String deletedDate;
     private String status;
 }

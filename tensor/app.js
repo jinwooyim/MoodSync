@@ -380,7 +380,6 @@ app.post('/predict', express.json(), async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
 
 //fsm 재 선언
 const fsm = require('fs/promises');
@@ -450,11 +449,9 @@ app.get('/model-status', async (req, res) => {
 
 
   res.json(status); // { act_model: true, book_model: false, ... }
-=======
 // 상태 확인
 app.get('/status', (req, res) => {
   res.json({ status: 'running', modelTrained: isModelTrained });
->>>>>>> 379f0735e882d38dc48a18502c8dd89ed96d2caf
 });
 
 // 기본 페이지
@@ -466,6 +463,7 @@ app.get('/', (req, res) => {
         <p>GET /status - 서버 상태 확인</p>
     `);
 });
+})
 
 // 서버 시작
 app.listen(port, () => {

@@ -105,7 +105,20 @@
     	select count(*) from user_contact where status = 'ACTIVE'
     </select>
     
-    <select id="getTimeContactCount">
-    
+    <select id="getTimeContactCount" resultType="com.boot.analize.dto.AnalizeContactDTO">
+    	SELECT COUNT(*)
+     , SUBSTR(
+     TO_CHAR(CREATED_DATE, 'YYYYMMDD HH12MISS')
+   , 10
+   , 2
+)CREATED_TIME
+  FROM USER_CONTACT
+ WHERE TO_CHAR(CREATED_DATE, 'YYYYMMDD') = #{created_date}
+ GROUP BY SUBSTR(
+     TO_CHAR(CREATED_DATE, 'YYYYMMDD HH12MISS')
+   , 10
+   , 2
+)
+ ORDER BY CREATED_TIME
     </select>
 </mapper>

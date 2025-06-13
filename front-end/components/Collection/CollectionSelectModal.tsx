@@ -69,8 +69,9 @@ export default function CollectionSelectModal({
     // console.log("CollectionSelectModal - isOpen:", isOpen);
     // console.log("CollectionSelectModal - collections (received):", collections);
     // console.log("CollectionSelectModal - selectedCollectionId (state):", selectedCollectionId);
-    if (collections.length > 0) {
-        // console.log("CollectionSelectModal - first collection.collectionId type:", typeof collections[0].id, "value:", collections[0].id);
+    if (collections.length > 0 && selectedCollectionId === null) {
+      // collections가 비어있지 않고, 아직 아무것도 선택되지 않았을 때
+      setSelectedCollectionId(Number(collections[0].collectionId));
     }
   }, [isOpen, collections, selectedCollectionId]);
 
@@ -132,7 +133,7 @@ export default function CollectionSelectModal({
                     >
                       <span className="font-semibold">{collection.name}</span>
                       <span className="text-sm text-muted-foreground ml-2">
-                        {collection.description ? `(${collection.description})` : ''}
+                        {collection.itemCount ? `(${collection.itemCount})` : ''}
                       </span>
                     </Label>
                   </div>

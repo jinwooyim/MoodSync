@@ -209,6 +209,8 @@ public class CollectionController {
     @PutMapping("/{collectionId}/items/full-update")
     public ResponseEntity<Void> updateCollectionItems(@PathVariable Long collectionId,
                                                       @RequestBody List<CollectionItemDTO> updatedItems) {
+    	log.info("collectionId 는 옴=>"+collectionId);
+    	log.info("updatedItems 가 안 옴=>"+updatedItems);
         collectionService.updateAllItemsOrder(collectionId, updatedItems); // 서비스 메서드 이름 변경 고려
         return ResponseEntity.ok().build();
     }

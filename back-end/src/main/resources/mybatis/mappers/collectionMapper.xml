@@ -50,6 +50,16 @@
 	    ORDER BY createdAt DESC
 	</select>
 	
+<!--	메인화면에서 컬렉션에 해당하는 아이템 갯수 출력-->
+    <select id="countCollectionItemsByCollectionId" parameterType="int" resultType="int">
+	    SELECT
+            COUNT(*)
+        FROM
+            COLLECTION_ITEMS
+        WHERE
+            collectionId = #{collectionId}
+	</select>
+	
 	
     <!-- 아이템 조회 -->
     <select id="findByCollectionId" resultType="com.boot.collection.dto.CollectionItemDTO">

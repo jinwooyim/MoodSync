@@ -123,8 +123,19 @@ public class CollectionServiceImpl implements CollectionService {
 	@Transactional(readOnly = true) // ★ 사용자 컬렉션 목록만 조회: 읽기 전용
 	public List<CollectionDTO> getCollectionsOnlyByUserId(int userId) {
 		CollectionDAO dao = sqlSession.getMapper(CollectionDAO.class);
-        log.info("컬렉션 목록만 조회 (userId: {})", userId);
-        return dao.findCollectionsByUserId(userId);
+//        log.info("컬렉션 목록만 조회 (userId: {})", userId);
+		
+		//컬렉션 목록 조회
+        List<CollectionDTO> collections = dao.findCollectionsByUserId(userId);
+        
+     // 2. 각 컬렉션에 대해 아이템 개수를 조회하여 DTO에 설정
+        for (CollectionDTO collection : collections) {
+            int itemCount = dao.countCollectionItemsByCollectionId(collection.getCollectionId());
+            collection.setItemCount(itemCount);
+//            log.info("컬렉션 '{}' (ID: {})의 아이템 개수: {}", collection.getName(), collection.getCollectionId(), itemCount);
+        }
+        return collections;
+
 	}
 
 	@Override

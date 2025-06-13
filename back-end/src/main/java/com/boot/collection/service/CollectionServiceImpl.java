@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional; // <-- 이 라�
 import com.boot.collection.dao.CollectionDAO;
 import com.boot.collection.dto.CollectionDTO;
 import com.boot.collection.dto.CollectionItemDTO;
+import com.boot.collection.dto.ItemIdsInOrderRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -159,12 +160,12 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Override
     @Transactional // ★ 모든 아이템 정보 업데이트: DB 변경 (UPDATE)
-    public void updateAllItemsOrder(Long collectionId, List<CollectionItemDTO> updatedItems) {
+    public void updateAllItemsOrder(Long collectionId, List<ItemIdsInOrderRequest> updatedItems) {
         CollectionDAO dao = sqlSession.getMapper(CollectionDAO.class);
         log.info("서비스: 컬렉션 {}의 모든 아이템 정보 업데이트 시도. ({}개 아이템)", collectionId, updatedItems.size());
 
-        for (CollectionItemDTO dto : updatedItems) {
-            Long collectionItemId = Long.valueOf(dto.getCollectionItemId()); // DTO의 collectionItemId를 Long으로 변환
+        for (ItemIdsInOrderRequest dto : updatedItems) {
+            Long collectionItemId = Long.valueOf(dto.getId()); 
             int updatedRows = dao.updateCollectionItemOrder(collectionItemId, dto.getItemOrder());
             if (updatedRows == 0) {
                 log.warn("경고: 컬렉션 {}에서 아이템 ID {}의 전체 정보 업데이트 실패 (존재하지 않거나 변경 없음).", collectionId, collectionItemId);

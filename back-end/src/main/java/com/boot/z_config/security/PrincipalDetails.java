@@ -26,6 +26,7 @@ public class PrincipalDetails implements UserDetails, OAuth2User
 	{
 		this.user = user;
 		this.attributes = attributes;
+		System.out.println("[DEBUG] PrincipalDetails 생성 - userAdmin: " + user.getUserAdmin());
 	}
 	@Override
 	public Map<String, Object> getAttributes() {
@@ -44,14 +45,17 @@ public class PrincipalDetails implements UserDetails, OAuth2User
 
 
 	// 사용자의 권한 반환
+	// 이거 좀 이상함;;
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		Collection<GrantedAuthority> authorities = new ArrayList<>();
-
+		System.out.println("@# => " + user.getUserAdmin());
 		// userAdmin 값에 따라 권한 부여 (0: 일반 사용자, 1: 관리자)
 		if (user.getUserAdmin() == 1) {
+			System.out.println("어드민");
 			authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
 		} else {
+			System.out.println("일반");
 			authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 		}
 

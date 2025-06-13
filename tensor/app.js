@@ -254,10 +254,6 @@ async function getCachedData(type, url) {
   return response;
 }
 
-app.get('/clear-models', async (req, res) => {
-
-})
-
 // ========== 음악, 행동, 도서에 대해 학습 및 저장 =========== -> 메인
 app.get('/train', async (req, res) => {
   try {
@@ -384,6 +380,75 @@ app.post('/predict', express.json(), async (req, res) => {
   }
 });
 
+
+//fsm 재 선언
+const fsm = require('fs/promises');
+
+// 모델 파일 삭제
+app.post('/clear-models', async (req, res) => {
+  const act_model_DIR = path.join(__dirname, 'act_model');
+  const book_model_DIR = path.join(__dirname, 'book_model');
+  const music_model_DIR = path.join(__dirname, 'music_model');
+  try {
+    const act_files = await fsm.readdir(act_model_DIR);
+    const book_files = await fsm.readdir(book_model_DIR);
+    const music_files = await fsm.readdir(music_model_DIR);
+    
+    await Promise.all(act_files.map(async (act_files) => {
+      const act_filePath = path.join(act_model_DIR, act_files);
+      const act_stat = await fsm.stat(act_filePath);
+      
+      if (act_stat.isFile()) {
+        await fsm.unlink(act_filePath); // 파일 삭제
+      }
+    }));
+    
+    await Promise.all(book_files.map(async (book_files) => {
+      const book_filePath = path.join(book_model_DIR, book_files);
+      const book_stat = await fsm.stat(book_filePath);
+      
+      if (book_stat.isFile()) {
+        await fsm.unlink(book_filePath); // 파일 삭제
+      }
+    }));
+    
+    await Promise.all(music_files.map(async (music_files) => {
+      const music_filePath = path.join(music_model_DIR, music_files);
+      const music_stat = await fsm.stat(music_filePath);
+      
+      if (music_stat.isFile()) {
+        await fsm.unlink(music_filePath); // 파일 삭제
+      }
+      console.log("모델 삭제 완료.")
+    }));
+    
+    res.status(200).json({ message: 'All model files have been deleted.' });
+  } catch (error) {
+    console.error('Error clearing model files:', error);
+    res.status(500).json({ error: 'Failed to clear model files.' });
+  }
+});
+
+// 상태 확인
+app.get('/model-status', async (req, res) => {
+  const checkDir = async (dirPath) => {
+    try {
+      const files = await fsm.readdir(dirPath);
+      return files.length > 0;
+    } catch (err) {
+      console.log("model is empty!!");
+      return false; // 폴더가 없거나 읽기 실패 시 비활성으로 간주
+    }
+  };
+
+  const status = {
+    act_model: await checkDir(path.join(__dirname, 'act_model')),
+    book_model: await checkDir(path.join(__dirname, 'book_model')),
+    music_model: await checkDir(path.join(__dirname, 'music_model'))
+  };
+
+
+  res.json(status); // { act_model: true, book_model: false, ... }
 // 상태 확인
 app.get('/status', (req, res) => {
   res.json({ status: 'running', modelTrained: isModelTrained });
@@ -398,6 +463,7 @@ app.get('/', (req, res) => {
         <p>GET /status - 서버 상태 확인</p>
     `);
 });
+})
 
 // 서버 시작
 app.listen(port, () => {

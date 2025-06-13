@@ -1,5 +1,11 @@
 import api from './base';
 
+// const express = require('express');
+// const cors=require('cors');
+// const app=express();
+
+// app.use(cors());
+
 interface LoginCredentials {
   userId: string;
   userPw: string;
@@ -44,7 +50,7 @@ export const login = async (credentials: LoginCredentials) => {
 export const logout = async () => {
   try {
     await api.post('/user/logout');
-    console.log("서버 로그아웃 요청 성공: HttpOnly 쿠키 만료 예정.");
+    // console.log("서버 로그아웃 요청 성공: HttpOnly 쿠키 만료 예정.");
   } catch (error) {
     console.error("서버 로그아웃 요청 실패:", error);
   }
@@ -53,26 +59,26 @@ export const logout = async () => {
 // 현재 사용자 정보 가져오기 (디버깅 로그 추가)
 export const getCurrentUser = async (): Promise<UserDTO | null> => {
   try {
-    console.log("getCurrentUser API 호출 시작");
+    // console.log("getCurrentUser API 호출 시작");
     const response = await api.get('/user/me');
     
     // 응답 데이터 상세 로깅
-    console.log("getCurrentUser API 응답:", response);
-    console.log("사용자 데이터:", response.data);
+    // console.log("getCurrentUser API 응답:", response);
+    // console.log("사용자 데이터:", response.data);
     
     // 관리자 관련 필드 확인
     if (response.data) {
-      console.log("관리자 관련 필드 확인:");
-      console.log("- useradmin:", response.data.useradmin);
-      console.log("- userAdmin:", response.data.userAdmin);
-      console.log("- user_admin:", response.data.user_admin);
-      console.log("- isAdmin:", response.data.isAdmin);
-      console.log("- role:", response.data.role);
+      // console.log("관리자 관련 필드 확인:");
+      // console.log("- useradmin:", response.data.useradmin);
+      // console.log("- userAdmin:", response.data.userAdmin);
+      // console.log("- user_admin:", response.data.user_admin);
+      // console.log("- isAdmin:", response.data.isAdmin);
+      // console.log("- role:", response.data.role);
       
       // 모든 필드 출력 (알 수 없는 필드 확인용)
-      console.log("모든 필드:");
+      // console.log("모든 필드:");
       Object.keys(response.data).forEach(key => {
-        console.log(`- ${key}:`, response.data[key]);
+        // console.log(`- ${key}:`, response.data[key]);
       });
     }
     

@@ -27,7 +27,7 @@ interface AuthState {
   loginSuccess: (userData: any) => void; // 로그인 성공 시 호출 함수
   logoutUser: () => Promise<void>; // 로그아웃 함수
   isAdmin: () => boolean
-  refreshUserInfo: () => Promise<void>
+  // refreshUserInfo: () => Promise<void>
 }
 
 const useAuthStore = create<AuthState>((set, get) => ({
@@ -42,7 +42,7 @@ const useAuthStore = create<AuthState>((set, get) => ({
       const user = await getCurrentUser();
       // user가 null이 아니고, 빈 객체도 아니며, 로그인된 사용자임을 나타내는 특정 필드가 있는지 확인
       // 예: user.id가 존재하는지, user.username이 비어있지 않은지 등
-      console.log("AuthStore: 백엔드 사용자 정보:", user)
+      // console.log("AuthStore: 백엔드 사용자 정보:", user)
 
       if (user && Object.keys(user).length > 0 && user.userId) { // <-- 이 조건을 더 엄격하게
         // 사용자 정보 구조 확인 및 처리
@@ -50,7 +50,7 @@ const useAuthStore = create<AuthState>((set, get) => ({
 
         // jwt_token 객체가 있는 경우 그 안의 정보를 사용
         if (user.jwt_token && typeof user.jwt_token === "object") {
-          console.log("AuthStore: jwt_token 객체 발견:", user.jwt_token)
+          // console.log("AuthStore: jwt_token 객체 발견:", user.jwt_token)
           processedUser = {
             ...user.jwt_token,
             token: user.token, // 토큰 정보도 유지
@@ -73,7 +73,7 @@ const useAuthStore = create<AuthState>((set, get) => ({
           }
         }
 
-        console.log("AuthStore: 처리된 사용자 정보:", processedUser)
+        // console.log("AuthStore: 처리된 사용자 정보:", processedUser)
         
   // // 로그인 성공 시 호출
   // loginSuccess: (userData) => {
@@ -84,7 +84,7 @@ const useAuthStore = create<AuthState>((set, get) => ({
         set({ isLoggedIn: false, user: null, loading: false })
       }
     } catch (error) {
-      console.log("AuthStore: 인증 상태 확인 실패 (토큰 없음 또는 서버 오류)", error);
+      // console.log("AuthStore: 인증 상태 확인 실패 (토큰 없음 또는 서버 오류)", error);
       // 에러 발생 시 무조건 로그아웃 상태로 처리
       set({ isLoggedIn: false, user: null, loading: false });
     }
@@ -98,7 +98,7 @@ const useAuthStore = create<AuthState>((set, get) => ({
 
   // 로그인 성공 시 호출 (기존 시그니처 유지하면서 JWT 파싱 추가)
   loginSuccess: (userData: any) => {
-    console.log("AuthStore: 로그인 성공 - 원본 데이터:", userData)
+    // console.log("AuthStore: 로그인 성공 - 원본 데이터:", userData)
 
     let processedUser: User = {}
 
@@ -109,7 +109,7 @@ const useAuthStore = create<AuthState>((set, get) => ({
 
     // 2. jwt_token 객체가 있는 경우 그 안의 정보를 사용
     if (userData.jwt_token && typeof userData.jwt_token === "object") {
-      console.log("AuthStore: jwt_token 객체에서 사용자 정보 추출:", userData.jwt_token)
+      // console.log("AuthStore: jwt_token 객체에서 사용자 정보 추출:", userData.jwt_token)
       processedUser = {
         ...processedUser,
         ...userData.jwt_token,
@@ -118,7 +118,7 @@ const useAuthStore = create<AuthState>((set, get) => ({
 
     // 3. JWT 토큰이 있는 경우 디코딩해서 추가 정보 가져오기
     if (userData.token) {
-      console.log("AuthStore: JWT 토큰 디코딩 시작:", userData.token)
+      // console.log("AuthStore: JWT 토큰 디코딩 시작:", userData.token)
       const tokenInfo = getUserInfoFromToken(userData.token)
       if (tokenInfo) {
         console.log("AuthStore: JWT 토큰에서 추출한 정보:", tokenInfo)
@@ -139,15 +139,15 @@ const useAuthStore = create<AuthState>((set, get) => ({
 
       // 토큰을 localStorage에 저장
       if (typeof window !== "undefined") {
-        localStorage.setItem("token", userData.token)
-        console.log("AuthStore: 토큰 localStorage에 저장 완료")
+        localStorage.setItem("jwt_token", userData.token)
+        // console.log("AuthStore: 토큰 localStorage에 저장 완료")
       }
     }
 
-    console.log("AuthStore: 최종 처리된 사용자 정보:", processedUser)
-    console.log("AuthStore: userAdmin 값:", processedUser.userAdmin, "타입:", typeof processedUser.userAdmin)
+    // console.log("AuthStore: 최종 처리된 사용자 정보:", processedUser)
+    // console.log("AuthStore: userAdmin 값:", processedUser.userAdmin, "타입:", typeof processedUser.userAdmin)
 
-    // set({ isLoggedIn: true, user: processedUser, loading: false })
+    set({ isLoggedIn: true, user: processedUser, loading: false })
     
   },
 
@@ -175,44 +175,44 @@ const useAuthStore = create<AuthState>((set, get) => ({
       return false
     }
 
-    console.log("AuthStore: 관리자 확인 중 - 사용자 정보:", user)
+    // console.log("AuthStore: 관리자 확인 중 - 사용자 정보:", user)
 
     // 1. JWT 토큰에서 먼저 확인 (토큰이 있는 경우)
     if (user.token) {
       const tokenAdmin = isAdminFromToken(user.token)
       if (tokenAdmin) {
-        console.log("AuthStore: JWT 토큰으로 관리자 확인됨")
+        // console.log("AuthStore: JWT 토큰으로 관리자 확인됨")
         return true
       }
     }
 
     // 2. userAdmin 필드 확인 (JWT에서 가져온 정보)
     if (user.userAdmin === 1) {
-      console.log("AuthStore: userAdmin 필드로 관리자 확인됨 (값:", user.userAdmin, ")")
+      // console.log("AuthStore: userAdmin 필드로 관리자 확인됨 (값:", user.userAdmin, ")")
       return true
     }
 
     // 3. useradmin 필드 확인
     if (user.useradmin === 1) {
-      console.log("AuthStore: useradmin 필드로 관리자 확인됨 (값:", user.useradmin, ")")
+      // console.log("AuthStore: useradmin 필드로 관리자 확인됨 (값:", user.useradmin, ")")
       return true
     }
 
     // 4. 다른 가능한 필드명들도 확인
     if (user.user_admin === 1) {
-      console.log("AuthStore: user_admin 필드로 관리자 확인됨 (값:", user.user_admin, ")")
+      // console.log("AuthStore: user_admin 필드로 관리자 확인됨 (값:", user.user_admin, ")")
       return true
     }
 
     // 5. isAdmin 필드 확인 (boolean 타입)
     if (user.isAdmin === true) {
-      console.log("AuthStore: isAdmin 필드로 관리자 확인됨")
+      // console.log("AuthStore: isAdmin 필드로 관리자 확인됨")
       return true
     }
 
     // 6. role 필드 확인
     if (user.role && (user.role === "admin" || user.role === "ADMIN")) {
-      console.log("AuthStore: role 필드로 관리자 확인됨")
+      // console.log("AuthStore: role 필드로 관리자 확인됨")
       return true
     }
 
@@ -220,7 +220,7 @@ const useAuthStore = create<AuthState>((set, get) => ({
     if (user.userId && typeof user.userId === "string") {
       const adminUserIds = ["admin", "administrator", "root"]
       if (adminUserIds.includes(user.userId.toLowerCase())) {
-        console.log("AuthStore: userId로 관리자 확인됨")
+        // console.log("AuthStore: userId로 관리자 확인됨")
         return true
       }
     }

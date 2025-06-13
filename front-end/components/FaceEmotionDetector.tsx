@@ -10,8 +10,8 @@ import { ArrowLeft, ScanFace } from "lucide-react"
 
 // TensorFlow.js 코어 및 백엔드 모듈 임포트 추가
 import * as tf from "@tensorflow/tfjs-core"
-import "@tensorflow/tfjs-backend-cpu" // CPU 백엔드 임포트
-import "@tensorflow/tfjs-backend-webgl" // WebGL 백엔드 임포트
+// import "@tensorflow/tfjs-backend-cpu" // CPU 백엔드 임포트
+// import "@tensorflow/tfjs-backend-webgl" // WebGL 백엔드 임포트
 
 // 새로 생성한 타입과 유틸리티 함수 임포트
 import type { FaceExpressions, CustomMoodScores } from "@/types/emotion"

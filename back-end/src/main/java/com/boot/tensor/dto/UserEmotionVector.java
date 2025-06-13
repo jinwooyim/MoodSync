@@ -1,6 +1,4 @@
-package com.boot.collection.dto;
-
-import java.util.List;
+package com.boot.tensor.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemIdsInOrderRequest {
-	private int id;
-	private int itemOrder;
+public class UserEmotionVector {
+	private Long userId;
+	private double[] vector;
 }

@@ -33,19 +33,21 @@
     <!-- 전체 피드백 조회 (페이징) -->
     <select id="allReadFeedback" parameterType="com.boot.z_page.criteria.CriteriaDTO" resultType="com.boot.feedback.dto.FeedbackDTO">
         <![CDATA[
-        SELECT feedbackId, userNumber, feedbackCategory, feedbackScore, feedbackContent, createdDate
+       	SELECT feedbackId, userNumber, userName, feedbackCategory, feedbackScore, feedbackContent, createdDate
         FROM (
-            SELECT rownum as rn, feedbackId, userNumber, feedbackCategory, feedbackScore, feedbackContent, createdDate
+            SELECT rownum as rn, feedbackId, userNumber, userName, feedbackCategory, feedbackScore, feedbackContent, createdDate
             FROM (
-                SELECT FEEDBACKID as feedbackId,
-                       USERNUMBER as userNumber,
-                       FEEDBACK_CATEGORY as feedbackCategory,
-                       FEEDBACK_SCORE as feedbackScore,
-                       FEEDBACK_CONTENT as feedbackContent,
-                       CREATED_DATE as createdDate
-                FROM user_feedback
-                WHERE NVL(STATUS, 'ACTIVE') != 'DELETED'
-                ORDER BY created_date DESC
+                SELECT uf.FEEDBACKID as feedbackId,
+                       uf.USERNUMBER as userNumber,
+                       ui.userName as userName,
+                       uf.FEEDBACK_CATEGORY as feedbackCategory,
+                       uf.FEEDBACK_SCORE as feedbackScore,
+                       uf.FEEDBACK_CONTENT as feedbackContent,
+                       to_char(uf.created_date, 'YYYY-MM-DD HH24:MI') as createdDate
+                FROM user_feedback uf
+                LEFT JOIN user_info ui ON uf.USERNUMBER = ui.USERNUMBER
+                WHERE uf.status = 'ACTIVE'
+                ORDER BY uf.created_date DESC
             ) a
             WHERE rownum <= (#{pageNum} * #{amount})
         ) aa

@@ -1,9 +1,11 @@
 package com.boot.contact.dao;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.boot.analize.dto.AnalizeContactDTO;
 import com.boot.contact.dto.ContactDTO;
 import com.boot.z_page.criteria.CriteriaDTO;
 
@@ -37,4 +39,8 @@ public interface ContactDAO {
 
 	// 답변 안한거 가져오기
 	public int getNotyetAnswer();
+
+	// 데이터 분석 =================
+	public List<AnalizeContactDTO> getTimeContactCount(@Param("created_date") String created_date);
+
 }

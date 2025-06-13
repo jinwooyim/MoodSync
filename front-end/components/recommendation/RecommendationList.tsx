@@ -197,7 +197,7 @@ export default function RecommendationList({
                 key={index}
                 music={music}
                 onAddToCollection={handleAddToCollection}
-                videoUrl={youtubeVideos[index]?.videoUrl}  // index에 맞춰 videoUrl 넘겨주기
+                youtubeVideos={youtubeVideos[index] ? [youtubeVideos[index]] : []}
               />
             ))}
           </div>

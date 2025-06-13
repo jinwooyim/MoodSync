@@ -228,9 +228,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                         // 컬렉션이 없을 때 메시지도 애니메이션 적용
                                         <motion.div
                                             key="no-collections-sidebar-message"
-                                            initial={{ opacity: 0, x: -20 }}
-                                            animate={{ opacity: 1, x: 0, transition: { type: "spring", damping: 20, stiffness: 100 } }}
-                                            exit={{ opacity: 0, x: -20, transition: { duration: 0.15 } }}
+                                            // initial={{ opacity: 0, x: -20 }}
+                                            // animate={{ opacity: 1, x: 0, transition: { type: "spring", damping: 20, stiffness: 100 } }}
+                                            // exit={{ opacity: 0, x: -20, transition: { duration: 0.15 } }}
                                             className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400"
                                         >
                                             컬렉션이 없습니다.
@@ -243,20 +243,24 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                                     return (
                                                         <motion.div
                                                             key={String(collection.collectionId)} // 고유한 key 필수
-                                                            initial="hidden"
-                                                            animate="visible"
-                                                            exit="exit"
-                                                            variants={{
-                                                                hidden: { opacity: 0, x: -20 },
-                                                                visible: { opacity: 1, x: 0, transition: { type: "spring", damping: 20, stiffness: 100 } },
-                                                                exit: { opacity: 0, x: -20, transition: { duration: 0.15 } },
-                                                            }}
+                                                            // initial="hidden"
+                                                            // animate="visible"
+                                                            // exit="exit"
+                                                            // variants={{
+                                                            //     hidden: { opacity: 0, x: -20 },
+                                                            //     visible: { opacity: 1, x: 0, transition: { type: "spring", damping: 20, stiffness: 100 } },
+                                                            //     exit: { opacity: 0, x: -20, transition: { duration: 0.15 } },
+                                                            // }}
                                                             layout // 레이아웃 변경 애니메이션
                                                         >
-                                                            <SidebarMenuItem>
+                                                             <SidebarMenuItem>
                                                                 <SidebarMenuButton
                                                                     onClick={() => handleCollectionClick(String(collection.collectionId))}
-                                                                    className={openedCollectionIds.includes(String(collection.collectionId)) ? "bg-indigo-500 text-white" : ""}
+                                                                    className={
+                                                                        openedCollectionIds.includes(String(collection.collectionId))
+                                                                            ? "bg-pink-500 text-white hover:bg-pink-600 dark:bg-pink-700 dark:hover:bg-pink-800" // 선택된 상태일 때 핑크색, 호버 시 더 진한 핑크
+                                                                            : "hover:bg-gray-100 dark:hover:bg-gray-700 data-[active=true]:bg-pink-100 dark:data-[active=true]:bg-pink-900/30 data-[active=true]:text-pink-700 dark:data-[active=true]:text-pink-300 transition-colors duration-300" // 선택되지 않은 상태일 때 회색 호버 및 data-active 스타일
+                                                                    }
                                                                 >
                                                                     <List className="size-4" /> {collection.name}
                                                                 </SidebarMenuButton>

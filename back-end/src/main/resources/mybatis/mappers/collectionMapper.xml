@@ -68,10 +68,11 @@
             collectionId,
             contentTitle,
             contentType,
-            addedAt
+            addedAt,
+            itemOrder
         FROM COLLECTION_ITEMS
         WHERE collectionId = #{collectionId}
-        ORDER BY addedAt ASC
+        ORDER BY itemOrder ASC, ADDEDAT desc
     </select>
 
     <!-- collectionItem 삽입 -->

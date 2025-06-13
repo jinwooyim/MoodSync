@@ -2,6 +2,7 @@ package com.boot.collection.controller;
 
 import com.boot.collection.dto.CollectionDTO;
 import com.boot.collection.dto.CollectionItemDTO;
+import com.boot.collection.dto.ItemIdsInOrderRequest;
 import com.boot.collection.service.CollectionService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -208,7 +209,7 @@ public class CollectionController {
     // 전체 아이템 정보 업데이트 엔드포인트: updateCollectionItemsFull
     @PutMapping("/{collectionId}/items/full-update")
     public ResponseEntity<Void> updateCollectionItems(@PathVariable Long collectionId,
-                                                      @RequestBody List<CollectionItemDTO> updatedItems) {
+                                                      @RequestBody List<ItemIdsInOrderRequest> updatedItems) {
     	log.info("collectionId 는 옴=>"+collectionId);
     	log.info("updatedItems 가 안 옴=>"+updatedItems);
         collectionService.updateAllItemsOrder(collectionId, updatedItems); // 서비스 메서드 이름 변경 고려

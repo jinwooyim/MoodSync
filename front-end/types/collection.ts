@@ -21,3 +21,4 @@ export interface Collection {
   itemCount?: number; 
   userName?: string;
 }
+

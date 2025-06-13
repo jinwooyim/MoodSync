@@ -107,7 +107,7 @@ public class AnalizeController {
 	}
 
 	// 특정 사람의 특성 시간대나 요일별 감정 탐색 : 시계열 분석(Time Series Analysis)
-	@GetMapping("/analize-record")
+	@GetMapping("/analize-timeseries")
 	public void recordAnalize(@RequestParam HashMap<String, String> param) {
 
 	}

@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { Home, Settings } from "lucide-react";
 import { Calendar, TrendingUp, BookOpen, BarChart3, List } from "lucide-react"
-import { useState, useEffect, useCallback } from "react"; // useCallback 임포트 추가
-import { DragDropContext, DropResult } from '@hello-pangea/dnd'; // DragDropContext, DropResult 임포트 추가
-
+import { useState, useEffect, useCallback } from "react";
+import { DragDropContext, DropResult } from '@hello-pangea/dnd';
+import CollectionFormModal from "@/components/Collection/CollectionFormModal";
 import {
   Sidebar,
   SidebarContent,
@@ -26,32 +26,96 @@ import { useCollections } from "@/hooks/useCollections";
 import CollectionItemsView from "@/components/Collection/CollectionItemsView";
 import type { Collection, CollectionItem } from '@/types/collection';
 // API 함수 임포트 추가
-import { deleteCollectionItem, addCollectionItemToExisting, updateCollectionItemsFull } from '@/lib/api/collections';
+// fetchCollections를 포함하는 것은 useCollections 훅 내부에서 처리되므로 여기서는 제거
+import { createCollection, updateCollection, deleteCollectionItem, addCollectionItemToExisting, updateCollectionItemsFull } from "@/lib/api/collections";
+import { useRouter } from "next/navigation";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
-  const { collections, loading, error, refetchCollections } = useCollections();
+  // ⭐ setCollections를 useCollections 훅에서 가져옴 ⭐
+  const { collections, loading, error, refetchCollections, setCollections } = useCollections(); 
   
-  // ⭐ 선택된 컬렉션 ID들을 저장하는 배열 상태 ⭐
   const [openedCollectionIds, setOpenedCollectionIds] = useState<string[]>([]);
+  const router = useRouter();
 
-  // 사이드바 컬렉션 버튼 클릭 핸들러 (다시 추가)
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [editingCollection, setEditingCollection] = useState<Collection | null>(null);
+  
+  const handleFormSubmit = async (
+    name: string,
+    description: string,
+    isPublic: boolean,
+    collectionId?: string
+  ) => {
+    try {
+      if (collectionId) {
+        // 기존 컬렉션 수정
+        const collectionIdAsNumber = Number(collectionId);
+        if (isNaN(collectionIdAsNumber)) {
+          window.alert("수정할 컬렉션 ID가 유효하지 않습니다. 다시 시도해주세요.");
+          return;
+        }
+        await updateCollection({
+          collectionId: collectionIdAsNumber,
+          name,
+          description,
+          isPublic,
+        });
+        window.alert("컬렉션이 성공적으로 수정되었습니다.");
+        // ⭐ 수정된 컬렉션을 setCollections를 통해 즉시 업데이트 ⭐
+        setCollections(prevCollections => 
+          prevCollections.map(col => 
+            String(col.collectionId) === collectionId ? { ...col, name, description, isPublic } : col
+          )
+        );
+      } else {
+        // 새 컬렉션 생성
+        // 백엔드에서 생성된 컬렉션 객체를 반환하도록 API를 가정하거나,
+        // 임시로 클라이언트에서 생성된 데이터를 추가합니다.
+        const newCollectionData = await createCollection({ name, description, isPublic });
+        window.alert("컬렉션이 성공적으로 생성되었습니다.");
+        // ⭐ 새 컬렉션을 setCollections를 통해 즉시 추가 ⭐
+        setCollections(prevCollections => [
+          ...prevCollections, 
+          { 
+            collectionId: String(newCollectionData.collectionId), // 백엔드에서 반환하는 ID 사용
+            name, 
+            description, 
+            isPublic, 
+            items: [], 
+            // 기타 필드 (userId, createdAt 등)는 서버에서 받을 수 있다면 추가 매핑 필요
+          }
+        ]);
+      }
+
+      setShowFormModal(false); // 모달 닫기
+      setEditingCollection(null); // 수정 중인 컬렉션 초기화
+    } catch (e: any) {
+      console.error("API 호출 중 오류 발생:", e);
+      if (e instanceof Error && e.message === 'Unauthorized') {
+        window.alert('로그인이 만료되었습니다. 다시 로그인 해주세요.');
+        router.push('/user/login');
+        return;
+      }
+      const errorMessage = e.response?.data?.message || e.message || '알 수 없는 오류';
+      window.alert(`작업에 실패했습니다: ${errorMessage}`);
+    }
+  };
+
+  // 사이드바 컬렉션 버튼 클릭 핸들러
   const handleCollectionClick = useCallback((collectionId: string) => {
     setOpenedCollectionIds(prevIds => {
       if (prevIds.includes(collectionId)) {
-        // 이미 열려 있으면 닫기 (제거)
         return prevIds.filter(id => id !== collectionId);
       } else {
-        // 안 열려 있으면 열기 (추가)
         return [...prevIds, collectionId];
       }
     });
   }, []);
 
-  // "새 컬렉션 만들기" 버튼 클릭 핸들러 (다시 추가)
+  // "새 컬렉션 만들기" 버튼 클릭 핸들러 (모달 열기)
   const handleCreateCollectionClick = useCallback(() => {
-    // ⭐ 모든 컬렉션 뷰를 닫고, 기본 children (예: 컬렉션 목록 페이지)을 렌더링 ⭐
-    setOpenedCollectionIds([]);
-    // 필요하다면 이곳에서 router.push('/collections?action=create') 등을 호출할 수 있습니다.
+    setEditingCollection(null); // 새 컬렉션이므로 편집 중인 컬렉션 없음
+    setShowFormModal(true); // 모달 열기
   }, []);
 
   // CollectionItemsView에서 컬렉션 뷰를 닫는 핸들러 (X 버튼 클릭 시)
@@ -60,7 +124,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   }, []);
 
   // CollectionItemsView에서 아이템 삭제가 확정되었을 때 호출될 핸들러
-  // 이 핸들러에서 API 호출 및 전체 컬렉션 새로고침을 처리합니다.
   const handleDeleteItemConfirmed = useCallback(async (collectionId: string, itemId: string) => {
     if (!window.confirm(`정말로 이 아이템을 컬렉션에서 삭제하시겠습니까?`)) {
       throw new Error('Deletion cancelled by user.');
@@ -68,7 +131,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     try {
       await deleteCollectionItem(Number(collectionId), Number(itemId));
       window.alert("아이템이 성공적으로 삭제되었습니다.");
-      await refetchCollections();
+      await refetchCollections(); // 데이터 변경 후 컬렉션 목록 새로고침 (DND는 복잡하므로 refetch 유지)
     } catch (err: any) {
       console.error("메인 레이아웃: 아이템 삭제 중 오류 발생:", err);
       if (err.message !== 'Deletion cancelled by user.') {
@@ -82,17 +145,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const onDragEnd = useCallback(async (result: DropResult) => {
     const { source, destination, draggableId } = result;
 
-    // 1. 드롭 대상이 없으면 아무것도 하지 않음
-    if (!destination) {
+    if (!destination || (source.droppableId === destination.droppableId && source.index === destination.index)) {
       return;
     }
 
-    // 2. 같은 위치에 드롭했으면 아무것도 하지 않음
-    if (source.droppableId === destination.droppableId && source.index === destination.index) {
-      return;
-    }
-
-    // 드래그된 아이템 객체를 찾습니다.
     const draggedItem = collections.flatMap(col => col.items)
       .find(item => String(item.collectionItemId) === draggableId);
 
@@ -101,7 +157,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       return;
     }
 
-    // 원본 컬렉션과 대상 컬렉션 찾기
     const sourceCollection = collections.find(col => String(col.collectionId) === source.droppableId);
     const destinationCollection = collections.find(col => String(col.collectionId) === destination.droppableId);
 
@@ -110,78 +165,60 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       return;
     }
 
-    // 3. 같은 컬렉션 내에서 순서만 변경 (Reorder)
-    if (source.droppableId === destination.droppableId) {
-      console.log(`컬렉션 내부 순서 변경: ${source.droppableId}`);
-      const itemsInCollection = [...sourceCollection.items].sort((a,b) => a.itemOrder - b.itemOrder);
-      const [movedItem] = itemsInCollection.splice(source.index, 1);
-      itemsInCollection.splice(destination.index, 0, movedItem);
+    try {
+      if (source.droppableId === destination.droppableId) {
+        // 같은 컬렉션 내에서 순서만 변경 (Reorder)
+        console.log(`컬렉션 내부 순서 변경: ${source.droppableId}`);
+        const itemsInCollection = [...sourceCollection.items].sort((a,b) => a.itemOrder - b.itemOrder);
+        const [movedItem] = itemsInCollection.splice(source.index, 1);
+        itemsInCollection.splice(destination.index, 0, movedItem);
 
-      // 새로운 순서로 itemOrder 업데이트
-      const updatedItemsPayload = itemsInCollection.map((item, index) => ({
-        collectionItemId: item.collectionItemId,
-        itemOrder: index,
-      }));
+        const updatedItemsPayload = itemsInCollection.map((item, index) => ({
+          // ⭐ collectionItemId 대신 id로 변경 ⭐
+          id: item.collectionItemId, 
+          itemOrder: index,
+        }));
 
-      try {
         await updateCollectionItemsFull(source.droppableId, updatedItemsPayload);
         window.alert("아이템 순서가 성공적으로 변경되었습니다.");
-        await refetchCollections();
-      } catch (error) {
-        console.error("컬렉션 내부 순서 변경 실패:", error);
-        window.alert("아이템 순서 변경에 실패했습니다.");
-        await refetchCollections();
-      }
-    }
-    // 4. 다른 컬렉션으로 아이템 이동 (Move between lists)
-    else {
-      console.log(`컬렉션 간 이동: ${source.droppableId} -> ${destination.droppableId}`);
-      // 원본 컬렉션에서 아이템 제거
-      const sourceItems = [...sourceCollection.items].filter(item => String(item.collectionItemId) !== draggableId).sort((a,b) => a.itemOrder - b.itemOrder);
-      // 대상 컬렉션에 아이템 추가 및 순서 조정
-      const destinationItems = [...destinationCollection.items].sort((a,b) => a.itemOrder - b.itemOrder);
-
-      const itemDtoForNewCollection = {
+      } else {
+        // 다른 컬렉션으로 아이템 이동 (Move between lists)
+        console.log(`컬렉션 간 이동: ${source.droppableId} -> ${destination.droppableId}`);
         
-        contentTitle: draggedItem.contentTitle,
-        // ⭐ 타입 캐스팅을 추가하여 TypeScript 오류 해결 ⭐
-        contentType: draggedItem.contentType as "music" | "activity" | "book", 
-        contentId: draggedItem.contentId || '', 
-        itemOrder: destination.index,
-      };
-
-      try {
         // 1. 원본 컬렉션에서 아이템 삭제 (API 호출)
         await deleteCollectionItem(Number(source.droppableId), Number(draggableId));
         
         // 2. 대상 컬렉션에 아이템 추가 (API 호출)
-        const newItemResponse = await addCollectionItemToExisting(Number(destination.droppableId), itemDtoForNewCollection);
+        const itemDtoForNewCollection = {
+          collectionId: Number(destination.droppableId), // DTO에 collectionId 포함
+          contentTitle: draggedItem.contentTitle,
+          contentType: draggedItem.contentType as "music" | "activity" | "book", 
+          contentId: draggedItem.contentId || '', 
+          itemOrder: destination.index, // 새로운 위치에 대한 초기 순서
+        };
+        await addCollectionItemToExisting(Number(destination.droppableId), itemDtoForNewCollection);
 
-        // 3. 두 컬렉션의 순서 업데이트
-        // 원본 컬렉션의 아이템 순서 업데이트
-        const updatedSourceItemsPayload = sourceItems.map((item, index) => ({
-          collectionItemId: item.collectionItemId,
+        // 3. 원본 컬렉션의 남은 아이템 순서 재정렬 및 업데이트
+        const sourceItemsRemaining = sourceCollection.items
+          .filter(item => String(item.collectionItemId) !== draggableId)
+          .sort((a,b) => a.itemOrder - b.itemOrder);
+        const updatedSourceItemsPayload = sourceItemsRemaining.map((item, index) => ({
+          // ⭐ collectionItemId 대신 id로 변경 ⭐
+          id: item.collectionItemId,
           itemOrder: index,
         }));
         await updateCollectionItemsFull(source.droppableId, updatedSourceItemsPayload); 
         
-        // 대상 컬렉션의 순서는 새로 추가된 아이템을 포함하여 refetchCollections가 처리할 것입니다.
-        // 만약 필요하다면 대상 컬렉션 아이템의 순서도 명시적으로 업데이트하는 로직을 추가할 수 있습니다.
-        // 예를 들어:
-        // const updatedDestinationItemsPayload = [...destinationItems, { collectionItemId: newItemResponse.collectionItemId, itemOrder: destination.index }]
-        //   .sort((a, b) => a.itemOrder - b.itemOrder)
-        //   .map((item, index) => ({ collectionItemId: item.collectionItemId, itemOrder: index }));
-        // await updateCollectionItemsFull(destination.droppableId, updatedDestinationItemsPayload);
-
         window.alert("아이템이 컬렉션 간 성공적으로 이동되었습니다.");
-        await refetchCollections(); // 전체 컬렉션 새로고침 (새로 생성된 ID 및 순서 반영)
-      } catch (error) {
-        console.error("컬렉션 간 이동 실패:", error);
-        window.alert("아이템 이동에 실패했습니다.");
-        await refetchCollections();
       }
+      
+      await refetchCollections(); // 모든 작업 성공 후 전체 컬렉션 새로고침
+    } catch (error: any) {
+      console.error("DND 작업 실패:", error);
+      window.alert(`아이템 이동/순서 변경에 실패했습니다: ${error.message || '알 수 없는 오류'}`);
+      await refetchCollections(); // 오류 시 롤백 (이전 상태로 복원)
     }
-  }, [collections, refetchCollections]); // 의존성 배열에 collections와 refetchCollections 포함
+  }, [collections, refetchCollections, setCollections]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
@@ -242,7 +279,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
           {/* DragDropContext를 메인 콘텐츠 영역을 감싸도록 이동 */}
           <DragDropContext onDragEnd={onDragEnd}>
-            <main className="flex-1 overflow-y-auto p-8 bg-gray-50 dark:bg-gray-900 transition-colors duration-300 flex flex-wrap gap-8">
+            <main className="flex-1 p-8 bg-gray-50 dark:bg-gray-900 transition-colors duration-300 flex flex-wrap gap-8">
               {openedCollectionIds.length > 0 ? (
                 openedCollectionIds.map(id => {
                   const collectionToDisplay = collections.find(col => String(col.collectionId) === id);
@@ -266,6 +303,16 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           </DragDropContext>
         </div>
       </SidebarProvider>
+      {/* 컬렉션 생성/수정 모달은 레이아웃에 직접 렌더링 */}
+      <CollectionFormModal
+        isOpen={showFormModal}
+        onClose={() => {
+          setShowFormModal(false);
+          setEditingCollection(null);
+        }}
+        editingCollection={editingCollection}
+        onSubmit={handleFormSubmit}
+      />
     </div>
   );
 }

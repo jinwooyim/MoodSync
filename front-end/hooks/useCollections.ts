@@ -2,13 +2,14 @@
 import { useState, useEffect, useCallback } from "react";
 import type { Collection } from "@/types/collection";
 import { fetchCollections } from "@/lib/api/collections";
-import { useRouter } from "next/navigation"; // useRouter도 필요
+import { useRouter } from "next/navigation";
 
 interface UseCollectionsResult {
   collections: Collection[];
   loading: boolean;
   error: string | null;
-  refetchCollections: () => Promise<void>; // 데이터를 다시 불러올 함수
+  refetchCollections: () => Promise<void>;
+  setCollections: React.Dispatch<React.SetStateAction<Collection[]>>; // ⭐ setCollections 추가 ⭐
 }
 
 export const useCollections = (): UseCollectionsResult => {
@@ -19,13 +20,12 @@ export const useCollections = (): UseCollectionsResult => {
 
   const loadCollections = useCallback(async () => {
     setLoading(true);
-    setError(null); // 새로운 로드 시 에러 초기화
+    setError(null);
     try {
       const fetchedCollections = await fetchCollections();
       setCollections(fetchedCollections);
     } catch (e) {
       if (e instanceof Error && e.message === 'Unauthorized') {
-        // alert 대신 커스텀 모달 사용 권장
         window.alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
         router.push('/user/login');
       } else {
@@ -39,12 +39,12 @@ export const useCollections = (): UseCollectionsResult => {
 
   useEffect(() => {
     loadCollections();
-  }, [loadCollections]); // loadCollections는 useCallback으로 메모이제이션되었으므로 안전
+  }, [loadCollections]);
 
-  // 외부에서 데이터를 다시 불러올 수 있도록 함수 제공
   const refetchCollections = useCallback(async () => {
     await loadCollections();
   }, [loadCollections]);
 
-  return { collections, loading, error, refetchCollections };
+  // ⭐ setCollections를 반환 객체에 추가 ⭐
+  return { collections, loading, error, refetchCollections, setCollections };
 };

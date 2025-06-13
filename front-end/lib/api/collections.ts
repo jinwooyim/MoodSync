@@ -29,8 +29,8 @@ export interface CollectionItemDTO {
   collectionItemId?: number; // 생성 시에는 백엔드에서 할당, 수정/삭제 시에는 필요
   contentTitle: string;
   contentType: "music" | "activity" | "book";
-  itemOrder: number; // 아이템의 순서
-  contentId: string; // 원본 추천 아이템의 ID (음악 ID, 활동 ID, 책 ID 등)
+  itemOrder?: number; // 아이템의 순서
+  contentId?: string; // 원본 추천 아이템의 ID (음악 ID, 활동 ID, 책 ID 등)
   collectionId?: number; // 이 DTO가 어떤 컬렉션에 속하는지 명시 (선택 사항이지만 명확성을 위해)
 }
 
@@ -70,7 +70,7 @@ export async function fetchCollections(): Promise<Collection[]> {
       contentType: itemDto.contentType,
       addedAt: itemDto.addedAt,
       itemOrder: itemDto.itemOrder, 
-      contentId: itemDto.contentId, // ⭐ contentId 매핑 추가 ⭐
+      contentId: itemDto.contentId,
     })) : [],
   }));
 }
@@ -93,7 +93,7 @@ export async function fetchCollection(id: string): Promise<Collection> {
       contentType: itemDto.contentType,    
       addedAt: itemDto.addedAt,
       itemOrder: itemDto.itemOrder, 
-      contentId: itemDto.contentId, // ⭐ contentId 매핑 추가 ⭐
+      contentId: itemDto.contentId,
     })) : [],
     userName: dto.userName,
   };
@@ -103,8 +103,13 @@ export async function addToCollection(payload: AddToCollectionPayload) {
   const res = await api.post('/api/collections/add-to-collection', payload); 
   return res.data;
 }
-
+export async function addCollectionItemToSelectedCollection(payload: CollectionItemDTO) {
+    const res = await api.post('/api/collections/add-item', payload);
+      return res.data; 
+}
 export async function addCollectionItemToExisting(collectionId: number, itemDto: CollectionItemDTO) {
+    // collectionId는 이제 URL 경로가 아닌, itemDto 내부에 포함됩니다.
+    // 기존 itemDto에 collectionId가 이미 있거나, 없으면 새로 추가합니다.
     const payload = { ...itemDto, collectionId: collectionId };
     const res = await api.post(`/api/collections/add-item`, payload); // ⭐ 엔드포인트 변경 ⭐
     return res.data;
@@ -125,10 +130,10 @@ export async function updateCollectionItemsOrder(
     return res.data;
 }
 
-// ⭐ `updateCollectionItemsFull` 타입 명확화: `collectionItemId`로 변경 ⭐
+// ⭐ `updateCollectionItemsFull` 타입 명확화: `collectionItemId`를 `id`로 변경 ⭐
 export async function updateCollectionItemsFull(
     collectionId: string,
-    updatedItems: Array<{ collectionItemId: number; itemOrder: number }> 
+    updatedItems: Array<{ id: number; itemOrder: number }> // ⭐ collectionItemId 대신 id로 변경 ⭐
 ): Promise<void> {
     const res = await api.put(`/api/collections/${collectionId}/items/full-update`, updatedItems);
     return res.data; 

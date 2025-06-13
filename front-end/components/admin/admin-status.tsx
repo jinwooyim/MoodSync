@@ -311,25 +311,6 @@ export function AdminStats() {
           </CardContent>
         </Card>
       </div>
-
-<<<<<<< HEAD
-      {/* 분석 차트 */}
-      <div>
-        <h2 className="text-2xl font-bold mb-4">분석 차트</h2>
-
-        {/* 시간대별 문의 수와 카테고리별 피드백 차트를 나란히 배치 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 h-200">
-          <ContactTimeChart />
-          <FeedbackCategoryChart />
-        </div>
-
-        {/* 이탈 예측 차트 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <ChurnPredictionChart />
-        </div>
-      </div>
-
-=======
       {/* 감정 응집도 차트 */}
       <Card className="overflow-hidden">
         <CardHeader className="flex flex-row items-center justify-between">
@@ -358,7 +339,23 @@ export function AdminStats() {
           )}
         </CardContent>
       </Card>
->>>>>>> 3298310830a2bba1298b6c028042b7cc2077838e
+      {/* 분석 차트 */}
+      <div>
+        <h2 className="text-2xl font-bold mb-4">분석 차트</h2>
+
+        {/* 시간대별 문의 수와 카테고리별 피드백 차트를 나란히 배치 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 h-200">
+          <ContactTimeChart />
+          <FeedbackCategoryChart />
+        </div>
+
+        {/* 이탈 예측 차트 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <ChurnPredictionChart />
+        </div>
+      </div>
+
+      
     </div>
   )
 }

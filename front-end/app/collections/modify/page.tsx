@@ -1,21 +1,41 @@
-// app/page.tsx
+// app/(main)/layout.tsx (Example)
+"use client";
+import { SidebarProvider } from "@/components/ui/sidebar"; // Assuming this file is components/ui/sidebar.tsx
+import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuButton } from "@/components/ui/sidebar";
+import Link from "next/link";
+import { Home, Settings } from "lucide-react"; // Example icons
 
-import {Sidebar ,SidebarProvider} from "@/components/ui/sidebar";
-export default function HomePage() {
+export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-screen bg-gray-100">
-          {/* 사이드바 */}
-          <SidebarProvider>
-          <Sidebar >
-            <div className="p-4 text-2xl font-bold border-b border-gray-700">
-              My App
-            </div>
-            <div className="p-4 text-sm text-gray-400 border-t border-gray-700">
-              © 2024 My App
-            </div>
-          </Sidebar>
-          </SidebarProvider>
-
-        </div>
+    <SidebarProvider>
+      <div className="flex">
+        <Sidebar>
+          <SidebarHeader className="flex-col">
+            <h1 className="text-xl font-bold">My App</h1>
+          </SidebarHeader>
+          <SidebarContent>
+            <SidebarMenu>
+              <SidebarMenuButton asChild>
+                <Link href="/">
+                  <Home />
+                  <span>Home</span>
+                </Link>
+              </SidebarMenuButton>
+              <SidebarMenuButton asChild>
+                <Link href="/settings">
+                  <Settings />
+                  <span>Settings</span>
+                </Link>
+              </SidebarMenuButton>
+              {/* More menu items here */}
+            </SidebarMenu>
+          </SidebarContent>
+          {/* You can add a SidebarFooter here */}
+        </Sidebar>
+        <main className="flex-1 p-4">
+          {children} {/* Your page content */}
+        </main>
+      </div>
+    </SidebarProvider>
   );
 }

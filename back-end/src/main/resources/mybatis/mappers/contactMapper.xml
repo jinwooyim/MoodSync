@@ -104,4 +104,8 @@
     <select id="getNotyetAnswer" resultType="int">
     	select count(*) from user_contact where status = 'ACTIVE'
     </select>
+    
+    <select id="getTimeContactCount">
+    
+    </select>
 </mapper>

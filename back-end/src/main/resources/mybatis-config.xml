@@ -14,5 +14,9 @@
 		<mapper resource="mybatis/mappers/contactMapper.xml"/>
 		<mapper resource="mybatis/mappers/feedbackMapper.xml"/>
 		<mapper resource="mybatis/mappers/answerMapper.xml"/>
+		
+<!--		데이터 분석-->
+		<mapper resource="mybatis/mappers/analizeContactMapper.xml"/>
+		<mapper resource="mybatis/mappers/analizeFeedbackMapper.xml"/>
 	</mappers>
 </configuration>

@@ -19,16 +19,23 @@ export default function Header() {
   const [refreshing, setRefreshing] = useState(false)
 
   // 컴포넌트 마운트 시 관리자 상태 확인
+  // useEffect(() => {
+  //   if (isLoggedIn && user) {
+  //     const adminStatus = isAdmin()
+  //     console.log("Header: 관리자 상태 확인:", {
+  //       isLoggedIn,
+  //       user,
+  //       adminStatus,
+  //     })
+  //   }
+  // }, [isLoggedIn, user, isAdmin])
+
+  // checkAuthStatus는 AppProviders에서 한 번만 호출하여 전역 상태를 초기화합니다
   useEffect(() => {
     if (isLoggedIn && user) {
-      const adminStatus = isAdmin()
-      console.log("Header: 관리자 상태 확인:", {
-        isLoggedIn,
-        user,
-        adminStatus,
-      })
+      console.log("Header: 로그인 상태 변경 감지 - 사용자 정보:", user);
     }
-  }, [isLoggedIn, user, isAdmin])
+  }, [isLoggedIn, user]);
 
   const handleLogout = async () => {
     await logoutUser() // Zustand 스토어의 로그아웃 함수 호출

@@ -106,12 +106,6 @@ public class AnalizeController {
 		}
 	}
 
-	// 유사한 감정 행동 유사한 감정 행동 패턴을 가진 사용자 군집화 : 클러스터링(Clustering)
-	@GetMapping("/analize-collection")
-	public void collectionAnalize(@RequestParam HashMap<String, String> param) {
-
-	}
-
 	// 사용자 이탈 분석 : (Churn Analysis)
 	@GetMapping("/analize-churn")
 	public void churnAnalize(@RequestParam HashMap<String, String> param) {

@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api")
 public class UserClusteringController {
+	
 
 	// 유사한 감정 행동 패턴을 가진 사용자 군집화 : 클러스터링(Clustering)
 	@GetMapping("/analize-collection")

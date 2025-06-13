@@ -18,8 +18,8 @@ public class FeedbackDTO {
 	private String feedbackCategory;
 	private int feedbackScore;
 	private String feedbackContent;
-    private Date createdDate;
-    private Date updatedDate; 
-    private Date deletedDate;
+    private String createdDate;
+    private String updatedDate; 
+    private String deletedDate;
     private String status;
 }

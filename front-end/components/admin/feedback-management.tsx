@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast"
 interface Feedback {
   feedbackId: number
   userNumber: number
+  userName: string
   feedbackCategory: string
   feedbackScore: number
   feedbackContent: string
@@ -93,7 +94,18 @@ export function FeedbackManagement() {
       </div>
     )
   }
-
+// 날짜 포매팅 함수
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleString('ko-KR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  }).replace(/\./g, '-').replace(/\s/g, ' ');
+};
   return (
     <div className="space-y-6">
       <Card>
@@ -146,7 +158,7 @@ export function FeedbackManagement() {
                         <div className="flex items-center space-x-4">
                           <span className="flex items-center">
                             <User className="w-3 h-3 mr-1" />
-                            사용자 #{feedback.userNumber}
+                            {feedback.userName}
                           </span>
                           <span className="flex items-center">
                             <Calendar className="w-3 h-3 mr-1" />

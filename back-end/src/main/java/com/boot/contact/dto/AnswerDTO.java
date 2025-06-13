@@ -14,8 +14,8 @@ public class AnswerDTO {
 	private int contactId;
 	private int userNumber;
 	private String answerContent;
-	private Date createdDate;
-	private Date updatedDate;
-	private Date deletedDate;
+	private String createdDate;
+	private String updatedDate;
+	private String deletedDate;
 	private String status;
 }

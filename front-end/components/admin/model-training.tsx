@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress"
 import { Brain, Play, AlertTriangle, CheckCircle, Loader2 } from "lucide-react"
 import { trainModel } from "@/lib/api/admin"
 import { useToast } from "@/hooks/use-toast"
+import ModelStatusGrid from '@/components/ModelStatusGrid';
 
 export function ModelTraining() {
   const [isTraining, setIsTraining] = useState(false)
@@ -151,7 +152,7 @@ export function ModelTraining() {
           </Alert>
 
           {/* 모델 정보 */}
-          <div className="grid md:grid-cols-3 gap-4">
+          {/* <div className="grid md:grid-cols-3 gap-4">
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm">활동 추천 모델</CardTitle>
@@ -205,7 +206,9 @@ export function ModelTraining() {
                 </div>
               </CardContent>
             </Card>
-          </div>
+          </div> */}
+          <h1 className="text-xl font-bold mb-4">모델 상태 확인</h1>
+          <ModelStatusGrid />
 
           {/* 학습 시작 버튼 */}
           <div className="flex justify-center">

@@ -4,10 +4,10 @@ import api from "./base"
 export async function trainModel(): Promise<{ status: string; message: string }> {
   try {
     // 기존 모델 파일들 삭제 요청
-    await fetch('http://localhost:4000/clear-models', { method: 'DELETE' })
+    await fetch('http://localhost:4000/clear-models', { method: 'POST' })
     
     // 모델 학습 시작
-    const response = await fetch('http://localhost:4000/train', { method: 'POST' })
+    const response = await fetch('http://localhost:4000/train', { method: 'GET' })
     const data = await response.json()
     
     return {

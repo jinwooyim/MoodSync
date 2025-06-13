@@ -1,5 +1,7 @@
 package com.boot.user.dto;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
@@ -10,7 +12,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 // 데이터 불러올 때 비밀번호가 필요한 서비스일때만 이거 사용
-public class UserDTO {
+public class UserDTO implements Serializable {
+	//직렬화때메 문제????
+	private static final long serialVersionUID = 1L;//
 	private int userNumber;
 	private String userId;
 	@JsonIgnore

@@ -24,13 +24,13 @@ export interface ReadContactParams {
 }
 
 export interface UpdateContactParams {
-  contactId: string
+  contactId: number
   contact_title: string
   contact_content: string
 }
 
 export interface DeleteContactParams {
-  contactId: string
+  contactId: number
 }
 
 export async function createContact(params: CreateContactParams) {
@@ -57,7 +57,7 @@ export async function updateContact(params: UpdateContactParams) {
   // 디버깅을 위한 상세 로그 추가
   console.log("=== updateContact 호출 ===")
   console.log("전체 params:", params)
-  console.log("contactId:", params.contactId, "타입:", typeof params.contactId, "길이:", params.contactId?.length)
+  // console.log("contactId:", params.contactId, "타입:", typeof params.contactId, "길이:", params.contactId?.length)
   console.log(
     "contact_title:",
     params.contact_title,
@@ -76,7 +76,7 @@ export async function updateContact(params: UpdateContactParams) {
   )
 
   // contactId가 유효한지 확인
-  if (!params.contactId || params.contactId.trim() === "") {
+  if (!params.contactId) {
     console.error("contactId가 비어있음:", params.contactId)
     throw new Error("contactId가 필요합니다.")
   }
@@ -129,7 +129,7 @@ export async function deleteContact(params: DeleteContactParams) {
   console.log("deleteContact params:", params)
 
   // contactId가 유효한지 확인
-  if (!params.contactId || params.contactId.trim() === "") {
+  if (!params.contactId) {
     throw new Error("contactId가 필요합니다.")
   }
 
@@ -169,7 +169,7 @@ export async function fetchContacts(
         userNumber: dto.userNumber,
         userName: dto.userName,
         contactTitle: dto.contactTitle,
-        createdDate: dto.createdDate, 
+        createdDate: dto.createdDate,
         contactContent: dto.contactContent,
       })),
       pagination: res.data.pagination,
@@ -229,3 +229,12 @@ export async function fetchContactStats(): Promise<{ totalContacts: number }> {
     throw new Error(res.data.message || "문의 통계 조회에 실패했습니다.")
   }
 }
+
+export async function fetchContactAnswer(contactId: number) {
+  const res = await api.get("/api/contact_answer", {
+    params: { contactId }
+  });
+  return res.data;
+}
+
+

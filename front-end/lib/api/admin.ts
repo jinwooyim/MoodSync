@@ -24,12 +24,15 @@ export async function trainModel(): Promise<{ status: string; message: string }>
 }
 
 // 문의 답변 추가 API
-export async function addContactReply(contactId: string, reply: string): Promise<{ status: string; message: string }> {
+export async function addContactReply(
+  contactId: number,
+  answerContent: string
+): Promise<{ status: string; message: string }> {
   const res = await api.post("/api/add_contact_reply", {
     contactId,
-    reply
-  })
-  return res.data
+    answerContent
+  });
+  return res.data;
 }
 
 // 관리자 통계 API

@@ -12,7 +12,7 @@ import { addContactReply } from "@/lib/api/admin"
 import { useToast } from "@/hooks/use-toast"
 
 interface Contact {
-  contactId: string
+  contactId: number
   userNumber: number
   userName: string
   contactTitle: string

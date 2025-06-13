@@ -17,9 +17,11 @@ public interface CollectionDAO {
     List<CollectionDTO> selectAllCollections();
     List<CollectionDTO> findCollectionsByUserId(int userId);
     
+    int countCollectionItemsByCollectionId(int collectionId);
     // 아이템 넣는 부분
     List<CollectionItemDTO> findByCollectionId(int collectionId);
     int insertCollectionItem(CollectionItemDTO collectionItem);
+    
 //    void updateCollectionItem(CollectionItemDTO collectionItem);
     int deleteCollectionItem(Integer collectionItemId);
     void deleteByCollectionId(Long collectionId);

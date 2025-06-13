@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.boot.collection.dto.CollectionDTO;
 import com.boot.collection.dto.CollectionItemDTO;
+import com.boot.collection.dto.ItemIdsInOrderRequest;
 
 public interface CollectionService {
     int createCollection(CollectionDTO collection);
@@ -27,6 +28,6 @@ public interface CollectionService {
     
  // 드래그 드랍 순서변경
     void updateItemOrder(Long collectionId, List<Long> itemIdsInOrder);
-    void updateAllItemsOrder(Long collectionId, List<CollectionItemDTO> updatedItems);
+    void updateAllItemsOrder(Long collectionId, List<ItemIdsInOrderRequest> updatedItems);
     
 }

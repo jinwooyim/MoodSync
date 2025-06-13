@@ -18,5 +18,7 @@ export interface Collection {
   createdAt?: string;
   updatedAt?: string;
   items: CollectionItem[];
+  itemCount?: number; 
   userName?: string;
 }
+

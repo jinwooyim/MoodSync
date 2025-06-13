@@ -39,7 +39,7 @@ const CollectionFormModal: React.FC<CollectionFormModalProps> = ({
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        await onSubmit(name, description, isPublic, editingCollection?.id);
+        await onSubmit(name, description, isPublic, editingCollection?.collectionId);
         // 제출 후 폼 초기화는 부모 컴포넌트에서 모달 닫기 로직에 포함될 수 있습니다.
     };
 

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react"
 
 import ImageSlider from "@/components/ImageSlider"
 import EmotionSelection from "@/components/EmotionSelection"
-import RecommendationList from "@/components/RecommendationList"
+import RecommendationList from "@/components/recommendation/RecommendationList"
 import EmotionSliderCard from "@/components/EmotionSliderCard"
 import FaceEmotionDetector from "@/components/FaceEmotionDetector"
 import type { CustomMoodScores } from "@/types/emotion"

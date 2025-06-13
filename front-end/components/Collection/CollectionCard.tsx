@@ -1,7 +1,7 @@
 // components/CollectionCard.tsx
 import React from 'react';
 import type { Collection } from '@/types/collection';
-import { Music, CheckSquare, Book } from "lucide-react"
+import { Music, Activity , Book } from "lucide-react"
 
 interface CollectionCardProps {
     collection: Collection;
@@ -18,7 +18,7 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
 }) => {
     // 공유 링크 복사 핸들러
     const handleCopyShareLink = () => {
-        const shareLink = `${window.location.origin}/share/collection/${collection.id}`;
+        const shareLink = `${window.location.origin}/collections/share/${collection.collectionId}`;
         navigator.clipboard.writeText(shareLink);
         alert('공유 링크가 클립보드에 복사되었습니다.');
     };
@@ -44,12 +44,12 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
                         <>
                             {collection.items.slice(0, 3).map((item) => (
                                 <div
-                                    key={item.id}
+                                    key={item.collectionItemId}
                                     className="bg-indigo-50 rounded px-2 py-1 text-sm text-indigo-700 flex items-center gap-1"
                                 >
                                     <span className="font-bold">
                                         {item.contentType === 'music' && <Music className="w-4 h-4" />}
-                                        {item.contentType === 'acting' && <CheckSquare className="w-4 h-4" />}
+                                        {item.contentType === 'activity' && <Activity className="w-4 h-4" />}
                                         {item.contentType === 'book' && <Book className="w-4 h-4" />}
                                     </span>
                                     <span>{item.contentTitle}</span>
@@ -69,7 +69,7 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
             <div className="flex gap-2 mt-4">
                 <button
                     className="text-indigo-600 hover:underline text-sm"
-                    onClick={() => onViewDetails(collection.id)}
+                    onClick={() => onViewDetails(collection.collectionId)}
                 >
                     상세보기
                 </button>
@@ -81,7 +81,7 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
                 </button>
                 <button
                     className="text-red-500 hover:underline text-sm"
-                    onClick={() => onDelete(collection.id)}
+                    onClick={() => onDelete(collection.collectionId)}
                 >
                     삭제
                 </button>

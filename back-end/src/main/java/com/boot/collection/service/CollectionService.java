@@ -13,11 +13,20 @@ public interface CollectionService {
     List<CollectionDTO> getAllCollections();
     List<CollectionDTO> getCollectionsByUserId(int userNumber);
     
+    //1개 컬렉션 불러오면서 아이템들 몽땅 불러옴 
+    public CollectionDTO getCollectionWithItemsById(int collectionId);
+    
+    //컬렉션에 아이템 추가하기 위해 컬렉션 리스트 가져옴
+    public List<CollectionDTO> getCollectionsOnlyByUserId(int userId);
     
     public int insertCollectionItem(CollectionItemDTO collectionItem);
 //    public CollectionDTO updateCollectionItem(CollectionItemDTO collectionItem);
     
     public int deleteCollectionItem(int collectionId);
     public void deleteBycollectionId(int collectionId);
+    
+ // 드래그 드랍 순서변경
+    void updateItemOrder(Long collectionId, List<Long> itemIdsInOrder);
+    void updateAllItemsOrder(Long collectionId, List<CollectionItemDTO> updatedItems);
     
 }

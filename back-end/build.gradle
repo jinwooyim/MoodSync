@@ -12,6 +12,14 @@ java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(17)
 	}
+	// (6/12 주연)파라미터 이름을 유지하기 위해 추가했었는데 일단뺐어요
+//	compileJava {
+//        options.compilerArgs << "-parameters"
+//    }
+//    compileTestJava { 
+//        options.compilerArgs << "-parameters"
+//    }
+
 }
 
 configurations {

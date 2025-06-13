@@ -1,27 +1,69 @@
 "use client"
 
 import type React from "react"
-
-import { Heart, Mail, Phone, MapPin, Send } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { Heart, Mail, Phone, MapPin, Send, Loader2, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { useToast } from "@/hooks/use-toast"
 import { useState } from "react"
+import { createContact } from "@/lib/api/contact"
+import { SuccessModal } from "@/components/contact/success-modal"
+import {MyContactsModal} from "@/components/contact/my-contacts-modal"
 
 export default function ContactPage() {
+  const router = useRouter()
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
+    contact_title: "",
+    contact_content: "",
   })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [showMyContactsModal, setShowMyContactsModal] = useState(false)
+  const { toast } = useToast()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // 실제 구현에서는 서버로 데이터를 전송
-    console.log("Contact form submitted:", formData)
-    alert("문의사항이 성공적으로 전송되었습니다. 빠른 시일 내에 답변드리겠습니다.")
-    setFormData({ name: "", email: "", subject: "", message: "" })
+
+    if (!formData.contact_title.trim() || !formData.contact_content.trim()) {
+      toast({
+        title: "입력 오류",
+        description: "제목과 내용을 모두 입력해주세요.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      const response = await createContact({
+        contact_title: formData.contact_title.trim(),
+        contact_content: formData.contact_content.trim(),
+      })
+
+      if (response.status === "success") {
+        setFormData({ contact_title: "", contact_content: "" })
+        // 성공 모달 표시
+        setShowSuccessModal(true)
+      } else {
+        toast({
+          title: "전송 실패",
+          description: response.message || "문의 전송에 실패했습니다.",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error("Contact submission error:", error)
+      toast({
+        title: "오류 발생",
+        description: "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -29,6 +71,20 @@ export default function ContactPage() {
       ...formData,
       [e.target.name]: e.target.value,
     })
+  }
+
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false)
+    // 메인 페이지로 이동
+    router.push("/")
+  }
+
+  const handleOpenMyContacts = () => {
+    setShowMyContactsModal(true)
+  }
+
+  const handleCloseMyContacts = () => {
+    setShowMyContactsModal(false)
   }
 
   return (
@@ -98,7 +154,7 @@ export default function ContactPage() {
               <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1 transition-colors duration-300">
                 <li>• 구체적인 문제 상황을 설명해주세요</li>
                 <li>• 사용 중인 기기와 브라우저를 알려주세요</li>
-                <li>• 스크린샷이 있다면 첨부해주세요</li>
+                <li>• 오류 메시지가 있다면 정확히 기재해주세요</li>
               </ul>
             </div>
           </div>
@@ -106,99 +162,95 @@ export default function ContactPage() {
           {/* Contact Form */}
           <div className="lg:col-span-2">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300">
-              <h2 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white transition-colors duration-300">
-                문의 양식
-              </h2>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      htmlFor="name"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-300"
-                    >
-                      이름 *
-                    </label>
-                    <Input
-                      id="name"
-                      name="name"
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={handleChange}
-                      placeholder="이름을 입력해주세요"
-                      className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-300"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-300"
-                    >
-                      이메일 *
-                    </label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={handleChange}
-                      placeholder="이메일을 입력해주세요"
-                      className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-300"
-                    />
-                  </div>
-                </div>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white transition-colors duration-300">
+                  문의 양식
+                </h2>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleOpenMyContacts}
+                  className="flex items-center gap-2 text-pink-600 border-pink-200 hover:bg-pink-50 dark:text-pink-400 dark:border-pink-800 dark:hover:bg-pink-900/20"
+                >
+                  <FileText className="w-4 h-4" />
+                  나의 문의
+                </Button>
+              </div>
 
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label
-                    htmlFor="subject"
+                    htmlFor="contact_title"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-300"
                   >
                     제목 *
                   </label>
                   <Input
-                    id="subject"
-                    name="subject"
+                    id="contact_title"
+                    name="contact_title"
                     type="text"
                     required
-                    value={formData.subject}
+                    value={formData.contact_title}
                     onChange={handleChange}
                     placeholder="문의 제목을 입력해주세요"
+                    disabled={isSubmitting}
                     className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-300"
                   />
                 </div>
 
                 <div>
                   <label
-                    htmlFor="message"
+                    htmlFor="contact_content"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-300"
                   >
                     문의 내용 *
                   </label>
                   <Textarea
-                    id="message"
-                    name="message"
+                    id="contact_content"
+                    name="contact_content"
                     required
-                    value={formData.message}
+                    value={formData.contact_content}
                     onChange={handleChange}
                     placeholder="문의하실 내용을 자세히 작성해주세요"
-                    rows={6}
+                    rows={8}
+                    disabled={isSubmitting}
                     className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors duration-300"
                   />
                 </div>
 
                 <Button
                   type="submit"
-                  className="w-full bg-pink-500 hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700 text-white transition-colors duration-300"
+                  disabled={isSubmitting}
+                  className="w-full bg-pink-500 hover:bg-pink-600 dark:bg-pink-600 dark:hover:bg-pink-700 text-white transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Send className="w-4 h-4 mr-2" />
-                  문의하기
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      전송 중...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4 mr-2" />
+                      문의하기
+                    </>
+                  )}
                 </Button>
               </form>
             </div>
           </div>
         </div>
       </div>
+
+      {/* 성공 모달 */}
+      <SuccessModal
+        isOpen={showSuccessModal}
+        onClose={handleCloseSuccessModal}
+        title="문의가 등록되었습니다"
+        description="문의사항이 성공적으로 등록되었습니다. 빠른 시일 내에 답변드리겠습니다."
+      />
+
+      {/* 나의 문의 모달 */}
+      <MyContactsModal isOpen={showMyContactsModal} onClose={handleCloseMyContacts} />
     </div>
   )
 }

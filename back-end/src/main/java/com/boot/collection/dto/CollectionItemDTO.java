@@ -15,4 +15,5 @@ public class CollectionItemDTO {
     private String contentTitle; 
     private String contentType;
     private LocalDateTime addedAt;
+    private int itemOrder; 
 }

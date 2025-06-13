@@ -35,7 +35,15 @@ public class AnalizeController {
 	public ResponseEntity<?> contactAnalize(@RequestParam("created_date") String created_date) {
 
 		try {
+//			List<AnalizeContactDTO> dtos = new ArrayList<AnalizeContactDTO>();
 			List<AnalizeContactDTO> dtos = contactAnalize.countContact(created_date);
+
+			for (int i = 0; i < dtos.size(); i++) {
+//				dtos.get(i) = contactAnalize.countContact(created_date);
+				dtos = new ArrayList<AnalizeContactDTO>();
+				
+			}
+
 			Map<Integer, Object> response = new HashMap<>();
 			log.info("@# created_date =>" + created_date);
 			log.info("@# dtos.size(); =>" + dtos.size());

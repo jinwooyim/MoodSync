@@ -2,6 +2,7 @@
 
 import { Heart, User, Bell, Music, Shield, Palette, Download, Trash2, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 import { Switch } from "@/components/ui/switch"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -84,9 +85,8 @@ export default function SettingsPage() {
         <div className="space-y-6">
           {/* 계정 설정 */}
           <Card
-            className={`transition-all duration-500 ease-out bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 ${
-              visibleItems.includes(0) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-            }`}
+            className={`transition-all duration-500 ease-out bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 ${visibleItems.includes(0) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              }`}
           >
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white transition-colors duration-300">
@@ -142,11 +142,10 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          {/* 알림 설정 */}
+          {/* 알림 설정
           <Card
-            className={`transition-all duration-500 ease-out bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 ${
-              visibleItems.includes(1) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-            }`}
+            className={`transition-all duration-500 ease-out bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 ${visibleItems.includes(1) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              }`}
           >
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white transition-colors duration-300">
@@ -234,9 +233,9 @@ export default function SettingsPage() {
                 />
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
-          {/* 개인화 설정 */}
+          {/* 개인화 설정
           <Card
             className={`transition-all duration-500 ease-out bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 ${
               visibleItems.includes(2) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
@@ -309,13 +308,12 @@ export default function SettingsPage() {
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/* 프라이버시 설정 */}
           <Card
-            className={`transition-all duration-500 ease-out bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 ${
-              visibleItems.includes(3) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-            }`}
+            className={`transition-all duration-500 ease-out bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 ${visibleItems.includes(3) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              }`}
           >
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white transition-colors duration-300">
@@ -371,9 +369,8 @@ export default function SettingsPage() {
 
           {/* 앱 설정 */}
           <Card
-            className={`transition-all duration-500 ease-out bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 ${
-              visibleItems.includes(4) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-            }`}
+            className={`transition-all duration-500 ease-out bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 ${visibleItems.includes(4) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              }`}
           >
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white transition-colors duration-300">
@@ -399,7 +396,7 @@ export default function SettingsPage() {
                 <Switch id="darkMode" checked={mounted && theme === "dark"} onCheckedChange={handleDarkModeChange} />
               </div>
 
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <Label
                   htmlFor="language"
                   className="text-sm font-medium text-gray-900 dark:text-white transition-colors duration-300"
@@ -416,15 +413,14 @@ export default function SettingsPage() {
                   <option value="en">English</option>
                   <option value="ja">日本語</option>
                 </select>
-              </div>
+              </div> */}
             </CardContent>
           </Card>
 
           {/* 데이터 관리 */}
           <Card
-            className={`transition-all duration-500 ease-out bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 ${
-              visibleItems.includes(5) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-            }`}
+            className={`transition-all duration-500 ease-out bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 ${visibleItems.includes(5) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              }`}
           >
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white transition-colors duration-300">
@@ -485,9 +481,8 @@ export default function SettingsPage() {
 
           {/* 지원 및 정보 */}
           <Card
-            className={`transition-all duration-500 ease-out bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 ${
-              visibleItems.includes(6) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-            }`}
+            className={`transition-all duration-500 ease-out bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 ${visibleItems.includes(6) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              }`}
           >
             <CardHeader>
               <CardTitle className="text-gray-900 dark:text-white transition-colors duration-300">
@@ -506,13 +501,17 @@ export default function SettingsPage() {
                   도움말 센터
                   <ChevronRight className="w-4 h-4" />
                 </Button>
-                <Button
-                  variant="outline"
-                  className="justify-between border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300"
+
+                <a
+                  href="/contact"
+                  className="inline-flex items-center justify-between border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300 rounded px-4 py-2"
                 >
                   문의하기
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
+                  <ChevronRight className="w-4 h-4 ml-2" />
+                </a>
+
+
+
                 <Button
                   variant="outline"
                   className="justify-between border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300"
@@ -520,23 +519,23 @@ export default function SettingsPage() {
                   앱 정보
                   <ChevronRight className="w-4 h-4" />
                 </Button>
-                <Button
-                  variant="outline"
-                  className="justify-between border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300"
+                <a
+                  href="/feedback"
+                  className="inline-flex items-center justify-between border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300 rounded px-4 py-2"
                 >
-                  피드백 보내기
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
+                  피드백
+                  <ChevronRight className="w-4 h-4 ml-2" />
+                </a>
+
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* 저장 버튼 */}
+        {/* 저장 버튼
         <div
-          className={`mt-8 flex justify-end gap-3 transition-all duration-500 ease-out ${
-            visibleItems.includes(6) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
+          className={`mt-8 flex justify-end gap-3 transition-all duration-500 ease-out ${visibleItems.includes(6) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
         >
           <Button
             variant="outline"
@@ -547,7 +546,7 @@ export default function SettingsPage() {
           <Button className="bg-pink-500 dark:bg-pink-600 text-white hover:bg-pink-600 dark:hover:bg-pink-700 transition-colors duration-300">
             설정 저장
           </Button>
-        </div>
+        </div> */}
       </div>
     </div>
   )

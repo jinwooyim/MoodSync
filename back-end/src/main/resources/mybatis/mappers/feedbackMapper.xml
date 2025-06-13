@@ -7,8 +7,8 @@
         <selectKey keyProperty="feedbackId" resultType="int" order="BEFORE">
             SELECT NVL(MAX(FEEDBACKID), 0) + 1 FROM user_feedback
         </selectKey>
-        INSERT INTO user_feedback(FEEDBACKID, USERNUMBER, FEEDBACK_CATEGORY, FEEDBACK_SCORE, FEEDBACK_CONTENT, CREATED_DATE) 
-        VALUES(#{feedbackId}, #{userNumber}, #{feedbackCategory}, #{feedbackScore}, #{feedbackContent}, SYSDATE)
+        INSERT INTO user_feedback(FEEDBACKID, USERNUMBER, FEEDBACK_CATEGORY, FEEDBACK_SCORE, FEEDBACK_CONTENT) 
+        VALUES(#{feedbackId}, #{userNumber}, #{feedbackCategory}, #{feedbackScore}, #{feedbackContent})
     </insert>
 
     <!-- 특정 피드백 조회 (ID 반환) -->

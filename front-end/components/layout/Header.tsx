@@ -14,7 +14,7 @@ export default function Header() {
   const logoutUser = useAuthStore((state) => state.logoutUser) // 스토어에서 로그아웃 함수 가져오기
   const user = useAuthStore((state) => state.user)
   const isAdmin = useAuthStore((state) => state.isAdmin)
-  const refreshUserInfo = useAuthStore((state) => state.refreshUserInfo)
+  // const refreshUserInfo = useAuthStore((state) => state.refreshUserInfo)
   const router = useRouter()
   const [refreshing, setRefreshing] = useState(false)
 
@@ -34,6 +34,12 @@ export default function Header() {
   useEffect(() => {
     if (isLoggedIn && user) {
       console.log("Header: 로그인 상태 변경 감지 - 사용자 정보:", user);
+      const adminStatus = isAdmin()
+      // console.log("Header: 관리자 상태 확인:", {
+      //   isLoggedIn,
+      //   user,
+      //   adminStatus,
+      // })
     }
   }, [isLoggedIn, user]);
 

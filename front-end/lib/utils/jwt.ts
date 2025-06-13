@@ -21,7 +21,7 @@ export function decodeJWT(token: string) {
 // 로컬스토리지에서 토큰 가져오기
 export function getTokenFromStorage(): string | null {
   if (typeof window === "undefined") return null
-  return localStorage.getItem("token") || sessionStorage.getItem("token")
+  return localStorage.getItem("jwt_token") || sessionStorage.getItem("jwt_token")
 }
 
 // JWT 토큰에서 사용자 정보 추출

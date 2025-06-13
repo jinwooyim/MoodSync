@@ -139,7 +139,7 @@ const useAuthStore = create<AuthState>((set, get) => ({
 
       // 토큰을 localStorage에 저장
       if (typeof window !== "undefined") {
-        localStorage.setItem("token", userData.token)
+        localStorage.setItem("jwt_token", userData.token)
         console.log("AuthStore: 토큰 localStorage에 저장 완료")
       }
     }
@@ -147,7 +147,7 @@ const useAuthStore = create<AuthState>((set, get) => ({
     console.log("AuthStore: 최종 처리된 사용자 정보:", processedUser)
     console.log("AuthStore: userAdmin 값:", processedUser.userAdmin, "타입:", typeof processedUser.userAdmin)
 
-    // set({ isLoggedIn: true, user: processedUser, loading: false })
+    set({ isLoggedIn: true, user: processedUser, loading: false })
     
   },
 

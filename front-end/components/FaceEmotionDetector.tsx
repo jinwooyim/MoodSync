@@ -9,9 +9,10 @@ import { Card, CardContent } from "@/components/ui/card"
 import { ArrowLeft, ScanFace } from "lucide-react"
 
 // TensorFlow.js 코어 및 백엔드 모듈 임포트 추가
-import * as tf from "@tensorflow/tfjs-core"
-import "@tensorflow/tfjs-backend-cpu" // CPU 백엔드 임포트
-import "@tensorflow/tfjs-backend-webgl" // WebGL 백엔드 임포트
+// 이거 동적생성으로 변경
+// import * as tf from "@tensorflow/tfjs-core"
+// import "@tensorflow/tfjs-backend-cpu" // CPU 백엔드 임포트
+// import "@tensorflow/tfjs-backend-webgl" // WebGL 백엔드 임포트
 
 // 새로 생성한 타입과 유틸리티 함수 임포트
 import type { FaceExpressions, CustomMoodScores } from "@/types/emotion"
@@ -35,36 +36,43 @@ export default function FaceEmotionDetector({ onEmotionDetected }: FaceEmotionDe
   const MODEL_URL = "/models" // public/models 폴더 경로
 
   // 모델 로드 및 TensorFlow.js 백엔드 초기화
-  useEffect(() => {
-    const loadModels = async () => {
-      try {
-        // TensorFlow.js 백엔드 초기화 시도 (WebGL 먼저 시도, 실패 시 CPU 전환)
-        try {
-          await tf.setBackend("webgl") // WebGL 백엔드를 명시적으로 설정
-          await tf.ready() // 백엔드가 준비될 때까지 기다림
-          console.log("TensorFlow.js 백엔드 (WebGL) 초기화 성공.")
-        } catch (backendError) {
-          // WebGL 초기화 실패 시 CPU 백엔드를 시도
-          console.warn("WebGL 백엔드 초기화 실패, CPU 백엔드로 전환 시도:", backendError)
-          await tf.setBackend("cpu") // CPU 백엔드로 설정
-          await tf.ready() // CPU 백엔드가 준비될 때까지 기다림
-          console.log("TensorFlow.js 백엔드 (CPU) 초기화 성공 (대체 모드).")
-          setErrorMessage("WebGL을 사용할 수 없어 CPU 모드로 실행됩니다. 분석 속도가 저하될 수 있습니다.")
-        }
+useEffect(() => {
+  let isInitialized = false;
+  const loadModels = async () => {
+    try {
+      // 동적 import로 중복 로딩 방지
+      const tf = await import("@tensorflow/tfjs-core");
+      await import("@tensorflow/tfjs-backend-webgl");
+      await import("@tensorflow/tfjs-backend-cpu");
 
-        // 백엔드가 성공적으로 초기화된 후에 face-api.js 모델 로드
-        await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL)
-        await faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL)
-        setLoadingModels(false)
-        console.log("Face-API models loaded successfully!")
-      } catch (error) {
-        console.error("Failed to load face-api models or initialize TensorFlow.js backend:", error)
-        setErrorMessage("얼굴 인식 모델 또는 TensorFlow.js 백엔드를 로드하는 데 실패했습니다. 콘솔을 확인해주세요.")
-        setLoadingModels(false) // 로딩 상태 해제
+      if (!isInitialized) {
+        try {
+          await tf.setBackend("webgl");
+          await tf.ready();
+          console.log("TensorFlow.js 백엔드 (WebGL) 초기화 성공.");
+        } catch (backendError) {
+          await tf.setBackend("cpu");
+          await tf.ready();
+          console.log("TensorFlow.js 백엔드 (CPU) 초기화 성공 (대체 모드).");
+          setErrorMessage("WebGL을 사용할 수 없어 CPU 모드로 실행됩니다. 분석 속도가 저하될 수 있습니다.");
+        }
+        isInitialized = true;
       }
+
+      // face-api.js 모델 로드
+      await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+      await faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL);
+      setLoadingModels(false);
+      console.log("Face-API models loaded successfully!");
+    } catch (error) {
+      console.error("Failed to load face-api models or initialize TensorFlow.js backend:", error);
+      setErrorMessage("얼굴 인식 모델 또는 TensorFlow.js 백엔드를 로드하는 데 실패했습니다. 콘솔을 확인해주세요.");
+      setLoadingModels(false);
     }
-    loadModels()
-  }, []) // 빈 배열로 한 번만 실행되도록 설정
+  };
+  loadModels();
+}, []);
+
 
   // 이미지 업로드 핸들러
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {

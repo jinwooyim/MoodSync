@@ -1,7 +1,10 @@
 // lib/api/collections.ts
 import api from './base';
-import type { Collection, CollectionItem } from '@/types/collection'; // CollectionItem도 import
+// 이미 타입 정의되어 있는 것들:
+import type { Collection, CollectionItem } from '@/types/collection'; 
 import type { MusicRecommendation, ActivityRecommendation, BookRecommendation } from '@/types'; 
+
+// --- 기존 인터페이스 유지 및 업데이트 ---
 
 export interface CreateCollectionParams {
   name: string;
@@ -21,14 +24,17 @@ export interface AddToCollectionPayload {
   item: MusicRecommendation | ActivityRecommendation | BookRecommendation;
 }
 
+// ⭐ CollectionItemDTO 타입 업데이트: itemOrder와 contentId 추가, collectionItemId는 옵셔널 ⭐
 export interface CollectionItemDTO {
-  collectionItemId: number;
+  collectionItemId?: number; // 생성 시에는 백엔드에서 할당, 수정/삭제 시에는 필요
   contentTitle: string;
   contentType: "music" | "activity" | "book";
-  // addedAt, collectionItemId 등은 백엔드에서 생성하므로 클라이언트에서 보낼 필요 없음.
-  // 만약 contentDetails를 JSON string으로 저장하고 싶다면 여기에 추가:
-  // contentDetails?: string;
+  itemOrder: number; // 아이템의 순서
+  contentId: string; // 원본 추천 아이템의 ID (음악 ID, 활동 ID, 책 ID 등)
+  collectionId?: number; // 이 DTO가 어떤 컬렉션에 속하는지 명시 (선택 사항이지만 명확성을 위해)
 }
+
+// --- 기존 API 함수 유지 ---
 
 export async function createCollection(params: CreateCollectionParams) {
   const res = await api.post('/api/collections', params);
@@ -64,11 +70,11 @@ export async function fetchCollections(): Promise<Collection[]> {
       contentType: itemDto.contentType,
       addedAt: itemDto.addedAt,
       itemOrder: itemDto.itemOrder, 
+      contentId: itemDto.contentId, // ⭐ contentId 매핑 추가 ⭐
     })) : [],
   }));
 }
 
-// 특정 컬렉션을 가져오는 함수
 export async function fetchCollection(id: string): Promise<Collection> {
   const res = await api.get(`/api/collections/${id}`);
   const dto = res.data;
@@ -84,52 +90,46 @@ export async function fetchCollection(id: string): Promise<Collection> {
       collectionItemId: itemDto.collectionItemId,
       collectionId: String(itemDto.collectionId),
       contentTitle: itemDto.contentTitle, 
-      contentType: itemDto.contentType,   
+      contentType: itemDto.contentType,    
       addedAt: itemDto.addedAt,
       itemOrder: itemDto.itemOrder, 
+      contentId: itemDto.contentId, // ⭐ contentId 매핑 추가 ⭐
     })) : [],
     userName: dto.userName,
   };
 }
 
-// 메인화면 컬렉션에 아이템 추가
 export async function addToCollection(payload: AddToCollectionPayload) {
   const res = await api.post('/api/collections/add-to-collection', payload); 
   return res.data;
 }
-export async function addCollectionItemToSelectedCollection(payload: CollectionItemDTO) {
-  const res = await api.post('/api/collections/add-item', payload); // 백엔드의 `/api/collections/add-item` 엔드포인트 호출
-  return res.data; 
 
+export async function addCollectionItemToExisting(collectionId: number, itemDto: CollectionItemDTO) {
+    const payload = { ...itemDto, collectionId: collectionId };
+    const res = await api.post(`/api/collections/add-item`, payload); // ⭐ 엔드포인트 변경 ⭐
+    return res.data;
 }
-// deleteCollectionItem 
-export async function deleteCollectionItem(collectionId: number, itemId: number) {
-    // if (!confirm('정말로 이 아이템을 컬렉션에서 삭제하시겠습니까?')) {
-    //     throw new Error('Deletion cancelled by user.'); 
-    // }
 
+export async function deleteCollectionItem(collectionId: number, itemId: number) {
     const res = await api.delete(`/api/collections/${collectionId}/items/${itemId}`);
     return res.data;
 }
 
+// --- 순서 관련 API 함수 유지 및 타입 명확화 ---
 
-// 컬렉션 아이템 순서 업데이트 API 함수
 export async function updateCollectionItemsOrder(
     collectionId: string,
     itemIdsInOrder: string[] // 순서대로 정렬된 아이템 ID 리스트
 ): Promise<void> {
-    // 이 함수도 api 인스턴스를 사용하는 것이 좋습니다.
     const res = await api.put(`/api/collections/${collectionId}/items/reorder`, itemIdsInOrder);
     return res.data;
 }
 
-// 이 함수가 updateCollectionItemsOrder보다 onDragEnd에서 newItems를 바로 전달하기 편리
+// ⭐ `updateCollectionItemsFull` 타입 명확화: `collectionItemId`로 변경 ⭐
 export async function updateCollectionItemsFull(
     collectionId: string,
-    updatedItems: Array<{ id: number; itemOrder: number }> // 또는 CollectionItem[]
+    updatedItems: Array<{ collectionItemId: number; itemOrder: number }> 
 ): Promise<void> {
-    // === 여기가 핵심 변경사항입니다: fetch 대신 api.put 사용 ===
     const res = await api.put(`/api/collections/${collectionId}/items/full-update`, updatedItems);
-    // axios는 응답 상태가 2xx가 아니면 자동으로 에러를 던지므로, response.ok 체크는 필요 없습니다.
     return res.data; 
 }

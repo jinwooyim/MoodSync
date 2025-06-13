@@ -267,11 +267,10 @@ const CollectionDetailModal: React.FC<CollectionDetailModalProps> = ({
                 <div className="sticky bottom-0 bg-white pt-4 pb-0 z-10">
                     <div className="flex justify-between items-center mt-6">
                         <p className="text-sm text-gray-500">
-                            이 컬렉션은 **{collection.userName || '알 수 없는'}**님의 컬렉션입니다.
+                            이 컬렉션은 {collection.userName || ''}님의 컬렉션입니다.
                         </p>
                         <div className="flex space-x-2">
-                            {/* 취소 버튼 */}
-                            <button
+                            {/* <button
                                 className="px-5 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300"
                                 onClick={() => {
                                     // onReorderItems가 있고 변경 사항이 있을 때만 경고 메시지 표시
@@ -282,7 +281,7 @@ const CollectionDetailModal: React.FC<CollectionDetailModalProps> = ({
                                 }}
                             >
                                 취소
-                            </button>
+                            </button> */}
                             {/* 저장 버튼은 onReorderItems prop이 있을 때만 렌더링하고, 변경 사항이 있을 때만 활성화 */}
                             {onReorderItems && (
                                 <button
@@ -302,3 +301,4 @@ const CollectionDetailModal: React.FC<CollectionDetailModalProps> = ({
 };
 
 export default CollectionDetailModal;
+

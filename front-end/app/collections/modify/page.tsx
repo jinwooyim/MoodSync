@@ -25,13 +25,11 @@ import {
 import { useCollections } from "@/hooks/useCollections";
 import CollectionItemsView from "@/components/Collection/CollectionItemsView";
 import type { Collection, CollectionItem } from '@/types/collection';
-// API 함수 임포트 추가
-// fetchCollections를 포함하는 것은 useCollections 훅 내부에서 처리되므로 여기서는 제거
+// API 함수 임포트
 import { createCollection, updateCollection, deleteCollectionItem, addCollectionItemToExisting, updateCollectionItemsFull } from "@/lib/api/collections";
 import { useRouter } from "next/navigation";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
-  // ⭐ setCollections를 useCollections 훅에서 가져옴 ⭐
   const { collections, loading, error, refetchCollections, setCollections } = useCollections(); 
   
   const [openedCollectionIds, setOpenedCollectionIds] = useState<string[]>([]);
@@ -61,34 +59,16 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           isPublic,
         });
         window.alert("컬렉션이 성공적으로 수정되었습니다.");
-        // ⭐ 수정된 컬렉션을 setCollections를 통해 즉시 업데이트 ⭐
-        setCollections(prevCollections => 
-          prevCollections.map(col => 
-            String(col.collectionId) === collectionId ? { ...col, name, description, isPublic } : col
-          )
-        );
       } else {
         // 새 컬렉션 생성
-        // 백엔드에서 생성된 컬렉션 객체를 반환하도록 API를 가정하거나,
-        // 임시로 클라이언트에서 생성된 데이터를 추가합니다.
-        const newCollectionData = await createCollection({ name, description, isPublic });
+        await createCollection({ name, description, isPublic });
         window.alert("컬렉션이 성공적으로 생성되었습니다.");
-        // ⭐ 새 컬렉션을 setCollections를 통해 즉시 추가 ⭐
-        setCollections(prevCollections => [
-          ...prevCollections, 
-          { 
-            collectionId: String(newCollectionData.collectionId), // 백엔드에서 반환하는 ID 사용
-            name, 
-            description, 
-            isPublic, 
-            items: [], 
-            // 기타 필드 (userId, createdAt 등)는 서버에서 받을 수 있다면 추가 매핑 필요
-          }
-        ]);
       }
 
       setShowFormModal(false); // 모달 닫기
       setEditingCollection(null); // 수정 중인 컬렉션 초기화
+      // ⭐ 생성 또는 수정 후 항상 전체 컬렉션을 새로고침하여 안정적인 ID를 확보 ⭐
+      await refetchCollections(); 
     } catch (e: any) {
       console.error("API 호출 중 오류 발생:", e);
       if (e instanceof Error && e.message === 'Unauthorized') {
@@ -131,7 +111,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     try {
       await deleteCollectionItem(Number(collectionId), Number(itemId));
       window.alert("아이템이 성공적으로 삭제되었습니다.");
-      await refetchCollections(); // 데이터 변경 후 컬렉션 목록 새로고침 (DND는 복잡하므로 refetch 유지)
+      await refetchCollections();
     } catch (err: any) {
       console.error("메인 레이아웃: 아이템 삭제 중 오류 발생:", err);
       if (err.message !== 'Deletion cancelled by user.') {
@@ -174,8 +154,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         itemsInCollection.splice(destination.index, 0, movedItem);
 
         const updatedItemsPayload = itemsInCollection.map((item, index) => ({
-          // ⭐ collectionItemId 대신 id로 변경 ⭐
-          id: item.collectionItemId, 
+          id: item.collectionItemId, // collectionItemId 대신 id로 변경
           itemOrder: index,
         }));
 
@@ -203,8 +182,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           .filter(item => String(item.collectionItemId) !== draggableId)
           .sort((a,b) => a.itemOrder - b.itemOrder);
         const updatedSourceItemsPayload = sourceItemsRemaining.map((item, index) => ({
-          // ⭐ collectionItemId 대신 id로 변경 ⭐
-          id: item.collectionItemId,
+          id: item.collectionItemId, // collectionItemId 대신 id로 변경
           itemOrder: index,
         }));
         await updateCollectionItemsFull(source.droppableId, updatedSourceItemsPayload); 
@@ -223,7 +201,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <SidebarProvider>
-        <div className="flex flex-grow">
+        <div className="flex flex-grow ">
           <Sidebar className="flex pt-[70px] bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-colors duration-300">
             <SidebarHeader>
               <div className="flex items-center gap-2 px-4 py-2">
@@ -254,16 +232,20 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                     <p className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">컬렉션이 없습니다.</p>
                   ) : (
                     <SidebarMenu>
-                      {collections.map((collection) => (
-                        <SidebarMenuItem key={String(collection.collectionId)}>
-                          <SidebarMenuButton
-                            onClick={() => handleCollectionClick(String(collection.collectionId))}
-                            className={openedCollectionIds.includes(String(collection.collectionId)) ? "bg-indigo-500 text-white" : ""}
-                          >
-                            <List className="size-4" /> {collection.name}
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      ))}
+                      {collections.map((collection) => {
+                        // ⭐ Debugging: Log collection IDs to find the source of 'undefined' keys ⭐
+                        console.log(`SidebarMenuItem key for collection ID: ${collection.collectionId}`);
+                        return (
+                          <SidebarMenuItem key={String(collection.collectionId)}>
+                            <SidebarMenuButton
+                              onClick={() => handleCollectionClick(String(collection.collectionId))}
+                              className={openedCollectionIds.includes(String(collection.collectionId)) ? "bg-indigo-500 text-white" : ""}
+                            >
+                              <List className="size-4" /> {collection.name}
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        );
+                      })}
                       <SidebarMenuItem key={"create-new-collection"}>
                         <SidebarMenuButton onClick={handleCreateCollectionClick}>
                           <List className="size-4" /> + 새 컬렉션 만들기

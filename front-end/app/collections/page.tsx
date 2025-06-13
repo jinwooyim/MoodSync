@@ -255,15 +255,25 @@ export default function CollectionPage() {
         <div className="container mx-auto px-4 py-8">
             <div className="flex items-center justify-between mb-8">
                 <h1 className="text-3xl font-bold">나의 컬렉션</h1>
-                <button
-                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow hover:bg-indigo-700"
-                    onClick={() => {
-                        setShowFormModal(true);
-                        setEditingCollection(null);
-                    }}
-                >
-                    + 새 컬렉션 만들기
-                </button>
+                <div className="flex space-x-4">
+                    <button
+                        className="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow hover:bg-indigo-700"
+                        onClick={() => {
+                            router.push('/collections/modify');
+                        }}
+                    >
+                        수정 모드
+                    </button>
+                    <button
+                        className="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow hover:bg-indigo-700"
+                        onClick={() => {
+                            setShowFormModal(true);
+                            setEditingCollection(null);
+                        }}
+                    >
+                        + 새 컬렉션 만들기
+                    </button>
+                </div>
             </div>
 
             {loading && <div className="text-center py-12 text-gray-500">로딩 중...</div>}

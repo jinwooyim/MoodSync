@@ -104,9 +104,9 @@ export async function addCollectionItemToSelectedCollection(payload: CollectionI
 }
 // deleteCollectionItem 
 export async function deleteCollectionItem(collectionId: number, itemId: number) {
-    if (!confirm('정말로 이 아이템을 컬렉션에서 삭제하시겠습니까?')) {
-        throw new Error('Deletion cancelled by user.'); 
-    }
+    // if (!confirm('정말로 이 아이템을 컬렉션에서 삭제하시겠습니까?')) {
+    //     throw new Error('Deletion cancelled by user.'); 
+    // }
 
     const res = await api.delete(`/api/collections/${collectionId}/items/${itemId}`);
     return res.data;

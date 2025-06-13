@@ -1,4 +1,4 @@
-package com.boot.analize;
+package com.boot.analize.service;
 
 public class UsingCountAnalize {
 

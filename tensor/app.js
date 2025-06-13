@@ -254,6 +254,43 @@ async function getCachedData(type, url) {
   return response;
 }
 
+
+app.get('/train-progress', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+
+  // 클라이언트별 독립적인 리포터 생성
+  const sendProgress = (data) => {
+    res.write(`data: ${JSON.stringify(data)}\n\n`);
+  };
+
+  // 모델별 콜백에 개별 리포터 연결
+  const originalCallbacks = {
+    act: ModelTraining.prototype.callbacks,
+    music: ModelTraining.prototype.callbacks,
+    book: ModelTraining.prototype.callbacks
+  };
+
+  // SSE 연결 해제 시 원본 콜백 복구
+  req.on('close', () => {
+    ModelTraining.prototype.callbacks = originalCallbacks;
+  });
+
+  // 현재 클라이언트 전용 콜백 설정
+  ModelTraining.prototype.callbacks = {
+    onEpochEnd: (epoch, logs) => {
+      sendProgress({
+        type: this.modelType, // 'act', 'music', 'book'
+        progress: Math.round((epoch / this.config.epochs) * 100),
+        accuracy: logs.acc
+      });
+    }
+  };
+});
+
+
+
 // ========== 음악, 행동, 도서에 대해 학습 및 저장 =========== -> 메인
 app.get('/train', async (req, res) => {
   try {

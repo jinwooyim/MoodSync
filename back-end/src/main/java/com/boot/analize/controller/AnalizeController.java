@@ -1,5 +1,6 @@
 package com.boot.analize.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.boot.analize.ContactAnalize;
 import com.boot.analize.dto.AnalizeContactDTO;
+import com.boot.analize.dto.AnalizeFeedbackDTO;
+import com.boot.analize.service.ContactAnalize;
+import com.boot.analize.service.FeedbackAnalize;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,6 +27,8 @@ public class AnalizeController {
 
 	@Autowired
 	private ContactAnalize contactAnalize;
+	@Autowired
+	private FeedbackAnalize feedbackAnalize;
 
 	// 일자별/시간대 별 문의하기 수
 	@GetMapping("/analize-contact")
@@ -35,11 +40,11 @@ public class AnalizeController {
 			log.info("@# created_date =>" + created_date);
 			log.info("@# dtos.size(); =>" + dtos.size());
 
-			String[] haveNumber = new String[dtos.size()];
+			int[] haveNumber = new int[dtos.size()];
 
 			for (int i = 0; i < dtos.size(); i++) {
 				log.info("@3 dtos.get(" + i + ") =>" + dtos.get(i));
-//				haveNumber[i] = dtos.get(i).getCreatedTime();
+				haveNumber[i] = Integer.parseInt(dtos.get(i).getCreatedTime());
 			}
 
 			int time_count = 0;
@@ -51,7 +56,7 @@ public class AnalizeController {
 			time_count = 0;
 			for (int i = 0; i < 24; i++) {
 				for (int j = 0; j < haveNumber.length; j++) {
-					if (response.get(time_count).equals(haveNumber[j])) {
+					if (time_count == haveNumber[j]) {
 						response.remove(time_count);
 						response.put(time_count, dtos.get(j).getCount());
 					}
@@ -71,20 +76,34 @@ public class AnalizeController {
 
 	// 일자별/카테고리 별 피드백 수
 	@GetMapping("/analize-feedback")
-	public void feedbackAnalize(@RequestParam HashMap<String, String> param) {
+	public ResponseEntity<?> feedbackAnalize(@RequestParam("created_date") String created_date) {
+		try {
+			List<AnalizeFeedbackDTO> dtos = feedbackAnalize.countFeedback(created_date);
+			log.info("@# feedback created_date =>" + created_date);
+			log.info("@# feedback dtos.size(); =>" + dtos.size());
 
-	}
+			List<Map<String, Object>> responseList = new ArrayList<>();
 
-	// 일자별/시간대별 이용현황과 예측치
-	@GetMapping("/analize-usingcount")
-	public void countAnalize(@RequestParam HashMap<String, String> param) {
+			for (int i = 0; i < dtos.size(); i++) {
+				Map<String, Object> response = new HashMap<>();
+				response.put("feedback_category", dtos.get(i).getFeedback_category());
+				response.put("count", dtos.get(i).getCount());
+				response.put("avg_score", dtos.get(i).getAvg_score());
 
-	}
+				log.info("" + i + response);
 
-	// 특정 사람의 특성 시간대나 요일별 감정 탐색 : 시계열 분석(Time Series Analysis)
-	@GetMapping("/analize-record")
-	public void recordAnalize(@RequestParam HashMap<String, String> param) {
+				responseList.add(response);
+			}
+			log.info("@# responseList => " + responseList);
 
+			return ResponseEntity.ok(responseList);
+		} catch (Exception e) {
+			log.error(".분석 중 오류 발생: ", e);
+			Map<String, Object> errorResponse = new HashMap<>();
+			errorResponse.put("status", "error");
+			errorResponse.put("message", "서버 오류가 발생했습니다.");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+		}
 	}
 
 	// 유사한 감정 행동 유사한 감정 행동 패턴을 가진 사용자 군집화 : 클러스터링(Clustering)

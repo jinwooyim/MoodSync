@@ -36,17 +36,17 @@ export default function Header() {
   }
 
   // 사용자 정보 새로고침 함수
-  const handleRefreshUserInfo = async () => {
-    setRefreshing(true)
-    try {
-      await refreshUserInfo()
-      console.log("사용자 정보 새로고침 완료")
-    } catch (error) {
-      console.error("사용자 정보 새로고침 실패:", error)
-    } finally {
-      setRefreshing(false)
-    }
-  }
+  // const handleRefreshUserInfo = async () => {
+  //   setRefreshing(true)
+  //   try {
+  //     await refreshUserInfo()
+  //     console.log("사용자 정보 새로고침 완료")
+  //   } catch (error) {
+  //     console.error("사용자 정보 새로고침 실패:", error)
+  //   } finally {
+  //     setRefreshing(false)
+  //   }
+  // }
 
   // 관리자 상태를 실시간으로 확인
   const adminStatus = isLoggedIn ? isAdmin() : false
@@ -125,14 +125,14 @@ export default function Header() {
                 {/* <div className="text-xs text-gray-500 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
                   Admin: {adminStatus ? "YES" : "NO"} | userAdmin: {user.userAdmin} | useradmin: {user.useradmin}
                 </div> */}
-                <button
+                {/* <button
                   onClick={handleRefreshUserInfo}
                   className="text-xs text-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-300 px-2 py-1 rounded flex items-center gap-1"
                   disabled={refreshing}
                 >
                   <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} />
                   {refreshing ? "새로고침 중..." : "정보 새로고침"}
-                </button>
+                </button> */}
               </div>
             )}
 

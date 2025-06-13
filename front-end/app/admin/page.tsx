@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+// import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+// import { Badge } from "@/components/ui/badge"
 import { MessageSquare, Star, Brain, BarChart3, Users, TrendingUp } from 'lucide-react'
 import { ContactManagement } from "@/components/admin/contact-management"
 import { FeedbackManagement } from "@/components/admin/feedback-management"

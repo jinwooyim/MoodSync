@@ -50,6 +50,7 @@
     "cookies-next": "^6.0.0",
     "date-fns": "^2.29.3",
     "embla-carousel-react": "8.5.1",
+    "express": "^5.1.0",
     "face-api.js": "^0.22.2",
     "framer-motion": "^12.16.0",
     "input-otp": "1.4.1",

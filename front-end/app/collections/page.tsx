@@ -32,9 +32,9 @@ export default function CollectionPage() {
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [selectedCollection, setSelectedCollection] = useState<Collection | null>(null);
 
-    // ⭐ 수정 메시지를 보여줄 컬렉션 ID 상태 ⭐
+    //수정/정렬 메시지를 보여줄 컬렉션 ID 상태 
     const [collectionIdToShowEditMessage, setCollectionIdToShowEditMessage] = useState<string | null>(null);
-
+    const [collectionIdToShowReorderMessage, setCollectionIdToShowReorderMessage] = useState<string | null>(null);
     useEffect(() => {
         const loadCollections = async () => {
             setLoading(true);
@@ -207,13 +207,18 @@ export default function CollectionPage() {
                 }
                 return prevSelected;
             });
-            window.alert('아이템 순서가 성공적으로 저장되었습니다!'); // 순서 변경 성공 메시지 추가
+            setCollectionIdToShowReorderMessage(collectionId);
+            // window.alert('아이템 순서가 성공적으로 저장되었습니다!'); // 순서 변경 성공 메시지 추가
         } catch (error) {
             console.error("아이템 순서 저장 중 오류 발생:", error);
             window.alert('아이템 순서 저장에 실패했습니다. 다시 시도해주세요.');
             throw error;
         }
     };
+
+    const handleReorderMessageShown = useCallback(() => {
+        setCollectionIdToShowReorderMessage(null); // 메시지 표시 완료 후 ID 초기화
+    }, []);
 
     const handleCloseDetailModal = (updatedCollection?: Collection) => {
         setShowDetailModal(false);
@@ -278,10 +283,13 @@ export default function CollectionPage() {
                                 <CollectionCard
                                     collection={col}
                                     onViewDetails={() => handleViewDetails(String(col.collectionId))}
-                                    onEdit={handleEditCollection} 
+                                    onEdit={handleEditCollection}
                                     onDelete={handleDeleteCollection}
                                     showEditSuccessMessage={collectionIdToShowEditMessage === String(col.collectionId)}
                                     onEditMessageShown={handleEditMessageShown}
+                                    // ⭐ 이 부분 추가: 아이템 순서 변경 메시지 관련 prop 추가 ⭐
+                                    showReorderSuccessMessage={collectionIdToShowReorderMessage === String(col.collectionId)}
+                                    onReorderMessageShown={handleReorderMessageShown} // 이 부분이 누락되었을 수 있습니다.
                                 />
                             </motion.div>
                         ))}

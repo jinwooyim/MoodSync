@@ -50,11 +50,11 @@ export function ModelTraining() {
         let newProgress = 0
 
         if (elapsedMinutes < 1) {
-          newProgress = Math.min(30, prev + Math.random() * 10)
+          newProgress = Math.min(30, prev + Math.random() * 4.5)
         } else if (elapsedMinutes < 3) {
-          newProgress = Math.min(70, prev + Math.random() * 5)
+          newProgress = Math.min(50, prev + Math.random() * 4.5)
         } else {
-          newProgress = Math.min(95, prev + Math.random() * 3)
+          newProgress = Math.min(90, prev + Math.random() * 4.5)
         }
 
         return newProgress
@@ -182,7 +182,7 @@ export function ModelTraining() {
             <AlertDescription>
               <strong>주의사항:</strong>
               <ul className="mt-2 space-y-1 text-sm">
-                <li>• 모델 학습은 시간이 오래 걸릴 수 있습니다 (10-30분)</li>
+                <li>• 모델 학습은 시간이 오래 걸릴 수 있습니다 (5 ~ 30분)</li>
                 <li>• 학습 중에는 추천 기능이 일시적으로 중단될 수 있습니다</li>
                 <li>• 기존 모델 파일들이 삭제되고 새로운 모델이 생성됩니다</li>
                 <li>• 학습 중에는 페이지를 새로고침하지 마세요</li>

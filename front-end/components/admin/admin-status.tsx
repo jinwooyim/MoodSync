@@ -7,6 +7,10 @@ import { MessageSquare, Star, TrendingUp, Clock, CheckCircle } from "lucide-reac
 import { fetchContactStats, fetchPendingContactsCount } from "@/lib/api/contact"
 import { fetchFeedbackStats } from "@/lib/api/feedback"
 
+import { ContactTimeChart } from "@/components/analytics/contact-time-chart"
+import { FeedbackCategoryChart } from "@/components/analytics/feedback-category-chart"
+import { ChurnPredictionChart } from "@/components/analytics/churn-prediction-chart"
+
 export function AdminStats() {
   const [stats, setStats] = useState({
     totalContacts: 0,
@@ -107,6 +111,22 @@ export function AdminStats() {
             <p className="text-xs text-muted-foreground">피드백 평균 점수</p>
           </CardContent>
         </Card>
+      </div>
+
+      {/* 분석 차트 */}
+      <div>
+        <h2 className="text-2xl font-bold mb-4">분석 차트</h2>
+
+        {/* 시간대별 문의 수와 카테고리별 피드백 차트를 나란히 배치 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 h-200">
+          <ContactTimeChart />
+          <FeedbackCategoryChart />
+        </div>
+
+        {/* 이탈 예측 차트 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <ChurnPredictionChart />
+        </div>
       </div>
 
     </div>

@@ -1,11 +1,16 @@
 package com.boot.analize.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.boot.analize.dto.AnalizeContactDTO;
 import com.boot.analize.dto.AnalizeFeedbackDTO;
+import com.boot.analize.dto.UserChurnDTO;
+import com.boot.analize.service.ChurnDetectionService;
 import com.boot.analize.service.ContactAnalize;
 import com.boot.analize.service.FeedbackAnalize;
 
@@ -29,6 +36,8 @@ public class AnalizeController {
 	private ContactAnalize contactAnalize;
 	@Autowired
 	private FeedbackAnalize feedbackAnalize;
+	@Autowired
+	private ChurnDetectionService churnDetectionService;
 
 	// 일자별/시간대 별 문의하기 수
 	@GetMapping("/analize-contact")
@@ -107,8 +116,42 @@ public class AnalizeController {
 	}
 
 	// 사용자 이탈 분석 : (Churn Analysis)
-	@GetMapping("/analize-churn")
-	public void churnAnalize(@RequestParam HashMap<String, String> param) {
+	@GetMapping("/analize-churn-train")
+	public ResponseEntity<?> churnAnalize(HttpServletRequest request) {
+		try {
+			// 캐시 헤더 설정 (선택)
+			HttpHeaders headers = new HttpHeaders();
+			headers.setCacheControl("max-age=300"); // 5분 캐시
 
+			List<UserChurnDTO> dtos = churnDetectionService.getChurnDTO();
+
+			// features 및 labels 추출
+			List<List<Double>> features = dtos.stream().map(dto -> Arrays.asList(dto.getFeedbackScore(),
+					(double) dto.getRecommendCount(), (double) dto.getRecentActivityCount()))
+					.collect(Collectors.toList());
+
+			List<Integer> labels = dtos.stream().map(UserChurnDTO::getChurn) // 0 or 1
+					.collect(Collectors.toList());
+
+			Map<String, Object> response = new HashMap<>();
+			response.put("features", features);
+			response.put("labels", labels);
+			response.put("count", dtos.size());
+
+			log.info("@# churn features_count => " + features.size());
+			log.info("@# churn labels_count => " + labels.size());
+
+			return ResponseEntity.ok().headers(headers).body(response);
+
+		} catch (Exception e) {
+			log.error("churnAnalize 오류: ", e);
+
+			Map<String, Object> errorResponse = new HashMap<>();
+			errorResponse.put("status", "error");
+			errorResponse.put("message", "데이터 처리 중 오류 발생");
+			errorResponse.put("count", 0);
+
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+		}
 	}
 }

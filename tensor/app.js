@@ -304,6 +304,57 @@ app.get('/train', async (req, res) => {
   }
 });
 
+// ==========사용자 이탈 분석 =========== -> 분석
+app.get('/train-churn-model', async (req, res) => {
+  try {
+    const response = await axios.get('http://localhost:8485/api/analize-churn-train');
+    const { features, labels } = response.data;
+
+    console.log("@# features =>", features);
+    console.log("@# labels =>", labels);
+
+    if (!Array.isArray(features) || !Array.isArray(labels)) {
+      return res.status(400).json({ status: 'error', message: 'features와 labels는 배열이어야 합니다.' });
+    }
+    if (features.length !== labels.length) {
+      return res.status(400).json({ status: 'error', message: 'features와 labels의 길이는 같아야 합니다.' });
+    }
+
+    // features는 이미 [ [f1, f2, f3], ... ] 형태이므로 바로 tensor로 변환
+    const inputData = features;
+
+    // labels는 [0,1,0,1,...] 형태일 수 있으니, [ [0], [1], ... ]로 변경
+    const outputData = labels.map(label => [label]);
+
+    const trainingData = tf.tensor2d(inputData, [inputData.length, inputData[0].length]);
+    const targetData = tf.tensor2d(outputData, [outputData.length, outputData[0].length]);
+
+    const churnModel = tf.sequential();
+    churnModel.add(tf.layers.dense({ inputShape: [inputData[0].length], units: 10, activation: 'relu' }));
+    churnModel.add(tf.layers.dense({ units: 1, activation: 'sigmoid' }));
+
+    churnModel.compile({
+      optimizer: tf.train.adam(0.01),
+      loss: 'binaryCrossentropy',
+      metrics: ['accuracy'],
+    });
+
+    await churnModel.fit(trainingData, targetData, {
+      epochs: 50,
+      batchSize: 4,
+      shuffle: true,
+    });
+
+    res.json({ status: 'success', message: '모델 학습 완료', sampleSize: features.length });
+    saveModelPureJS(churnModel, path.join(__dirname, 'churnModel'));
+    console.log("모델 저장 완료!!");
+  } catch (err) {
+    console.error('모델 학습 오류:', err);
+    res.status(500).json({ status: 'error', message: '모델 학습 중 오류 발생' });
+  }
+});
+
+
 // ========== 예측 수행 =========== -> 메인
 // 예측 API (app.js)
 app.post('/predict', express.json(), async (req, res) => {
@@ -377,6 +428,59 @@ app.post('/predict', express.json(), async (req, res) => {
   } catch (err) {
     console.error('Predict failed:', err);
     res.status(500).json({ error: err.message });
+  }
+});
+
+// churn model 이탈가능성 예측
+app.post('/predict-churn-model', express.json(), async (req, res) => {
+  try {
+    const inputData = req.body;
+
+    console.log(req.body);
+
+    // 입력 데이터가 배열인지, 필수 키가 있는지 체크
+    if (
+      !inputData ||
+      typeof inputData.feedbackScore !== 'number' ||
+      typeof inputData.recommendCount !== 'number' ||
+      typeof inputData.recentActivityCount !== 'number'
+    ) {
+      return res.status(400).json({ status: 'error', message: '유효한 입력값이 필요합니다. (feedbackScore, recommendCount, recentActivityCount)' });
+    }
+
+    // 저장된 모델 로드 (비동기)
+    const churnModel = await tf.loadLayersModel('file://' + path.join(__dirname, 'churnModel', 'model.json'));
+
+    console.log("@# churnModel =>" , churnModel)
+
+    // 입력값 텐서 생성 (1개의 샘플, 3개의 특성)
+    const inputTensor = tf.tensor2d(
+      [[
+        inputData.feedbackScore,
+        inputData.recommendCount,
+        inputData.recentActivityCount
+      ]],
+      [1, 3]
+    );
+
+    console.log(inputData.feedbackScore);
+    console.log(inputData.recommendCount);
+    console.log(inputData.recentActivityCount);
+
+    // 예측 (0 ~ 1 사이 확률)
+    const predictionTensor = churnModel.predict(inputTensor);
+    const predictionArray = await predictionTensor.data();
+    const churnProbability = predictionArray[0];
+
+    res.json({
+      status: 'success',
+      churnProbability,  // 0 ~ 1 사이 값 (이탈 가능성)
+      message: churnProbability > 0.5 ? '이탈 가능성이 높습니다.' : '이탈 가능성이 낮습니다.'
+    });
+
+  } catch (err) {
+    console.error('이탈 예측 오류:', err);
+    res.status(500).json({ status: 'error', message: '이탈 예측 중 오류가 발생했습니다.' });
   }
 });
 

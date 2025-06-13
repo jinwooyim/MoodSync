@@ -92,3 +92,16 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* 차트 컨테이너 스타일 */
+.analytics-charts {
+  @apply bg-white p-6 rounded-lg shadow-sm;
+}
+
+/* 차트 색상 변수 */
+:root {
+  --color-count: #6366f1;
+  --color-score: #8b5cf6;
+  --color-churn-risk: #ef4444;
+  --color-churn-safe: #10b981;
+}

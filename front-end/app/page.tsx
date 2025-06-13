@@ -9,6 +9,7 @@ import EmotionSliderCard from "@/components/EmotionSliderCard"
 import FaceEmotionDetector from "@/components/FaceEmotionDetector"
 import type { CustomMoodScores } from "@/types/emotion"
 import type { RecommendationResult } from "@/types/index"
+import type { YoutubeVideo } from "@/lib/mypage/mypage-types"
 
 // 데이터 임포트 경로
 import { emotions } from "@/data/emotions"
@@ -185,6 +186,12 @@ export default function HomePage() {
           genre: b.bookGenre ?? "미정",
           description: b.bookDescription ?? "",
         })),
+          youtubeVideos: result.youtube_videos.map((v: any) => ({
+          title: v.title,
+          channel: v.channel,
+          thumbnail: v.thumbnail,
+          videoUrl: v.videoUrl,
+         })),
         recommendationEmotionId: emotionUsedForRecommendation,
       })
       setRecommendationDirty(false) // 추천 요청 시 dirty 해제
@@ -252,6 +259,7 @@ export default function HomePage() {
               musicRecommendations={recommendationResult.musicRecommendations}
               activityRecommendations={recommendationResult.activityRecommendations}
               bookRecommendations={recommendationResult.bookRecommendations}
+              youtubeVideos={recommendationResult.youtubeVideos} // 추가
               recommendationEmotionId={recommendationResult.recommendationEmotionId}
               recommendationDirty={recommendationDirty}
             />

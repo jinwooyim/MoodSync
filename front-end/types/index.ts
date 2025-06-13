@@ -50,4 +50,12 @@ export interface RecommendationResult {
   bookRecommendations: {
     [emotion: string]: BookRecommendation[];
   };
+  youtubeVideos?: YoutubeVideo[];
+}
+
+export interface YoutubeVideo {
+  title: string;
+  channel: string;
+  thumbnail: string;
+  videoUrl: string;
 }

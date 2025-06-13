@@ -1,12 +1,13 @@
 // types/collection.d.ts
 
 export interface CollectionItem {
-  collectionItemId: number; //★ string -> number로 변경
-  collectionId: string; // 백엔드의 collectionId에 해당
-  contentTitle: string; // ★ 새롭게 추가된 필드
-  contentType: string; // 기존에 있던 필드 유지
+  collectionItemId: number; 
+  collectionId: string; 
+  contentTitle: string; 
+  contentType: string; 
   addedAt: string;
   itemOrder: number;
+  contentId?: string; //추가
 }
 
 export interface Collection {

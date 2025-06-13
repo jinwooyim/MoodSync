@@ -37,6 +37,12 @@ interface RecommendationListProps {
   bookRecommendations: BookRecommendation[]
   recommendationEmotionId: string | null
   recommendationDirty?: boolean
+  youtubeVideos?: {
+    videoUrl: string;
+    thumbnail: string;
+    title: string;
+    channel: string;
+  }[]  // 유튜브 영상 배열 추가 (optional)
 }
 
 export default function RecommendationList({
@@ -45,6 +51,7 @@ export default function RecommendationList({
   bookRecommendations,
   recommendationEmotionId,
   recommendationDirty = false,
+  youtubeVideos = [], // 추가
 }: RecommendationListProps) {
   const [recommendationType, setRecommendationType] = useState<"music" | "activity" | "book">("music")
   const router = useRouter()
@@ -190,6 +197,7 @@ export default function RecommendationList({
                 key={index}
                 music={music}
                 onAddToCollection={handleAddToCollection}
+                videoUrl={youtubeVideos[index]?.videoUrl}  // index에 맞춰 videoUrl 넘겨주기
               />
             ))}
           </div>

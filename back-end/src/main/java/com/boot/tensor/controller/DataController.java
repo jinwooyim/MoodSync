@@ -1,7 +1,9 @@
 package com.boot.tensor.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,9 @@ import com.boot.tensor.dto.MusicDTO;
 import com.boot.tensor.service.ActingService;
 import com.boot.tensor.service.BookService;
 import com.boot.tensor.service.MusicService;
+import com.boot.userRecord.dao.YoutubeVideoDAO;
+import com.boot.userRecord.dto.YoutubeVideoDTO;
+import com.boot.userRecord.service.YoutubeService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,6 +39,11 @@ public class DataController {
 	@Autowired
 	private BookService bookService;
 
+	@Autowired
+	private YoutubeVideoDAO youtubeVideoDAO;
+	@Autowired
+	private YoutubeService youtubeService;
+	
 	@PostMapping("/emotion-result")
 	public ResponseEntity<?> executePredict(@RequestBody Map<String, Object> payload) {
 //	    log.info("@# 실행 emotion-result");
@@ -72,11 +82,48 @@ public class DataController {
 	    ArrayList<MusicDTO> music_dtos = musicService.getRandomMusic(musicPredictedClass + 1, userEmotionData);
 	    ArrayList<BookDTO> book_dtos = bookService.getRandomBook(bookPredictedClass + 1, userEmotionData);
 
+	    
+	    // youtube 정보 추가
+	    List<YoutubeVideoDTO> youtubeVideoDTOs = new ArrayList<>();
+	    
+	    for (MusicDTO music : music_dtos) {
+	        Long musicNumber = (long) (music.getMusicNumber()%600); // musicNumber 필드 필요
+	        String videoId = youtubeVideoDAO.findVideoIdByMusicNumber(musicNumber);
+
+	        Map<String, String> videoData = new HashMap<>();
+	        if (videoId != null && !videoId.isEmpty()) {
+	            try {
+	                videoData = youtubeService.getVideoDetailsById(videoId);
+	            } catch (IOException e) {
+	                e.printStackTrace();
+	                videoData.put("title", "API 실패");
+	                videoData.put("channel", "API 실패");
+	                videoData.put("thumbnail", "https://i.ytimg.com/vi/" + videoId + "/hqdefault.jpg");
+	                videoData.put("videoUrl", "https://www.youtube.com/watch?v=" + videoId);
+	            }
+	        } else {
+	            videoData.put("title", "영상 없음");
+	            videoData.put("channel", "미등록");
+	            videoData.put("thumbnail", "https://dummyimage.com/480x360/cccccc/000000?text=No+Video");
+	            videoData.put("videoUrl", "#");
+	        }
+
+	        YoutubeVideoDTO videoDTO = new YoutubeVideoDTO(
+	            videoData.get("title"),
+	            videoData.get("channel"),
+	            videoData.get("thumbnail"),
+	            videoData.get("videoUrl")
+	        );
+
+	        youtubeVideoDTOs.add(videoDTO);
+	    }
+	    
 	    Map<String, Object> result = new HashMap<>();
 	    result.put("act_dtos", act_dtos);
 	    result.put("music_dtos", music_dtos);
 	    result.put("book_dtos", book_dtos);
-
+	    result.put("youtube_videos", youtubeVideoDTOs);
+	    
 	    log.info("@# result =>" + result);
 
 	    return ResponseEntity.ok(result);

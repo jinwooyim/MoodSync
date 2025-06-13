@@ -1,7 +1,8 @@
-// components/CollectionCard.tsx
+// components/Collection/CollectionCard.tsx
 import React from 'react';
 import type { Collection } from '@/types/collection';
-import { Music, Activity , Book } from "lucide-react"
+import { Music, Activity , Book,Share2  } from "lucide-react"
+import { motion } from 'framer-motion'; // ⭐ Framer Motion 임포트 ⭐
 
 interface CollectionCardProps {
     collection: Collection;
@@ -16,15 +17,20 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
     onEdit,
     onDelete,
 }) => {
-    // 공유 링크 복사 핸들러
+    // 공유 링크 복사 핸들러 (기존 로직 유지)
     const handleCopyShareLink = () => {
         const shareLink = `${window.location.origin}/collections/share/${collection.collectionId}`;
         navigator.clipboard.writeText(shareLink);
-        alert('공유 링크가 클립보드에 복사되었습니다.');
+        window.alert('공유 링크가 클립보드에 복사되었습니다.');
     };
 
     return (
-        <div className="bg-white rounded-xl shadow p-6 flex flex-col">
+        // ⭐ 최상위 div에 motion.div 및 whileHover 애니메이션 추가 ⭐
+        <motion.div 
+            className="bg-white rounded-xl shadow p-6 flex flex-col"
+            whileHover={{ scale: 1.02 }} // 마우스 올렸을 때 1.02배 커지도록
+            transition={{ type: "spring", stiffness: 400, damping: 20 }} // 부드러운 스프링 애니메이션 효과
+        >
             <div className="flex items-center justify-between mb-2">
                 <h2 className="text-xl font-semibold">{collection.name}</h2>
                 <span
@@ -38,7 +44,7 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
                 </span>
             </div>
             <p className="text-gray-600 mb-4">{collection.description}</p>
-            <div className="flex-1">
+            <div className="flex-1 min-h-[70px]"> {/* 최소 높이 유지 */}
                 <div className="flex flex-wrap gap-2">
                     {collection.items && collection.items.length > 0 ? (
                         <>
@@ -69,7 +75,7 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
             <div className="flex gap-2 mt-4">
                 <button
                     className="text-indigo-600 hover:underline text-sm"
-                    onClick={() => onViewDetails(collection.collectionId)}
+                    onClick={() => onViewDetails(String(collection.collectionId))}
                 >
                     상세보기
                 </button>
@@ -81,7 +87,7 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
                 </button>
                 <button
                     className="text-red-500 hover:underline text-sm"
-                    onClick={() => onDelete(collection.collectionId)}
+                    onClick={() => onDelete(String(collection.collectionId))}
                 >
                     삭제
                 </button>
@@ -90,11 +96,11 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
                         className="ml-auto text-blue-500 hover:underline text-sm"
                         onClick={handleCopyShareLink}
                     >
-                        공유 링크 복사
+                        <Share2 />
                     </button>
                 )}
             </div>
-        </div>
+        </motion.div>
     );
 };
 

@@ -2,7 +2,7 @@
 "use client";
 import Link from "next/link";
 import { Home, Settings } from "lucide-react";
-import { Calendar, TrendingUp, BookOpen, BarChart3, List } from "lucide-react"
+import { Inbox, List } from "lucide-react"
 import { useState, useEffect, useCallback } from "react";
 import { DragDropContext, DropResult } from '@hello-pangea/dnd';
 import CollectionFormModal from "@/components/Collection/CollectionFormModal";
@@ -110,7 +110,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     }
     try {
       await deleteCollectionItem(Number(collectionId), Number(itemId));
-      window.alert("아이템이 성공적으로 삭제되었습니다.");
+      // window.alert("아이템이 성공적으로 삭제되었습니다.");
       await refetchCollections();
     } catch (err: any) {
       console.error("메인 레이아웃: 아이템 삭제 중 오류 발생:", err);
@@ -159,7 +159,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         }));
 
         await updateCollectionItemsFull(source.droppableId, updatedItemsPayload);
-        window.alert("아이템 순서가 성공적으로 변경되었습니다.");
+        // window.alert("아이템 순서가 성공적으로 변경되었습니다.");
       } else {
         // 다른 컬렉션으로 아이템 이동 (Move between lists)
         console.log(`컬렉션 간 이동: ${source.droppableId} -> ${destination.droppableId}`);
@@ -187,7 +187,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         }));
         await updateCollectionItemsFull(source.droppableId, updatedSourceItemsPayload); 
         
-        window.alert("아이템이 컬렉션 간 성공적으로 이동되었습니다.");
+        // window.alert("아이템이 컬렉션 간 성공적으로 이동되었습니다.");
       }
       
       await refetchCollections(); // 모든 작업 성공 후 전체 컬렉션 새로고침
@@ -206,14 +206,14 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <SidebarHeader>
               <div className="flex items-center gap-2 px-4 py-2">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-pink-500 dark:bg-pink-600 text-white transition-colors duration-300">
-                  <Calendar className="size-4" />
+                  <Inbox className="size-4" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-semibold text-gray-900 dark:text-white transition-colors duration-300">
-                    감정 대시보드
+                    컬렉션 수정
                   </span>
                   <span className="text-xs text-gray-500 dark:text-gray-400 transition-colors duration-300">
-                    Emotion Tracker
+                    Edit collection
                   </span>
                 </div>
               </div>
@@ -221,7 +221,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <SidebarContent>
               <SidebarGroup className="mt-6">
                 <SidebarGroupLabel className="text-gray-700 dark:text-gray-300 transition-colors duration-300">
-                  나의 컬렉션
+                  나의 컬렉션 목록
                 </SidebarGroupLabel>
                 <SidebarGroupContent>
                   {loading ? (

@@ -54,7 +54,7 @@ const CollectionItemsView: React.FC<CollectionItemsViewProps> = ({
       <p className="text-gray-600 mb-6">{collection.description || '설명 없음'}</p>
 
       <h3 className="text-lg font-semibold border-b pb-2 mb-4">
-        아이템 목록 <span className="ml-2 text-sm text-gray-500">(드래그하여 순서 변경)</span>
+        아이템 목록 
       </h3>
 
       <div className="flex-1 overflow-y-auto pr-2">
@@ -119,9 +119,6 @@ const CollectionItemsView: React.FC<CollectionItemsViewProps> = ({
           )}
           {/* ⭐ Droppable의 자식으로 함수가 끝났습니다. ⭐ */}
         </Droppable>
-      </div>
-      <div className="pt-4 border-t mt-6 text-center text-gray-500 text-sm">
-        이 컬렉션은 {collection.userName || ''}님의 컬렉션입니다.
       </div>
     </div>
   );

@@ -18,5 +18,6 @@
 <!--		데이터 분석-->
 		<mapper resource="mybatis/mappers/analizeContactMapper.xml"/>
 		<mapper resource="mybatis/mappers/analizeFeedbackMapper.xml"/>
+		<mapper resource="mybatis/mappers/userClusteringMapper.xml"/>
 	</mappers>
 </configuration>

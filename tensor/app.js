@@ -437,7 +437,7 @@ app.post('/predict-churn-model', express.json(), async (req, res) => {
     const inputData = req.body;
 
     console.log(req.body);
-
+    
     // 입력 데이터가 배열인지, 필수 키가 있는지 체크
     if (
       !inputData ||
@@ -447,12 +447,11 @@ app.post('/predict-churn-model', express.json(), async (req, res) => {
     ) {
       return res.status(400).json({ status: 'error', message: '유효한 입력값이 필요합니다. (feedbackScore, recommendCount, recentActivityCount)' });
     }
-
+    
     // 저장된 모델 로드 (비동기)
-    const churnModel = await tf.loadLayersModel('file://' + path.join(__dirname, 'churnModel', 'model.json'));
-
+    const churnModel = await loadModelPureJS(path.join(__dirname, 'churnModel'));
     console.log("@# churnModel =>" , churnModel)
-
+    
     // 입력값 텐서 생성 (1개의 샘플, 3개의 특성)
     const inputTensor = tf.tensor2d(
       [[
@@ -472,12 +471,16 @@ app.post('/predict-churn-model', express.json(), async (req, res) => {
     const predictionArray = await predictionTensor.data();
     const churnProbability = predictionArray[0];
 
+    console.log("1", predictionTensor);
+    console.log("2", predictionArray);
+    console.log("3", churnProbability);
+    
     res.json({
       status: 'success',
       churnProbability,  // 0 ~ 1 사이 값 (이탈 가능성)
       message: churnProbability > 0.5 ? '이탈 가능성이 높습니다.' : '이탈 가능성이 낮습니다.'
     });
-
+    
   } catch (err) {
     console.error('이탈 예측 오류:', err);
     res.status(500).json({ status: 'error', message: '이탈 예측 중 오류가 발생했습니다.' });

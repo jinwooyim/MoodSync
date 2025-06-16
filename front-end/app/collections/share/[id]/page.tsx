@@ -1,11 +1,11 @@
-// app/collections/share/[id]/page.tsx
 "use client";
 
 import { useEffect, useState } from 'react';
 import { notFound } from 'next/navigation';
-import { fetchCollection } from '@/lib/api/collections';
-import type { Collection } from '@/types/collection'; // Collection 타입 임포트
-import CollectionDetailModal from '@/components/Collection/CollectionDetailModal'; // ★ 모달 컴포넌트 임포트 ★
+import { fetchCollection, copyCollectionToMyCollections } from '@/lib/api/collections'; // ⭐ copyCollectionToMyCollections 임포트 ⭐
+import type { Collection } from '@/types/collection';
+import CollectionDetailModal from '@/components/Collection/CollectionDetailModal';
+import { useRouter } from 'next/navigation'; // useRouter 임포트
 
 interface CollectionSharePageProps {
     params: {
@@ -18,7 +18,9 @@ export default function CollectionSharePage({ params }: CollectionSharePageProps
     const [collection, setCollection] = useState<Collection | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false); // 모달의 열림 상태 관리
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const router = useRouter(); // useRouter 훅 초기화
 
     useEffect(() => {
         const loadCollection = async () => {
@@ -29,14 +31,14 @@ export default function CollectionSharePage({ params }: CollectionSharePageProps
 
                 if (fetchedCollection && fetchedCollection.isPublic) {
                     setCollection(fetchedCollection);
-                    setIsModalOpen(true); // 데이터를 성공적으로 가져오면 모달 열기
+                    setIsModalOpen(true);
                 } else {
-                    notFound(); 
+                    notFound();
                 }
             } catch (err: any) {
                 console.error("공유 컬렉션 정보 불러오기 실패:", err);
                 setError("컬렉션 정보를 불러오지 못했습니다.");
-                notFound(); 
+                notFound();
             } finally {
                 setLoading(false);
             }
@@ -47,10 +49,26 @@ export default function CollectionSharePage({ params }: CollectionSharePageProps
         }
     }, [collectionId]);
 
-    // 모달 닫기 핸들러 (브라우저 뒤로 가기)
+    // 모달 닫기 핸들러
     const handleCloseModal = () => {
         setIsModalOpen(false); // 모달 상태 닫기
         window.history.back(); // 브라우저 뒤로 가기
+        // 참고: 이 페이지에서 모달을 닫았을 때 `window.history.back()`은
+        // 이전 경로로 이동시킵니다. 만약 무조건 특정 페이지로 이동시키고 싶다면
+        // `router.push('/collections');` 와 같은 라우팅 로직을 사용해야 합니다.
+    };
+
+    // ⭐ '내 컬렉션으로 복사' 기능을 위한 핸들러 ⭐
+    const handleCopyCollection = async (collectionToCopy: Collection) => {
+        try {
+            await copyCollectionToMyCollections(String(collectionToCopy.collectionId));
+            // window.alert(`'${collectionToCopy.name}' 컬렉션이 나의 컬렉션으로 복사되었습니다.`);
+            handleCloseModal(); // 복사 성공 후 모달 닫기
+            router.push('/collections'); // ⭐ 복사 후 나의 컬렉션 페이지로 이동 (선택 사항) ⭐
+        } catch (error) {
+            console.error("컬렉션 복사 중 오류 발생:", error);
+            window.alert('컬렉션 복사에 실패했습니다. 다시 로그인하거나 나중에 시도해주세요.');
+        }
     };
 
     if (loading) {
@@ -61,23 +79,17 @@ export default function CollectionSharePage({ params }: CollectionSharePageProps
         return <div className="flex justify-center items-center h-screen text-red-500">{error}</div>;
     }
 
-    // 데이터는 있지만 아직 모달이 열리지 않았다면 (초기 로딩 후) null 반환.
-    // 보통은 isModalOpen이 true가 되어 모달이 바로 렌더링될 것입니다.
     if (!collection) {
         return null;
     }
 
-    
-
     return (
         <>
-            {/* CollectionDetailModal 컴포넌트 사용 */}
             <CollectionDetailModal
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
                 collection={collection}
-                // 공유 페이지에서는 onDeleteItem,reorder 안보냄
-                
+                onCopyCollection={handleCopyCollection}
             />
         </>
     );

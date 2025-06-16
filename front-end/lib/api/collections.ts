@@ -138,3 +138,66 @@ export async function updateCollectionItemsFull(
     const res = await api.put(`/api/collections/${collectionId}/items/full-update`, updatedItems);
     return res.data; 
 }
+
+export async function fetchPublicCollections(): Promise<Collection[]> {
+  const res = await api.get('/api/collections/public');
+
+  return res.data.map((dto: any) => ({
+    collectionId: String(dto.collectionId),
+    userId: dto.userId,
+    name: dto.name,
+    description: dto.description,
+    isPublic: dto.isPublic,
+    createdAt: dto.createdAt,
+    updatedAt: dto.updatedAt,
+    items: dto.items ? dto.items.map((itemDto: any) => ({
+      collectionItemId: itemDto.collectionItemId,
+      collectionId: String(itemDto.collectionId),
+      contentTitle: itemDto.contentTitle,
+      contentType: itemDto.contentType,
+      addedAt: itemDto.addedAt,
+      itemOrder: itemDto.itemOrder, 
+      contentId: itemDto.contentId,
+    })) : [],
+    userName: dto.userName,
+  }));
+}
+
+// ⭐ 새로 추가: 컬렉션 복사를 위한 페이로드 타입 ⭐
+export interface CopyCollectionPayload {
+  name: string;
+  description?: string;
+  isPublic: boolean; // 복사 시 기본적으로 false로 설정될 수 있음
+  items: Array<{
+    contentTitle: string;
+    contentType: "music" | "activity" | "book";
+    itemOrder: number;
+    contentId: string;
+  }>;
+}
+
+// ⭐ 새로 추가: 컬렉션을 나의 컬렉션으로 복사하는 API 함수 ⭐
+export async function copyCollectionToMyCollections(originalCollectionId: string): Promise<Collection> {
+  const res = await api.post(`/api/collections/copy/${originalCollectionId}`); // 원본 컬렉션 ID를 경로에 포함
+
+  const dto = res.data; // 복사된 새 컬렉션 정보가 반환될 것으로 예상
+  return {
+    collectionId: String(dto.collectionId),
+    userId: dto.userId,
+    name: dto.name,
+    description: dto.description,
+    isPublic: dto.isPublic,
+    createdAt: dto.createdAt,
+    updatedAt: dto.updatedAt,
+    items: dto.items ? dto.items.map((itemDto: any) => ({
+      collectionItemId: itemDto.collectionItemId,
+      collectionId: String(itemDto.collectionId),
+      contentTitle: itemDto.contentTitle,
+      contentType: itemDto.contentType,
+      addedAt: itemDto.addedAt,
+      itemOrder: itemDto.itemOrder,
+      contentId: itemDto.contentId,
+    })) : [],
+    userName: dto.userName, // 복사본에는 사용자 이름이 필요 없을 수 있지만, 타입에 맞춰 포함
+  };
+}

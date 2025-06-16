@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import type { Collection, CollectionItem } from "@/types/collection";
-import { fetchCollections, createCollection, updateCollection, deleteCollection, deleteCollectionItem, updateCollectionItemsFull } from "@/lib/api/collections";
+import { fetchPublicCollections,copyCollectionToMyCollections, createCollection, updateCollection, deleteCollection, deleteCollectionItem, updateCollectionItemsFull } from "@/lib/api/collections";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -20,8 +20,10 @@ import CollectionDetailModal from "@/components/Collection/CollectionDetailModal
 
 export default function CollectionPage() {
     const [collections, setCollections] = useState<Collection[]>([]);
+    const [collection, setCollection] = useState<Collection | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -35,11 +37,19 @@ export default function CollectionPage() {
     //수정/정렬 메시지를 보여줄 컬렉션 ID 상태 
     const [collectionIdToShowEditMessage, setCollectionIdToShowEditMessage] = useState<string | null>(null);
     const [collectionIdToShowReorderMessage, setCollectionIdToShowReorderMessage] = useState<string | null>(null);
+
+    // 모달 닫기 핸들러 (브라우저 뒤로 가기)
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedCollection(null);
+        router.push('/collections/share');
+    };
+    
     useEffect(() => {
         const loadCollections = async () => {
             setLoading(true);
             try {
-                const fetchedCollections = await fetchCollections();
+                const fetchedCollections = await fetchPublicCollections();
                 setCollections(fetchedCollections);
 
                 const action = searchParams?.get('action');
@@ -61,6 +71,18 @@ export default function CollectionPage() {
         };
         loadCollections();
     }, [searchParams, router]);
+
+    const handleCopyCollection = async (collectionToCopy: Collection) => {
+        try {
+            await copyCollectionToMyCollections(String(collectionToCopy.collectionId));
+            // window.alert(`'${collectionToCopy.name}' 컬렉션이 나의 컬렉션으로 복사되었습니다.`);
+            handleCloseModal(); // 복사 성공 후 모달 닫기
+            router.push('/collections'); // ⭐ 복사 후 나의 컬렉션 페이지로 이동 (선택 사항) ⭐
+        } catch (error) {
+            console.error("컬렉션 복사 중 오류 발생:", error);
+            window.alert('컬렉션 복사에 실패했습니다. 다시 로그인하거나 나중에 시도해주세요.');
+        }
+    };
 
     // ⭐ 컬렉션 수정 버튼 클릭 핸들러 추가 ⭐
     const handleEditCollection = (collection: Collection) => {
@@ -97,7 +119,7 @@ export default function CollectionPage() {
 
             setShowFormModal(false);
             setEditingCollection(null);
-            const newCollections = await fetchCollections(); // 변경된 컬렉션 다시 불러오기
+            const newCollections = await fetchPublicCollections(); // 변경된 컬렉션 다시 불러오기
             setCollections(newCollections);
         } catch (e: any) {
             console.error("API 호출 중 오류 발생:", e);
@@ -198,7 +220,7 @@ export default function CollectionPage() {
             await updateCollectionItemsFull(collectionId, itemsForUpdate);
             console.log("아이템 순서가 성공적으로 저장되었습니다.");
             // 아이템 순서 변경 후에도 컬렉션 데이터 새로고침
-            const updatedCollections = await fetchCollections();
+            const updatedCollections = await fetchPublicCollections();
             setCollections(updatedCollections);
             // 상세 모달이 열려 있다면, 해당 컬렉션의 아이템 목록도 업데이트
             setSelectedCollection(prevSelected => {
@@ -241,33 +263,17 @@ export default function CollectionPage() {
             animate="visible"
         >
             <div className="flex items-center justify-between mb-8">
-                <h1 className="text-3xl font-bold">나의 컬렉션</h1>
+                <h1 className="text-3xl font-bold">공개 컬렉션</h1>
                 <div className="flex space-x-4">
                     <button
                         className="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow hover:bg-indigo-700"
                         onClick={() => {
-                            router.push('/collections/share');
+                            router.push('/collections');
                         }}
                     >
-                        공개 컬렉션으로
+                        나의 컬렉션으로
                     </button>
-                    <button
-                        className="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow hover:bg-indigo-700"
-                        onClick={() => {
-                            router.push('/collections/modify');
-                        }}
-                    >
-                        수정 모드
-                    </button>
-                    <button
-                        className="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow hover:bg-indigo-700"
-                        onClick={() => {
-                            setShowFormModal(true);
-                            setEditingCollection(null);
-                        }}
-                    >
-                        + 새 컬렉션 만들기
-                    </button>
+                    
                 </div>
             </div>
 
@@ -291,79 +297,26 @@ export default function CollectionPage() {
                                 <CollectionCard
                                     collection={col}
                                     onViewDetails={() => handleViewDetails(String(col.collectionId))}
-                                    onEdit={handleEditCollection}
-                                    onDelete={handleDeleteCollection}
+                                    // onEdit={handleEditCollection}
+                                    // onDelete={handleDeleteCollection}
                                     showEditSuccessMessage={collectionIdToShowEditMessage === String(col.collectionId)}
                                     onEditMessageShown={handleEditMessageShown}
-                                    // ⭐ 이 부분 추가: 아이템 순서 변경 메시지 관련 prop 추가 ⭐
                                     showReorderSuccessMessage={collectionIdToShowReorderMessage === String(col.collectionId)}
-                                    onReorderMessageShown={handleReorderMessageShown} // 이 부분이 누락되었을 수 있습니다.
+                                    onReorderMessageShown={handleReorderMessageShown} 
                                 />
                             </motion.div>
                         ))}
                     </AnimatePresence>
                 </motion.div>
             )}
-
-            {/* 컬렉션 생성/수정 모달 */}
-            <AnimatePresence>
-                {showFormModal && (
-                    <motion.div
-                        variants={overlayVariants}
-                        initial="hidden"
-                        animate="visible"
-                        exit="exit"
-                        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-                    >
-                        <motion.div
-                            variants={modalContentVariants}
-                            initial="hidden"
-                            animate="visible"
-                            exit="exit"
-                            className="w-full max-w-md mx-auto"
-                        >
-                            <CollectionFormModal
-                                isOpen={true}
-                                onClose={() => {
-                                    setShowFormModal(false);
-                                    setEditingCollection(null);
-                                }}
-                                editingCollection={editingCollection}
-                                onSubmit={handleFormSubmit}
-                            />
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* 컬렉션 상세 보기 및 아이템 관리 모달 */}
-            <AnimatePresence>
-                {showDetailModal && (
-                    <motion.div
-                        variants={overlayVariants}
-                        initial="hidden"
-                        animate="visible"
-                        exit="exit"
-                        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-                    >
-                        <motion.div
-                            variants={modalContentVariants}
-                            initial="hidden"
-                            animate="visible"
-                            exit="exit"
-                            className="w-full max-w-2xl mx-auto"
-                        >
-                            <CollectionDetailModal
-                                isOpen={true}
-                                onClose={handleCloseDetailModal}
-                                collection={selectedCollection}
-                                onDeleteItem={(collectionIdStr, itemId) => handleItemDeleteFromCollection(Number(collectionIdStr), Number(itemId))}
-                                onReorderItems={handleReorderItems}
-                            />
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            <CollectionDetailModal
+                isOpen={showDetailModal}
+                onClose={handleCloseModal}
+                collection={selectedCollection}
+                onCopyCollection={handleCopyCollection}
+                // 공유 페이지에서는 onDeleteItem,reorder 안보냄
+                
+            />
         </motion.div>
     );
 }

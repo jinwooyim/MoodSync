@@ -111,7 +111,7 @@ public class CollectionServiceImpl implements CollectionService {
 	@Override
 	@Transactional // ★ itemId 기반 삭제: DB 변경 (DELETE)
 	public void deleteBycollectionId(int itemId) { // 메서드명과 파라미터가 혼동될 수 있으니 itemId로 변경
-		CollectionDAO dao = sqlSession.getMapper(CollectionDAO.class);
+//		CollectionDAO dao = sqlSession.getMapper(CollectionDAO.class);
 		log.info("서비스: 아이템 ID {}를 사용하여 컬렉션 아이템 삭제 시도", itemId);
 		// 이 메서드는 CollectionDAO에 실제 삭제 로직을 호출해야 합니다.
 		// 예: dao.deleteCollectionItem(itemId); 또는 dao.deleteItemById(itemId);
@@ -200,5 +200,62 @@ public class CollectionServiceImpl implements CollectionService {
             
         }
         log.info("서비스: 컬렉션 {} 아이템 순서 재인덱싱 완료.", collectionId);
+    }
+
+	@Override
+	public List<CollectionDTO> shareCollectionsIsPublic() {
+		CollectionDAO dao = sqlSession.getMapper(CollectionDAO.class);
+		List<CollectionDTO> collections= dao.shareCollectionsIsPublic();
+		for (CollectionDTO collection : collections) {
+            List<CollectionItemDTO> items = dao.findByCollectionId(collection.getCollectionId());
+            collection.setItems(items);
+        }
+        return collections;
+	}
+
+	@Override
+    @Transactional 
+    public CollectionDTO copyCollection(int originalCollectionId, int userId) {
+        CollectionDAO dao = sqlSession.getMapper(CollectionDAO.class);
+//        log.info("CollectionService.copyCollection 시작: originalCollectionId={}, userId={}", originalCollectionId, userId);
+        // 1. 원본 컬렉션 조회
+        CollectionDTO originalCollection = dao.selectCollection(originalCollectionId);
+        if (originalCollection == null) {
+            throw new IllegalArgumentException("원본 컬렉션을 찾을 수 없습니다: " + originalCollectionId);
+        }
+
+//        log.info("원본 컬렉션 조회 성공: originalCollectionName={}", originalCollection.getName());
+        // 2. 새 컬렉션 DTO 생성 (복사본)
+        CollectionDTO newCollection = new CollectionDTO();
+        newCollection.setUserId(userId); // 현재 로그인된 사용자 ID로 설정
+        newCollection.setName("Copied - " + originalCollection.getName());
+        newCollection.setDescription(originalCollection.getDescription());
+        newCollection.setIsPublic(false); // 복사본은 기본적으로 비공개로 설정
+
+        dao.insertCollection(newCollection);
+        int newCollectionId = newCollection.getCollectionId(); // 새로 생성된 컬렉션 ID
+//        log.info("새 컬렉션 삽입 성공. 새로 생성된 collectionId={}", newCollection.getCollectionId());
+
+        // 4. 원본 컬렉션 아이템 조회
+        List<CollectionItemDTO> originalItems = dao.findByCollectionId(originalCollectionId);
+
+        // 5. 새 컬렉션에 아이템 복사
+        if (originalItems != null && !originalItems.isEmpty()) {
+            int newItemOrder = 0; 
+            for (CollectionItemDTO originalItem : originalItems) {
+                CollectionItemDTO newItem = new CollectionItemDTO();
+                newItem.setCollectionId(newCollectionId); 
+                newItem.setContentTitle(originalItem.getContentTitle());
+                newItem.setContentType(originalItem.getContentType());
+//                newItem.setContentId(originalItem.getContentId());
+                newItem.setItemOrder(newItemOrder++); // 새 순서 부여
+                
+                dao.insertCollectionItem(newItem);
+            }
+        }
+
+        // 6. 복사된 컬렉션의 전체 정보 (아이템 포함)를 다시 조회하여 반환
+        // 새로 생성된 컬렉션을 다시 조회하여 아이템 리스트까지 포함된 완전한 DTO 반환
+        return dao.selectCollection(newCollectionId);
     }
 }

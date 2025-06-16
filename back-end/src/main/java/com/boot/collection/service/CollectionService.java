@@ -29,5 +29,10 @@ public interface CollectionService {
  // 드래그 드랍 순서변경
     void updateItemOrder(Long collectionId, List<Long> itemIdsInOrder);
     void updateAllItemsOrder(Long collectionId, List<ItemIdsInOrderRequest> updatedItems);
+    //공개 컬렉션
+    List<CollectionDTO> shareCollectionsIsPublic();
+    
+    //컬렉션 복사
+    CollectionDTO copyCollection(int originalCollectionId, int userId);
     
 }

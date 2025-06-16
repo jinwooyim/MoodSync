@@ -7,8 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface CollectionCardProps {
     collection: Collection;
     onViewDetails: (collectionId: string) => void;
-    onEdit: (collection: Collection) => void;
-    onDelete: (collectionId: string) => void;
+    onEdit?: (collection: Collection) => void;
+    onDelete?: (collectionId: string) => void;
     // ⭐ 새 props 추가: 수정 완료 메시지 트리거 ⭐
     showEditSuccessMessage: boolean;
     onEditMessageShown: () => void;
@@ -86,7 +86,7 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
                             opacity: { duration: 0.3, ease: "easeOut" },
                             y: { duration: 0.5, ease: "easeOut" }
                         }}
-                        className="absolute bottom-10 left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap
+                        className="absolute bottom-10 right-20 -translate-x-1/2 mb-2 whitespace-nowrap
                                    bg-gray-800 text-white text-xs rounded px-2 py-1
                                    pointer-events-none z-10"
                     >
@@ -143,18 +143,23 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
                 >
                     상세보기
                 </button>
-                <button
-                    className="text-gray-500 hover:underline text-sm"
-                    onClick={() => onEdit(collection)}
-                >
-                    수정
-                </button>
-                <button
-                    className="text-red-500 hover:underline text-sm"
-                    onClick={() => onDelete(String(collection.collectionId))}
-                >
-                    삭제
-                </button>
+                {onEdit && (
+                    <button
+                        className="text-gray-500 hover:underline text-sm"
+                        onClick={() => onEdit(collection)}
+                    >
+                        수정
+                    </button>
+                )}
+                {/* Conditionally render the Delete button */}
+                {onDelete && (
+                    <button
+                        className="text-red-500 hover:underline text-sm"
+                        onClick={() => onDelete(String(collection.collectionId))}
+                    >
+                        삭제
+                    </button>
+                )}
                 {collection.isPublic && (
                     <div className="ml-auto"> {/* relative 클래스는 motion.div로 옮김 */}
                         <button

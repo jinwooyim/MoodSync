@@ -350,9 +350,9 @@ export function AdminStats() {
         </div>
 
         {/* 이탈 예측 차트 */}
-        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <ChurnPredictionChart />
-        </div> */}
+        </div>
       </div>
 
       

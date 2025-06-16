@@ -20,16 +20,11 @@ export function ChurnPredictionChart() {
     try {
       // 예시 데이터 - 실제로는 필요한 사용자 데이터를 전달해야 함
       const userData = {
-        // 이탈 예측에 필요한 데이터
-        userActivity: {
-          loginFrequency: 3,
-          avgSessionTime: 15,
-          daysInactive: 5,
-        },
-        userFeedback: {
-          avgScore: 3.2,
-        },
-      }
+        feedbackScore: 3,
+        recommendCount: 15,
+        recentActivityCount: 5,
+      };
+      console.log("@# userData =>" , userData);
 
       // 직접 TensorFlow 서버로 요청
       const response = await fetch("http://localhost:4000/predict-churn-model", {
@@ -40,7 +35,6 @@ export function ChurnPredictionChart() {
         body: JSON.stringify(userData),
       })
 
-      console.log("@# userData =>" , userData);
 
       if (!response.ok) {
         throw new Error("Failed to fetch churn analytics")

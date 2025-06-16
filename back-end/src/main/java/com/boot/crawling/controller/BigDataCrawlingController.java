@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.boot.crawling.dto.BigDataBookDTO;
-import com.boot.crawling.service.BigDataActingService;
 import com.boot.crawling.service.BigDataBookService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -21,14 +20,6 @@ public class BigDataCrawlingController {
 
 	@Autowired
 	private BigDataBookService bigDataBookService;
-
-	@Autowired
-	private BigDataActingService bigDataActingService;
-
-	@GetMapping("/acting-crawl")
-	public void actingCrawling() {
-
-	}
 
 	@GetMapping("/book-crawl")
 	public BigDataBookDTO bookCrawling(@RequestParam(defaultValue = "total") String srchTarget,

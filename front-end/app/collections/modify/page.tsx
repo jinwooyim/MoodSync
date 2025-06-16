@@ -38,8 +38,10 @@ import {
     modalContentVariants, // 모달 내용 애니메이션
     cardVariants // 컬렉션 아이템 뷰(카드) 등장/삭제 애니메이션 (재활용)
 } from "@/lib/animations/framerVariants"; // 기존 Variants 임포트
+import { useTheme } from "next-themes"
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
+    const { theme } = useTheme() // 다크모드
     const { collections, loading, error, refetchCollections, setCollections } = useCollections();
 
     const [openedCollectionIds, setOpenedCollectionIds] = useState<string[]>([]);

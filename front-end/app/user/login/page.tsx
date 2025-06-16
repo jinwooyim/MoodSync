@@ -91,13 +91,13 @@ export default function UserLoginPage() {
           </div>
 
           <div className="space-y-2 mb-6">
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 dark:from-violet-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent transition-all duration-300">
               MoodSync
             </h1>
             <div className="flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">
-              <Heart className="w-4 h-4 text-pink-500" />
-              <Music className="w-4 h-4 text-blue-500" />
-              <BookOpen className="w-4 h-4 text-green-500" />
+              <Heart className="w-4 h-4 text-pink-500 dark:text-pink-400 transition-colors duration-300" />
+              <Music className="w-4 h-4 text-blue-500 dark:text-blue-400 transition-colors duration-300" />
+              <BookOpen className="w-4 h-4 text-green-500 dark:text-green-400 transition-colors duration-300" />
             </div>
           </div>
 
@@ -117,7 +117,7 @@ export default function UserLoginPage() {
         <Card className="shadow-2xl border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm animate-slide-up transition-colors duration-300">
           <CardHeader className="text-center pb-4">
             <CardTitle className="text-xl font-semibold text-gray-800 dark:text-white flex items-center justify-center gap-2 transition-colors duration-300">
-              <Sparkles className="w-5 h-5 text-violet-500" />
+              <Sparkles className="w-5 h-5 text-violet-500 dark:text-violet-400 transition-colors duration-300" />
               로그인
             </CardTitle>
             <CardDescription className="text-gray-600 dark:text-gray-400 transition-colors duration-300">
@@ -213,19 +213,19 @@ export default function UserLoginPage() {
         {/* Feature Highlights */}
         <div className="mt-8 grid grid-cols-3 gap-4 animate-fade-in delay-300">
           <div className="text-center p-4 bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-xl transition-colors duration-300">
-            <Heart className="w-6 h-6 text-pink-500 mx-auto mb-2" />
+            <Heart className="w-6 h-6 text-pink-500 dark:text-pink-400 mx-auto mb-2 transition-colors duration-300" />
             <p className="text-xs text-gray-600 dark:text-gray-400 font-medium transition-colors duration-300">
               감정 분석
             </p>
           </div>
           <div className="text-center p-4 bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-xl transition-colors duration-300">
-            <Music className="w-6 h-6 text-blue-500 mx-auto mb-2" />
+            <Music className="w-6 h-6 text-blue-500 dark:text-blue-400 mx-auto mb-2 transition-colors duration-300" />
             <p className="text-xs text-gray-600 dark:text-gray-400 font-medium transition-colors duration-300">
               음악 추천
             </p>
           </div>
           <div className="text-center p-4 bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm rounded-xl transition-colors duration-300">
-            <BookOpen className="w-6 h-6 text-green-500 mx-auto mb-2" />
+            <BookOpen className="w-6 h-6 text-green-500 dark:text-green-400 mx-auto mb-2 transition-colors duration-300" />
             <p className="text-xs text-gray-600 dark:text-gray-400 font-medium transition-colors duration-300">
               도서 추천
             </p>

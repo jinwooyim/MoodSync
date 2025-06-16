@@ -30,8 +30,32 @@ interface MyContactsModalProps {
 
 type ViewMode = "list" | "detail" | "edit"
 
+interface ContactWithStatus extends Contact {
+  status?: "답변대기" | "답변완료"
+}
+
+interface PaginationInfo {
+  currentPage: number
+  totalItems: number
+  totalPages: number
+  pageSize: number
+}
+
+interface FetchContactsResponse {
+  contacts: Contact[]
+  pagination: PaginationInfo
+}
+
+interface FetchContactAnswerResponse {
+  status: "success" | "error"
+  data?: {
+    answerContent: string
+  }
+}
+
 export function MyContactsModal({ isOpen, onClose }: MyContactsModalProps) {
-  const [contacts, setContacts] = useState<Contact[]>([])
+  // const [contacts, setContacts] = useState<Contact[]>([])
+  const [contacts, setContacts] = useState<ContactWithStatus[]>([])
   const [loading, setLoading] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [viewMode, setViewMode] = useState<ViewMode>("list")
@@ -60,7 +84,26 @@ export function MyContactsModal({ isOpen, onClose }: MyContactsModalProps) {
     setLoading(true)
     try {
       const response = await fetchMyContacts(page, 8)
-      setContacts(response.contacts)
+      // 각 contact에 대해 답변 상태 확인
+      const contactsWithStatus = await Promise.all(
+        response.contacts.map(async (contact) => {
+          try {
+            const answerResponse = await fetchContactAnswer(Number(contact.contactId))
+            const hasAnswer = answerResponse.status === "success" && answerResponse.data?.answerContent
+            return {
+              ...contact,
+              status: hasAnswer ? ("답변완료" as const) : ("답변대기" as const),
+            }
+          } catch {
+            return {
+              ...contact,
+              status: "답변대기" as const,
+            }
+          }
+        }),
+      )
+      // setContacts(response.contacts)
+      setContacts(contactsWithStatus)
       setPagination(response.pagination)
       setCurrentPage(page)
     } catch (error) {
@@ -107,9 +150,19 @@ export function MyContactsModal({ isOpen, onClose }: MyContactsModalProps) {
     }
   }
 
-  const handleContactClick = (contact: Contact) => {
+  const handleContactClick = async (contact: Contact) => {
     setSelectedContact(contact)
     setViewMode("detail")
+    try {
+      const answerResponse = await fetchContactAnswer(Number(contact.contactId))
+      if (answerResponse.status === "success" && answerResponse.data?.answerContent) {
+        setAnswer(answerResponse.data.answerContent)
+      } else {
+        setAnswer(null)
+      }
+    } catch (error) {
+      setAnswer(null)
+    }
   }
 
   const handleBackToList = () => {
@@ -282,11 +335,20 @@ export function MyContactsModal({ isOpen, onClose }: MyContactsModalProps) {
                       <Badge variant="outline" className="text-xs px-1.5 py-0 shrink-0 text-gray-500 border-gray-300">
                         {index + 1}
                       </Badge>
-                      <h3 className="font-medium text-gray-900 dark:text-white truncate text-sm">
+                      <h3 className="font-medium text-gray-900 dark:text-white truncate text-sm max-w-[80%]">
                         {contact.contactTitle}
                       </h3>
+                      {/* 상태 배지 추가 */}
                     </div>
-
+                    <Badge
+                      variant="outline"
+                      className={`text-xs px-2 py-0.5 shrink-0 ${contact.status === "답변완료"
+                        ? "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300"
+                        : "bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300"
+                        }`}
+                    >
+                      {contact.status || "답변대기"}
+                    </Badge>
                     <div className="flex items-center text-xs text-gray-500 shrink-0 ml-2">
                       <Calendar className="h-3 w-3 mr-1" />
                       {contact.createdDate}
@@ -341,12 +403,24 @@ export function MyContactsModal({ isOpen, onClose }: MyContactsModalProps) {
       {selectedContact && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <Badge variant="outline" className="text-xs">
-              <div className="flex items-center text-xs text-gray-500">
-                <Calendar className="h-3 w-3 mr-1" />
-                작성일: {selectedContact.createdDate}
-              </div>
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-xs">
+                <div className="flex items-center text-xs text-gray-500">
+                  <Calendar className="h-3 w-3 mr-1" />
+                  작성일: {selectedContact.createdDate}
+                </div>
+              </Badge>
+              {/* 상태 배지 추가 */}
+              <Badge
+                variant="outline"
+                className={`text-xs px-2 py-0.5 ${answer
+                  ? "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300"
+                  : "bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300"
+                  }`}
+              >
+                {answer ? "답변완료" : "답변대기"}
+              </Badge>
+            </div>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={handleEditClick}>
                 <Edit className="h-4 w-4 mr-1" />

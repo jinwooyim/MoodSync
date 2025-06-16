@@ -341,7 +341,7 @@ export default function UserJoinPage() {
             </div>
           </div>
 
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-pink-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-pink-600 dark:from-purple-400 dark:via-blue-400 dark:to-pink-400 bg-clip-text text-transparent mb-2 transition-all duration-300">
             MoodSync 회원가입
           </h1>
           <p className="text-gray-600 dark:text-gray-400 transition-colors duration-300">
@@ -349,9 +349,9 @@ export default function UserJoinPage() {
           </p>
 
           <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">
-            <Heart className="w-4 h-4 text-pink-500" />
-            <Music className="w-4 h-4 text-blue-500" />
-            <BookOpen className="w-4 h-4 text-green-500" />
+            <Heart className="w-4 h-4 text-pink-500 dark:text-pink-400 transition-colors duration-300" />
+            <Music className="w-4 h-4 text-blue-500 dark:text-blue-400 transition-colors duration-300" />
+            <BookOpen className="w-4 h-4 text-green-500 dark:text-green-400 transition-colors duration-300" />
           </div>
         </div>
 
@@ -897,9 +897,9 @@ export default function UserJoinPage() {
                   </p>
                 </div>
                 <div className="flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">
-                  <Heart className="w-4 h-4 text-pink-500" />
+                  <Heart className="w-4 h-4 text-pink-500 dark:text-pink-400 transition-colors duration-300" />
                   <span>감정 기반 맞춤 추천 서비스</span>
-                  <Music className="w-4 h-4 text-blue-500" />
+                  <Music className="w-4 h-4 text-blue-500 dark:text-blue-400 transition-colors duration-300" />
                 </div>
               </div>
             )}

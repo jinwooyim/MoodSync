@@ -33,6 +33,11 @@ export function WeeklyEmotionChart({ data }: WeeklyEmotionChartProps) {
     const ctx = chartRef.current.getContext("2d")
     if (!ctx) return
 
+    // Detect dark mode
+    const isDarkMode = document.documentElement.classList.contains("dark")
+    const gridColor = isDarkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)"
+    const textColor = isDarkMode ? "#ffffff" : "#374151"
+
     const colors = {
       happy: { border: "rgb(34, 197, 94)", background: "rgba(34, 197, 94, 0.1)" },
       sad: { border: "rgb(59, 130, 246)", background: "rgba(59, 130, 246, 0.1)" },
@@ -77,12 +82,27 @@ export function WeeklyEmotionChart({ data }: WeeklyEmotionChartProps) {
             max: 100,
             ticks: {
               stepSize: 20,
+              color: textColor,
+            },
+            grid: {
+              color: gridColor,
+            },
+          },
+          x: {
+            ticks: {
+              color: textColor,
+            },
+            grid: {
+              color: gridColor,
             },
           },
         },
         plugins: {
           legend: {
             position: "top",
+            labels: {
+              color: textColor,
+            },
           },
           tooltip: {
             mode: "index",

@@ -2,33 +2,26 @@
 
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Music, CheckSquare, Book } from "lucide-react"
+import { Music, CheckSquare, Book } from 'lucide-react'
 
-import { useState } from "react"
-// @/types에서 MusicRecommendation, ActivityRecommendation, BookRecommendation, RecommendationResult 임포트
+import { useState, useEffect } from "react"
 import type { MusicRecommendation, ActivityRecommendation, BookRecommendation } from "@/types"
 import { emotions } from "@/data/emotions"
 
-// API 호출 함수 임포트
-import { addToCollection,addCollectionItemToSelectedCollection } from "@/lib/api/collections";
-import MusicRecommendationCard from "@/components/recommendation/MusicRecommendationCard";
-import ActivityRecommendationCard from "@/components/recommendation/ActivityRecommendationCard";
-import BookRecommendationCard from "@/components/recommendation/BookRecommendationCard";
+import { addToCollection, addCollectionItemToSelectedCollection } from "@/lib/api/collections"
+import MusicRecommendationCard from "@/components/recommendation/MusicRecommendationCard"
+import ActivityRecommendationCard from "@/components/recommendation/ActivityRecommendationCard"
+import BookRecommendationCard from "@/components/recommendation/BookRecommendationCard"
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation"
+import CollectionSelectModal from "@/components/Collection/CollectionSelectModal"
+import type { Collection } from "@/types/collection"
 
-// 모달 컴포넌트 임포트
-import CollectionSelectModal from "@/components/Collection/CollectionSelectModal";
-// @/types/collection 에서 Collection 타입 임포트
-import type { Collection } from "@/types/collection";
-
-// 컬렉션 아이템 추가를 위한 payload 타입 정의
-// 이 타입은 백엔드의 CollectionItemDTO와 일치해야 합니다.
 interface CollectionItemPayload {
-  collectionId: number;
-  contentType: "music" | "activity" | "book";
-  contentTitle: string; // 음악의 title, 활동의 activity, 책의 title
-  contentDetails: any; // 원본 아이템 객체 전체 또는 필요한 세부 정보 (JSON 문자열 등으로 저장 가능)
+  collectionId: number
+  contentType: "music" | "activity" | "book"
+  contentTitle: string
+  contentDetails: any
 }
 
 interface RecommendationListProps {
@@ -38,11 +31,11 @@ interface RecommendationListProps {
   recommendationEmotionId: string | null
   recommendationDirty?: boolean
   youtubeVideos?: {
-    videoUrl: string;
-    thumbnail: string;
-    title: string;
-    channel: string;
-  }[]  // 유튜브 영상 배열 추가 (optional)
+    videoUrl: string
+    thumbnail: string
+    title: string
+    channel: string
+  }[]
 }
 
 export default function RecommendationList({
@@ -51,16 +44,24 @@ export default function RecommendationList({
   bookRecommendations,
   recommendationEmotionId,
   recommendationDirty = false,
-  youtubeVideos = [], // 추가
+  youtubeVideos = [],
 }: RecommendationListProps) {
+  const [animationKey, setAnimationKey] = useState(0)
+
+  // 추천 결과가 변경될 때마다 애니메이션을 다시 트리거
+  useEffect(() => {
+    setAnimationKey(prev => prev + 1)
+  }, [musicRecommendations, activityRecommendations, bookRecommendations])
+
   const [recommendationType, setRecommendationType] = useState<"music" | "activity" | "book">("music")
   const router = useRouter()
 
-  // --- 모달 관련 상태 추가 ---
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [userCollections, setUserCollections] = useState<Collection[]>([]); // Collection[] 타입 사용
-  const [currentItemToAdd, setCurrentItemToAdd] = useState<MusicRecommendation | ActivityRecommendation | BookRecommendation | null>(null);
-  const [currentItemType, setCurrentItemType] = useState<"music" | "activity" | "book" | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [userCollections, setUserCollections] = useState<Collection[]>([])
+  const [currentItemToAdd, setCurrentItemToAdd] = useState<
+    MusicRecommendation | ActivityRecommendation | BookRecommendation | null
+  >(null)
+  const [currentItemType, setCurrentItemType] = useState<"music" | "activity" | "book" | null>(null)
 
   const emotionUsedForDisplay = emotions.find((e) => e.id === recommendationEmotionId)
 
@@ -68,81 +69,73 @@ export default function RecommendationList({
     return null
   }
 
-  // 첫 번째 API 호출: 사용자 컬렉션 목록 가져오기 (모달을 띄우기 위함)
   const handleAddToCollection = async (
     item: MusicRecommendation | ActivityRecommendation | BookRecommendation,
-    type: "music" | "activity" | "book"
+    type: "music" | "activity" | "book",
   ) => {
     try {
-      // payload에는 아이템 정보가 담겨있지만, 서버는 이 단계에서 컬렉션 목록을 반환합니다.
-      const payload = { type, item };
-      // /api/add-to-collection 엔드포인트는 이제 컬렉션 목록을 반환합니다.
-      const collections: Collection[] = await addToCollection(payload); // 반환 타입이 Collection[]임을 명시
+      const payload = { type, item }
+      const collections: Collection[] = await addToCollection(payload)
 
-      setUserCollections(collections); // 받아온 컬렉션 목록 상태 업데이트
-      setCurrentItemToAdd(item);       // 추가할 아이템 정보 저장
-      setCurrentItemType(type);        // 추가할 아이템 타입 저장
-      setIsModalOpen(true);            // 모달 열기
+      setUserCollections(collections)
+      setCurrentItemToAdd(item)
+      setCurrentItemType(type)
+      setIsModalOpen(true)
 
-      console.log('사용자 컬렉션 목록을 성공적으로 불러왔습니다:', collections);
+      console.log("사용자 컬렉션 목록을 성공적으로 불러왔습니다:", collections)
     } catch (error) {
-      console.error('컬렉션 목록 조회 중 오류 발생:', error);
-      if (error instanceof Error && error.message === 'Unauthorized') {
-        alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
-        router.push('/user/login');
+      console.error("컬렉션 목록 조회 중 오류 발생:", error)
+      if (error instanceof Error && error.message === "Unauthorized") {
+        alert("로그인이 필요합니다. 로그인 페이지로 이동합니다.")
+        router.push("/user/login")
       } else {
-        alert('컬렉션 목록을 불러오는 데 실패했습니다.');
+        alert("컬렉션 목록을 불러오는 데 실패했습니다.")
       }
     }
-  };
+  }
 
-  // 두 번째 API 호출: 실제로 아이템을 특정 컬렉션에 추가
-  // 이 함수는 모달에서 컬렉션이 선택되었을 때 호출됩니다.
   const handleConfirmAddToSelectedCollection = async (
-    collectionId: number, // Collection 타입의 id가 number이므로 여기에 맞춤
+    collectionId: number,
     item: MusicRecommendation | ActivityRecommendation | BookRecommendation,
-    type: "music" | "activity" | "book"
+    type: "music" | "activity" | "book",
   ) => {
     try {
-      // 아이템의 제목을 가져오는 헬퍼 함수
       const getItemTitle = (selectedItem: MusicRecommendation | ActivityRecommendation | BookRecommendation) => {
-        if ('title' in selectedItem) {
-          return selectedItem.title;
-        } else if ('activity' in selectedItem) {
-          return selectedItem.activity;
+        if ("title" in selectedItem) {
+          return selectedItem.title
+        } else if ("activity" in selectedItem) {
+          return selectedItem.activity
         }
-        return '알 수 없는 항목'; // 안전을 위한 기본값
-      };
+        return "알 수 없는 항목"
+      }
 
-      const contentTitle = getItemTitle(item);
+      const contentTitle = getItemTitle(item)
 
       const addPayload: CollectionItemPayload = {
         collectionId: collectionId,
         contentType: type,
         contentTitle: contentTitle,
-        contentDetails: item, // 원본 아이템 객체 전체를 JSON stringify하여 저장하거나, 필요한 필드만 추출
-      };
-      // 실제 아이템을 컬렉션에 추가하는 API 엔드포인트 호출
-      const response = await addCollectionItemToSelectedCollection(addPayload);
+        contentDetails: item,
+      }
 
-      alert(`'${contentTitle}'(을)를 컬렉션에 성공적으로 추가했습니다!`);
-      console.log('아이템 컬렉션 추가 응답:', response);
+      const response = await addCollectionItemToSelectedCollection(addPayload)
 
-      setIsModalOpen(false);
-      setCurrentItemToAdd(null);
-      setCurrentItemType(null);
+      alert(`'${contentTitle}'(을)를 컬렉션에 성공적으로 추가했습니다!`)
+      console.log("아이템 컬렉션 추가 응답:", response)
 
+      setIsModalOpen(false)
+      setCurrentItemToAdd(null)
+      setCurrentItemType(null)
     } catch (error) {
-      console.error('컬렉션에 아이템 추가 중 오류 발생:', error);
-      // 로그인 오류 처리 (인터셉터에서 이미 처리되지만, 명시적으로 한 번 더)
-      if (error instanceof Error && error.message === 'Unauthorized') {
-        alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
-        router.push('/user/login');
+      console.error("컬렉션에 아이템 추가 중 오류 발생:", error)
+      if (error instanceof Error && error.message === "Unauthorized") {
+        alert("로그인이 필요합니다. 로그인 페이지로 이동합니다.")
+        router.push("/user/login")
       } else {
-        alert('컬렉션에 아이템 추가에 실패했습니다.');
+        alert("컬렉션에 아이템 추가에 실패했습니다.")
       }
     }
-  };
+  }
 
   return (
     <div className="mb-8">
@@ -194,10 +187,11 @@ export default function RecommendationList({
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {musicRecommendations.map((music, index) => (
               <MusicRecommendationCard
-                key={index}
+                key={`music-${animationKey}-${index}`}
                 music={music}
                 onAddToCollection={handleAddToCollection}
                 youtubeVideos={youtubeVideos[index] ? [youtubeVideos[index]] : []}
+                animationDelay={index * 50}
               />
             ))}
           </div>
@@ -207,9 +201,10 @@ export default function RecommendationList({
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {activityRecommendations.map((activity, index) => (
               <ActivityRecommendationCard
-                key={index}
+                key={`activity-${animationKey}-${index}`}
                 activity={activity}
                 onAddToCollection={handleAddToCollection}
+                animationDelay={index * 50}
               />
             ))}
           </div>
@@ -219,16 +214,16 @@ export default function RecommendationList({
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {bookRecommendations.map((book, index) => (
               <BookRecommendationCard
-                key={index}
+                key={`book-${animationKey}-${index}`}
                 book={book}
                 onAddToCollection={handleAddToCollection}
+                animationDelay={index * 50}
               />
             ))}
           </div>
         </TabsContent>
       </Tabs>
 
-      {/* 모달 컴포넌트 렌더링 */}
       <CollectionSelectModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

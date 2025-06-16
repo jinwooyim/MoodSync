@@ -24,6 +24,11 @@ export function EmotionRadarChart({ record }: EmotionRadarChartProps) {
     const ctx = chartRef.current.getContext("2d")
     if (!ctx) return
 
+    // Detect dark mode
+    const isDarkMode = document.documentElement.classList.contains("dark")
+    const gridColor = isDarkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)"
+    const textColor = isDarkMode ? "#ffffff" : "#000000"
+
     chartInstance.current = new Chart(ctx, {
       type: "radar",
       data: {
@@ -51,12 +56,16 @@ export function EmotionRadarChart({ record }: EmotionRadarChartProps) {
             max: 100,
             ticks: {
               stepSize: 20,
+              color: textColor,
             },
             grid: {
-              color: "rgba(0, 0, 0, 0.1)",
+              color: gridColor,
             },
             angleLines: {
-              color: "rgba(0, 0, 0, 0.1)",
+              color: gridColor,
+            },
+            pointLabels: {
+              color: textColor,
             },
           },
         },
@@ -87,30 +96,30 @@ export function EmotionRadarChart({ record }: EmotionRadarChartProps) {
       </div>
 
       {/* 감정 수치 표시 */}
-      <div className="grid grid-cols-2 gap-3 text-sm">
+      <div className="grid grid-cols-2 gap-3 text-sm text-gray-900 dark:text-white">
         <div className="flex justify-between">
           <span>행복:</span>
-          <span className="font-semibold">{record.happy}</span>
+          <span className="font-semibold text-gray-900 dark:text-white">{record.happy}</span>
         </div>
         <div className="flex justify-between">
           <span>슬픔:</span>
-          <span className="font-semibold">{record.sad}</span>
+          <span className="font-semibold text-gray-900 dark:text-white">{record.sad}</span>
         </div>
         <div className="flex justify-between">
           <span>스트레스:</span>
-          <span className="font-semibold">{record.stress}</span>
+          <span className="font-semibold text-gray-900 dark:text-white">{record.stress}</span>
         </div>
         <div className="flex justify-between">
           <span>평온함:</span>
-          <span className="font-semibold">{record.calm}</span>
+          <span className="font-semibold text-gray-900 dark:text-white">{record.calm}</span>
         </div>
         <div className="flex justify-between">
           <span>신남:</span>
-          <span className="font-semibold">{record.excited}</span>
+          <span className="font-semibold text-gray-900 dark:text-white">{record.excited}</span>
         </div>
         <div className="flex justify-between">
           <span>피곤함:</span>
-          <span className="font-semibold">{record.tired}</span>
+          <span className="font-semibold text-gray-900 dark:text-white">{record.tired}</span>
         </div>
       </div>
     </div>

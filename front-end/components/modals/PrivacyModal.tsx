@@ -91,9 +91,9 @@ export function PrivacyModal({ isOpen, onClose }: PrivacyModalProps) {
 
             <div className="mt-8 p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-600">
-                <strong>시행일자:</strong> 2024년 1월 1일
+                <strong>시행일자:</strong> 2025년 6월 2일
                 <br />
-                <strong>문의처:</strong> privacy@moodsync.com
+                <strong>문의처:</strong> qwer741523@naver.com
               </p>
             </div>
           </div>

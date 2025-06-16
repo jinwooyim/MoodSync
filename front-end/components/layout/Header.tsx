@@ -1,9 +1,8 @@
 "use client"
 
-import { Heart, Shield, RefreshCw } from "lucide-react"
+import { Heart, Shield } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import type React from "react"
 import { useEffect, useState } from "react"
 import useAuthStore from "@/store/authStore" // Zustand 스토어 임포트
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -33,7 +32,7 @@ export default function Header() {
   // checkAuthStatus는 AppProviders에서 한 번만 호출하여 전역 상태를 초기화합니다
   useEffect(() => {
     if (isLoggedIn && user) {
-      console.log("Header: 로그인 상태 변경 감지 - 사용자 정보:", user);
+      console.log("Header: 로그인 상태 변경 감지 - 사용자 정보:", user)
       const adminStatus = isAdmin()
       // console.log("Header: 관리자 상태 확인:", {
       //   isLoggedIn,
@@ -41,7 +40,7 @@ export default function Header() {
       //   adminStatus,
       // })
     }
-  }, [isLoggedIn, user]);
+  }, [isLoggedIn, user])
 
   const handleLogout = async () => {
     await logoutUser() // Zustand 스토어의 로그아웃 함수 호출
@@ -70,8 +69,8 @@ export default function Header() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Heart className="w-8 h-8 text-pink-500" />
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <Heart className="w-8 h-8 text-pink-500 dark:text-pink-400 transition-colors duration-300" />
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent transition-all duration-300">
                 MoodSync
               </h1>
             </div>
@@ -114,8 +113,8 @@ export default function Header() {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Heart className="w-8 h-8 text-pink-500" />
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <Heart className="w-8 h-8 text-pink-500 dark:text-pink-400 transition-colors duration-300" />
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent transition-all duration-300">
               <Link href="/">MoodSync</Link>
             </h1>
           </div>
@@ -124,7 +123,7 @@ export default function Header() {
             {isLoggedIn && adminStatus && (
               <Link
                 href="/admin"
-                className="flex items-center gap-1 px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors text-sm font-medium shadow-sm"
+                className="flex items-center gap-1 px-3 py-1.5 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-md transition-colors text-sm font-medium shadow-sm"
                 title="관리자 대시보드"
               >
                 <Shield className="w-4 h-4" />

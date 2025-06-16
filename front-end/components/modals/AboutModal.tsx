@@ -91,13 +91,13 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
                         <strong>회사명:</strong> 주식회사 MoodSync
                       </li>
                       <li>
-                        <strong>설립일:</strong> 2023년 3월
+                        <strong>설립일:</strong> 2025년 6월
                       </li>
                       <li>
-                        <strong>대표이사:</strong> 김무드
+                        <strong>대표이사:</strong> 임진우
                       </li>
                       <li>
-                        <strong>직원 수:</strong> 25명
+                        <strong>직원 수:</strong> 4명
                       </li>
                     </ul>
                   </div>
@@ -105,13 +105,13 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
                     <h4 className="font-semibold mb-2">연락처</h4>
                     <ul className="space-y-1 text-sm text-gray-700">
                       <li>
-                        <strong>주소:</strong> 서울특별시 강남구 테헤란로 123, 456호
+                        <strong>주소:</strong> 부산 부산진구 중앙대로 627 삼비빌딩 2F, 12F
                       </li>
                       <li>
-                        <strong>전화:</strong> 02-1234-5678
+                        <strong>전화:</strong> T: 1544-9970
                       </li>
                       <li>
-                        <strong>이메일:</strong> info@moodsync.com
+                        <strong>이메일:</strong> qwer741523@naver.com
                       </li>
                       <li>
                         <strong>웹사이트:</strong> www.moodsync.com

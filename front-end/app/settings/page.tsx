@@ -10,8 +10,24 @@ import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useState, useEffect } from "react"
 import { useTheme } from "next-themes"
+import { AboutModal } from "@/components/modals/AboutModal"
+// import { AboutModal } from "../modals/AboutModal"
+// import { getUserInfoFromToken } from "@/lib/utils/jwt"
+
+import useAuthStore from "@/store/authStore"
+
 
 export default function SettingsPage() {
+  const user = useAuthStore((state) => state.user)
+
+  const [openModal, setOpenModal] = useState<string | null>(null)
+  const handleModalOpen = (modalType: string) => {
+    setOpenModal(modalType)
+  }
+
+  const handleModalClose = () => {
+    setOpenModal(null)
+  }
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
@@ -30,8 +46,8 @@ export default function SettingsPage() {
     language: "ko",
 
     // 프로필 설정
-    displayName: "사용자",
-    email: "user@example.com",
+    displayName: user.userName,
+    email: user.userEmail,
   })
 
   const [visibleItems, setVisibleItems] = useState<number[]>([])
@@ -100,14 +116,15 @@ export default function SettingsPage() {
             <CardContent className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="displayName" className="text-gray-900 dark:text-white transition-colors duration-300">
-                    표시 이름
+                  <Label htmlFor="displayName" className="text-gray-900 dark:text-white transition-colors duration-300" >
+                    이름
                   </Label>
                   <Input
                     id="displayName"
                     value={settings.displayName}
                     onChange={(e) => handleSettingChange("displayName", e.target.value)}
                     className="mt-1 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white transition-colors duration-300"
+                    readOnly
                   />
                 </div>
                 <div>
@@ -120,6 +137,7 @@ export default function SettingsPage() {
                     value={settings.email}
                     onChange={(e) => handleSettingChange("email", e.target.value)}
                     className="mt-1 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white transition-colors duration-300"
+                    readOnly
                   />
                 </div>
               </div>
@@ -131,13 +149,13 @@ export default function SettingsPage() {
                 >
                   비밀번호 변경
                 </Button>
-                <Button
+                {/* <Button
                   variant="outline"
                   size="sm"
                   className="border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300"
                 >
                   프로필 사진 변경
-                </Button>
+                </Button> */}
               </div>
             </CardContent>
           </Card>
@@ -494,13 +512,13 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 gap-3">
-                <Button
-                  variant="outline"
-                  className="justify-between border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300"
+                <a
+                  href="/help"
+                  className="inline-flex items-center justify-between border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300 rounded px-4 py-2"
                 >
                   도움말 센터
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
+                  <ChevronRight className="w-4 h-4 ml-2" />
+                </a>
 
                 <a
                   href="/contact"
@@ -515,10 +533,12 @@ export default function SettingsPage() {
                 <Button
                   variant="outline"
                   className="justify-between border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300"
+                  onClick={() => handleModalOpen("about")}
                 >
                   앱 정보
                   <ChevronRight className="w-4 h-4" />
                 </Button>
+
                 <a
                   href="/feedback"
                   className="inline-flex items-center justify-between border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300 rounded px-4 py-2"
@@ -548,6 +568,8 @@ export default function SettingsPage() {
           </Button>
         </div> */}
       </div>
+      <AboutModal isOpen={openModal === "about"} onClose={handleModalClose} />
     </div>
+
   )
 }

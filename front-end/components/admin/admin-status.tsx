@@ -264,9 +264,51 @@ export function AdminStats() {
     <div className="space-y-6">
       {/* Stats Cards */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {/* 기존 카드 4개 그대로 유지 */}
-      </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">총 문의</CardTitle>
+            <MessageSquare className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalContacts}</div>
+            <p className="text-xs text-muted-foreground">전체 접수된 문의</p>
+          </CardContent>
+        </Card>
 
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">총 피드백</CardTitle>
+            <Star className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalFeedbacks}</div>
+            <p className="text-xs text-muted-foreground">사용자 피드백 수</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">대기 중인 문의</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.pendingContacts}</div>
+            <p className="text-xs text-muted-foreground">답변 대기 중</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">평균 만족도</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.averageRating}/5</div>
+            <p className="text-xs text-muted-foreground">피드백 평균 점수</p>
+          </CardContent>
+        </Card>
+      </div>
+      
       {/* 감정 응집도 시각화 - 가로로 길게 */}
       <Card className="overflow-hidden w-full">
         <CardHeader className="flex flex-row items-center justify-between">

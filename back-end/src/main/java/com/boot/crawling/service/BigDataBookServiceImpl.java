@@ -5,8 +5,6 @@ import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConve
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.boot.crawling.dto.BigDataBookDTO;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -18,7 +16,7 @@ public class BigDataBookServiceImpl implements BigDataBookService {
 	private String SERVICE_KEY;
 
 	@Override
-	public BigDataBookDTO searchBooks(String srchTarget, String query, int pageSize, int pageNum, String sort,
+	public String searchBooks(String srchTarget, String query, int pageSize, int pageNum, String sort,
 			String category) {
 		log.info("@# searchBooks !!");
 
@@ -33,6 +31,6 @@ public class BigDataBookServiceImpl implements BigDataBookService {
 
 		log.info("@# searchBooks url =>" + url);
 
-		return restTemplate.getForObject(url, BigDataBookDTO.class);
+		return url;
 	}
 }

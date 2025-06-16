@@ -1,16 +1,23 @@
-// components/recommendation/BookRecommendationCard.tsx
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Book, Inbox } from "lucide-react";
-import type { BookRecommendation } from "@/types";
+import { BookRecommendation } from "@/types"
+import { Book, Inbox } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 
 interface BookRecommendationCardProps {
-  book: BookRecommendation;
-  onAddToCollection: (item: BookRecommendation, type: "book") => void;
+  book: BookRecommendation
+  onAddToCollection: (item: BookRecommendation, type: "book") => void
 }
 
 export default function BookRecommendationCard({ book, onAddToCollection }: BookRecommendationCardProps) {
+  const handleDetailClick = () => {
+    const searchUrl = `https://www.nl.go.kr/NL/contents/search.do?kwd=${encodeURIComponent(
+      book.title
+    )}`
+
+    window.open(searchUrl, "_blank")
+  }
+
   return (
     <Card className="hover:shadow-lg dark:hover:shadow-gray-900/20 transition-all duration-300 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600">
       <CardHeader>
@@ -34,8 +41,8 @@ export default function BookRecommendationCard({ book, onAddToCollection }: Book
           </p>
         )}
         <div className="flex space-x-2 mt-4">
-          <Button className="w-full" variant="outline">
-            <Book className="w-4 h-4" />
+          <Button className="w-full" variant="outline" onClick={handleDetailClick}>
+            <Book className="w-4 h-4 mr-2" />
             자세히
           </Button>
           <Button className="w-full" variant="outline" onClick={() => onAddToCollection(book, "book")}>
@@ -45,5 +52,5 @@ export default function BookRecommendationCard({ book, onAddToCollection }: Book
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

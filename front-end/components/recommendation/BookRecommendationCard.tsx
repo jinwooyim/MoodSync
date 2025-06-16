@@ -3,9 +3,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Inbox } from "lucide-react"
 import type { BookRecommendation } from "@/types"
 import { useEffect, useState } from "react"
+import { Book, Inbox } from "lucide-react"
 
 interface BookRecommendationCardProps {
   book: BookRecommendation
@@ -18,6 +18,13 @@ export default function BookRecommendationCard({
   onAddToCollection,
   animationDelay = 0,
 }: BookRecommendationCardProps) {
+  const handleDetailClick = () => {
+    const searchUrl = `https://www.nl.go.kr/NL/contents/search.do?kwd=${encodeURIComponent(
+      book.title
+    )}`
+
+    window.open(searchUrl, "_blank")
+  }
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
@@ -58,6 +65,10 @@ export default function BookRecommendationCard({
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">{book.description}</p>
         )}
         <div className="flex space-x-2">
+          <Button className="w-full" variant="outline" onClick={handleDetailClick}>
+            <Book className="w-4 h-4 mr-2" />
+            자세히
+          </Button>
           <Button className="w-full" variant="outline" onClick={() => onAddToCollection(book, "book")}>
             <Inbox className="w-4 h-4 mr-2" />
             컬렉션에 추가

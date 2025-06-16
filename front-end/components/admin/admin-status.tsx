@@ -129,7 +129,6 @@ export function AdminStats() {
     중립: "rgba(158, 158, 158, 0.7)",
     default: "rgba(99, 102, 241, 0.7)",
   }
-
   const backgroundColors = emotions.map(
     (emotion) => emotionColors[emotion] ?? emotionColors.default,
   )
@@ -311,6 +310,7 @@ export function AdminStats() {
       
       {/* 감정 응집도 시각화 - 가로로 길게 */}
       <Card className="overflow-hidden w-full">
+
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>감정 응집도 시각화</CardTitle>

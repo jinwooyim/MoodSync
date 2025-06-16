@@ -26,6 +26,7 @@ export function ChurnPredictionChart({ onAnalysisClick }: ChurnPredictionChartPr
         feedbackScore: 3,
         recommendCount: 15,
         recentActivityCount: 5,
+
       }
       console.log("@# userData =>", userData)
 
@@ -62,7 +63,6 @@ export function ChurnPredictionChart({ onAnalysisClick }: ChurnPredictionChartPr
 
   // 컴포넌트가 마운트될 때 데이터 로드
   useEffect(() => {
-    // 초기 데이터 로드
     loadChurnData()
   }, [])
 
@@ -145,5 +145,6 @@ export function ChurnPredictionChart({ onAnalysisClick }: ChurnPredictionChartPr
         </ResponsiveContainer>
       </ChartContainer>
     </div>
+
   )
 }

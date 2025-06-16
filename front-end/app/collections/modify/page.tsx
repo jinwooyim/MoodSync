@@ -214,7 +214,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <div className="min-h-screen flex">
             <SidebarProvider>
                 <div className="flex flex-grow ">
-                    {/* Sidebar는 정적인 부분이므로 AnimatePresence로 감싸지 않습니다. */}
                     <Sidebar className="flex pt-[70px] bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-colors duration-300">
                         <SidebarContent>
                             <SidebarGroup className="mt-6">
@@ -227,33 +226,20 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                     ) : error ? (
                                         <p className="px-4 py-2 text-sm text-red-500">{error}</p>
                                     ) : collections.length === 0 ? (
-                                        // 컬렉션이 없을 때 메시지도 애니메이션 적용
                                         <motion.div
                                             key="no-collections-sidebar-message"
-                                            // initial={{ opacity: 0, x: -20 }}
-                                            // animate={{ opacity: 1, x: 0, transition: { type: "spring", damping: 20, stiffness: 100 } }}
-                                            // exit={{ opacity: 0, x: -20, transition: { duration: 0.15 } }}
                                             className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400"
                                         >
                                             컬렉션이 없습니다.
                                         </motion.div>
                                     ) : (
                                         <SidebarMenu>
-                                            {/* AnimatePresence를 사용하여 컬렉션 목록의 추가/삭제 애니메이션 적용 */}
                                             <AnimatePresence mode="popLayout">
                                                 {collections.map((collection) => {
                                                     return (
                                                         <motion.div
                                                             key={String(collection.collectionId)} // 고유한 key 필수
-                                                            // initial="hidden"
-                                                            // animate="visible"
-                                                            // exit="exit"
-                                                            // variants={{
-                                                            //     hidden: { opacity: 0, x: -20 },
-                                                            //     visible: { opacity: 1, x: 0, transition: { type: "spring", damping: 20, stiffness: 100 } },
-                                                            //     exit: { opacity: 0, x: -20, transition: { duration: 0.15 } },
-                                                            // }}
-                                                            layout // 레이아웃 변경 애니메이션
+                                                            layout 
                                                         >
                                                              <SidebarMenuItem>
                                                                 <SidebarMenuButton
@@ -301,20 +287,20 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                         if (collectionToDisplay) {
                                             return (
                                                 <motion.div
-    key={id}
-    className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 min-w-[300px]"
-    variants={slideInUpVariants} // 또는 slideInRightVariants 사용
-    initial="hidden"
-    animate="visible"
-    exit="exit"
-    // 이 경우에도 layout prop을 사용하면 늘어남 효과가 발생할 수 있으니 제거하거나 신중하게 사용
-    // layout 
->
-                                                    <CollectionItemsView
-                                                        collection={collectionToDisplay}
-                                                        onDeleteItemConfirmed={handleDeleteItemConfirmed}
-                                                        onCloseView={handleCloseCollectionView}
-                                                    />
+                                                    key={id}
+                                                    className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 min-w-[300px]"
+                                                    variants={slideInUpVariants} // 또는 slideInRightVariants 사용
+                                                    initial="hidden"
+                                                    animate="visible"
+                                                    exit="exit"
+                                                    // 이 경우에도 layout prop을 사용하면 늘어남 효과가 발생할 수 있으니 제거하거나 신중하게 사용
+                                                    // layout 
+                                                >
+                                                <CollectionItemsView
+                                                    collection={collectionToDisplay}
+                                                    onDeleteItemConfirmed={handleDeleteItemConfirmed}
+                                                    onCloseView={handleCloseCollectionView}
+                                                />
                                                 </motion.div>
                                             );
                                         }

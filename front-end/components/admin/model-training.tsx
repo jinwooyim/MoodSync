@@ -50,11 +50,11 @@ export function ModelTraining() {
         let newProgress = 0
 
         if (elapsedMinutes < 1) {
-          newProgress = Math.min(30, prev + Math.random() * 4.5)
+          newProgress = Math.min(30, prev + Math.random() * 4)
         } else if (elapsedMinutes < 3) {
-          newProgress = Math.min(50, prev + Math.random() * 4.5)
+          newProgress = Math.min(50, prev + Math.random() * 4)
         } else {
-          newProgress = Math.min(90, prev + Math.random() * 4.5)
+          newProgress = Math.min(90, prev + Math.random() * 4)
         }
 
         return newProgress

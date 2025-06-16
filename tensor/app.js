@@ -304,6 +304,68 @@ app.get('/train', async (req, res) => {
   }
 });
 
+// ==========사용자 이탈 분석 =========== -> 분석
+app.get('/train-churn-model', async (req, res) => {
+  try {
+    const response = await axios.get('http://localhost:8485/api/analize-churn-train');
+    const { features, labels } = response.data;
+
+    console.log("@# features =>", features);
+    console.log("@# labels =>", labels);
+
+    if (!Array.isArray(features) || !Array.isArray(labels)) {
+      return res.status(400).json({ status: 'error', message: 'features와 labels는 배열이어야 합니다.' });
+    }
+    if (features.length !== labels.length) {
+      return res.status(400).json({ status: 'error', message: 'features와 labels의 길이는 같아야 합니다.' });
+    }
+
+    // features는 이미 [ [f1, f2, f3], ... ] 형태이므로 바로 tensor로 변환
+    const inputData = features;
+
+    // labels는 [0,1,0,1,...] 형태일 수 있으니, [ [0], [1], ... ]로 변경
+    const outputData = labels.map(label => [label]);
+
+    const trainingData = tf.tensor2d(inputData, [inputData.length, inputData[0].length]);
+    const targetData = tf.tensor2d(outputData, [outputData.length, outputData[0].length]);
+
+    const churnModel = tf.sequential();
+    churnModel.add(tf.layers.dense({ inputShape: [inputData[0].length], units: 10, activation: 'relu' }));
+    churnModel.add(tf.layers.dense({ units: 1, activation: 'sigmoid' }));
+
+    // churnModel.compile({
+    //   optimizer: tf.train.adam(0.01),
+    //   loss: 'binaryCrossentropy',
+    //   metrics: ['accuracy'],
+    // });
+
+    churnModel.compile({
+      optimizer: tf.train.adam(0.005), // 🔁 러닝레이트 0.01 → 0.005 또는 0.001로 낮춤
+      loss: 'binaryCrossentropy',
+      metrics: ['accuracy'],
+    });
+
+    await churnModel.fit(trainingData, targetData, {
+      epochs: 240,
+      batchSize: 24,
+      shuffle: true,
+      callbacks: {
+        onEpochEnd: (epoch, logs) => {
+          console.log(`Epoch ${epoch + 1}: Loss = ${logs.loss.toFixed(4)}, Accuracy = ${logs.acc?.toFixed(4)}`);
+        },
+      },
+    });
+
+    res.json({ status: 'success', message: '모델 학습 완료', sampleSize: features.length });
+    saveModelPureJS(churnModel, path.join(__dirname, 'churnModel'));
+    console.log("모델 저장 완료!!");
+  } catch (err) {
+    console.error('모델 학습 오류:', err);
+    res.status(500).json({ status: 'error', message: '모델 학습 중 오류 발생' });
+  }
+});
+
+
 // ========== 예측 수행 =========== -> 메인
 // 예측 API (app.js)
 app.post('/predict', express.json(), async (req, res) => {
@@ -381,6 +443,88 @@ app.post('/predict', express.json(), async (req, res) => {
 });
 
 
+// 정규화 함수 추가 (기존 코드 위쪽에 선언)
+// function normalizeFeatures(features) {
+//   return features.map(row => {
+//     const [score, recommend, recent] = row;
+//     return [
+//       score / 5,         // FEEDBACK_SCORE: 0 ~ 5 → 0 ~ 1
+//       recommend / 10,    // RECOMMEND_COUNT: 0 ~ 10 → 0 ~ 1
+//       recent / 5         // RECENT_ACTIVITY_COUNT: 0 ~ 5 → 0 ~ 1
+//     ];
+//   });
+// }
+function normalizeSingleInput(input) {
+  return {
+    feedbackScore: input.feedbackScore / 5,
+    recommendCount: input.recommendCount / 10,
+    recentActivityCount: input.recentActivityCount / 5
+  };
+}
+
+
+// churn model 이탈가능성 예측
+app.post('/predict-churn-model', express.json(), async (req, res) => {
+  try {
+    // const inputData = req.body;
+    const inputData = normalizeSingleInput(req.body);
+
+    console.log(req.body);
+
+    // 입력 데이터가 배열인지, 필수 키가 있는지 체크
+    if (
+      !inputData ||
+      typeof inputData.feedbackScore !== 'number' ||
+      typeof inputData.recommendCount !== 'number' ||
+      typeof inputData.recentActivityCount !== 'number'
+    ) {
+      return res.status(400).json({ status: 'error', message: '유효한 입력값이 필요합니다. (feedbackScore, recommendCount, recentActivityCount)' });
+    }
+
+    // 저장된 모델 로드 (비동기)
+    // const churnModel = await loadModelPureJS(path.join(__dirname, 'churnModel'));
+    const churnModel = tf.sequential();
+    // console.log("@# churnModel =>", churnModel)
+    churnModel.add(tf.layers.dense({ inputShape: [3], units: 16, activation: 'relu' }));
+    churnModel.add(tf.layers.dense({ units: 8, activation: 'relu' }));
+    churnModel.add(tf.layers.dense({ units: 1, activation: 'sigmoid' }));
+
+    // 입력값 텐서 생성 (1개의 샘플, 3개의 특성)
+    const inputTensor = tf.tensor2d(
+      [[
+        inputData.feedbackScore,
+        inputData.recommendCount,
+        inputData.recentActivityCount
+      ]],
+      [1, 3]
+    );
+
+    console.log(inputData.feedbackScore);
+    console.log(inputData.recommendCount);
+    console.log(inputData.recentActivityCount);
+
+    // 예측 (0 ~ 1 사이 확률)
+    const predictionTensor = churnModel.predict(inputTensor);
+    const predictionArray = await predictionTensor.data();
+    const churnProbability = predictionArray[0];
+
+    console.log("1", predictionTensor);
+    console.log("2", predictionArray);
+    console.log("3", churnProbability);
+
+    res.json({
+      status: 'success',
+      churnProbability,  // 0 ~ 1 사이 값 (이탈 가능성)
+      message: churnProbability > 0.5 ? '이탈 가능성이 높습니다.' : '이탈 가능성이 낮습니다.'
+    });
+
+  } catch (err) {
+    console.error('이탈 예측 오류:', err);
+    res.status(500).json({ status: 'error', message: '이탈 예측 중 오류가 발생했습니다.' });
+  }
+});
+
+
 //fsm 재 선언
 const fsm = require('fs/promises');
 
@@ -393,35 +537,35 @@ app.post('/clear-models', async (req, res) => {
     const act_files = await fsm.readdir(act_model_DIR);
     const book_files = await fsm.readdir(book_model_DIR);
     const music_files = await fsm.readdir(music_model_DIR);
-    
+
     await Promise.all(act_files.map(async (act_files) => {
       const act_filePath = path.join(act_model_DIR, act_files);
       const act_stat = await fsm.stat(act_filePath);
-      
+
       if (act_stat.isFile()) {
         await fsm.unlink(act_filePath); // 파일 삭제
       }
     }));
-    
+
     await Promise.all(book_files.map(async (book_files) => {
       const book_filePath = path.join(book_model_DIR, book_files);
       const book_stat = await fsm.stat(book_filePath);
-      
+
       if (book_stat.isFile()) {
         await fsm.unlink(book_filePath); // 파일 삭제
       }
     }));
-    
+
     await Promise.all(music_files.map(async (music_files) => {
       const music_filePath = path.join(music_model_DIR, music_files);
       const music_stat = await fsm.stat(music_filePath);
-      
+
       if (music_stat.isFile()) {
         await fsm.unlink(music_filePath); // 파일 삭제
       }
       console.log("모델 삭제 완료.")
     }));
-    
+
     res.status(200).json({ message: 'All model files have been deleted.' });
   } catch (error) {
     console.error('Error clearing model files:', error);
@@ -449,20 +593,20 @@ app.get('/model-status', async (req, res) => {
 
 
   res.json(status); // { act_model: true, book_model: false, ... }
-// 상태 확인
-app.get('/status', (req, res) => {
-  res.json({ status: 'running', modelTrained: isModelTrained });
-});
+  // 상태 확인
+  app.get('/status', (req, res) => {
+    res.json({ status: 'running', modelTrained: isModelTrained });
+  });
 
-// 기본 페이지
-app.get('/', (req, res) => {
-  res.send(`
+  // 기본 페이지
+  app.get('/', (req, res) => {
+    res.send(`
         <h2>TensorFlow.js Emotion Server</h2>
         <p>POST /train - 모델 훈련</p>
         <p>POST /predict - 예측 (6개의 감정 값 필요)</p>
         <p>GET /status - 서버 상태 확인</p>
     `);
-});
+  });
 })
 
 // 서버 시작

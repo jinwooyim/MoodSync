@@ -1,24 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card"
-import {
-  MessageSquare,
-  Star,
-  TrendingUp,
-  Clock,
-  Calendar,
-} from "lucide-react"
-import {
-  fetchContactStats,
-  fetchPendingContactsCount,
-} from "@/lib/api/contact"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { MessageSquare, Star, TrendingUp, Clock, Calendar } from "lucide-react"
+import { fetchContactStats, fetchPendingContactsCount } from "@/lib/api/contact"
 import { fetchFeedbackStats } from "@/lib/api/feedback"
 import { fetchCohesiveEmotionStats } from "@/lib/api/emotion"
 import { DatePicker } from "../ui/date-picker"
@@ -29,16 +14,14 @@ import {
   CategoryScale,
   LinearScale,
   PointElement,
-  LineElement, // <-- 추가
-  BarElement,
+  LineElement,
   Title,
   Tooltip,
   Legend,
-  ChartOptions,
+  type ChartOptions,
 } from "chart.js"
 import { Line } from "react-chartjs-2"
 
-// ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
 interface Stats {
@@ -133,12 +116,8 @@ export function AdminStats() {
   }
 
   const emotions = Object.keys(emotionStats)
-  const mostCohesiveValues = emotions.map(
-    (emotion) => emotionStats[emotion]?.mostCohesiveValue ?? 0,
-  )
-  const mostCohesiveEmotions = emotions.map(
-    (emotion) => emotionStats[emotion]?.mostCohesiveEmotion ?? "",
-  )
+  const mostCohesiveValues = emotions.map((emotion) => emotionStats[emotion]?.mostCohesiveValue ?? 0)
+  const mostCohesiveEmotions = emotions.map((emotion) => emotionStats[emotion]?.mostCohesiveEmotion ?? "")
 
   const emotionColors: Record<string, string> = {
     기쁨: "rgba(255, 193, 7, 0.7)",
@@ -150,7 +129,6 @@ export function AdminStats() {
     중립: "rgba(158, 158, 158, 0.7)",
     default: "rgba(99, 102, 241, 0.7)",
   }
-
   const backgroundColors = emotions.map(
     (emotion) => emotionColors[emotion] ?? emotionColors.default,
   )
@@ -169,23 +147,23 @@ export function AdminStats() {
   //     },
   //   ],
   // }
-const data = {
-  labels: emotions,
-  datasets: [
-    {
-      label: "응집도 값",
-      data: mostCohesiveValues,
-      backgroundColor: backgroundColors,
-      borderColor: backgroundColors.map((color) => color.replace("0.7", "1")),
-      borderWidth: 2,
-      tension: 0.2, // 곡선 표현 강도
-      pointRadius: 8, // 포인트 크기
-      pointHoverRadius: 10, // 마우스 올렸을 때 더 크게
-      pointBackgroundColor: backgroundColors,
-      pointBorderColor: "#fff",
-    },
-  ],
-}
+  const data = {
+    labels: emotions,
+    datasets: [
+      {
+        label: "응집도 값",
+        data: mostCohesiveValues,
+        backgroundColor: backgroundColors,
+        borderColor: backgroundColors.map((color) => color.replace("0.7", "1")),
+        borderWidth: 2,
+        tension: 0.3, // 곡선 표현 강도
+        pointRadius: 8, // 포인트 크기
+        pointHoverRadius: 10, // 마우스 올렸을 때 더 크게
+        pointBackgroundColor: backgroundColors,
+        pointBorderColor: "#fff",
+      },
+    ],
+  }
 
 
   const options: ChartOptions<"line"> = {
@@ -281,7 +259,6 @@ const data = {
     },
   }
 
-
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
@@ -330,8 +307,10 @@ const data = {
           </CardContent>
         </Card>
       </div>
-      {/* 감정 응집도 차트 */}
-      <Card className="overflow-hidden">
+      
+      {/* 감정 응집도 시각화 - 가로로 길게 */}
+      <Card className="overflow-hidden w-full">
+
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>감정 응집도 시각화</CardTitle>
@@ -339,7 +318,11 @@ const data = {
           </div>
           <div className="flex items-center space-x-2">
             <Calendar className="h-4 w-4 text-muted-foreground" />
-            <DatePicker date={date} onDateChange={setDate as (date: Date | undefined) => void} placeholder="날짜 선택" />
+            <DatePicker
+              date={date}
+              onDateChange={setDate as (date: Date | undefined) => void}
+              placeholder="날짜 선택"
+            />
           </div>
         </CardHeader>
         <CardContent>
@@ -349,9 +332,7 @@ const data = {
             </div>
           ) : emotions.length > 0 ? (
             <div className="h-[300px] w-full">
-              {/* <Bar data={data} options={options} /> */}
               <Line data={data} options={options} />
-
             </div>
           ) : (
             <div className="flex items-center justify-center h-[300px] text-muted-foreground">
@@ -360,23 +341,43 @@ const data = {
           )}
         </CardContent>
       </Card>
-      {/* 분석 차트 */}
-      <div>
-        <h2 className="text-2xl font-bold mb-4">분석 차트</h2>
 
-        {/* 시간대별 문의 수와 카테고리별 피드백 차트를 나란히 배치 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 h-200">
-          <ContactTimeChart />
-          <FeedbackCategoryChart />
-        </div>
+      {/* 시간대별 문의 수 - 감정 응집도와 같은 폭으로 길게 */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg">시간대별 문의 수</CardTitle>
+          <CardDescription className="text-sm">2025년 06월 13일 기준</CardDescription>
+        </CardHeader>
+        <CardContent className="p-3">
+          <div className="h-[300px] w-full">
+            <ContactTimeChart />
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* 이탈 예측 차트 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <ChurnPredictionChart />
-        </div>
+      {/* 하단 2개 카드: 좌/우 나란히 배치 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="h-[650px]">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">카테고리별 피드백</CardTitle>
+            <CardDescription className="text-sm">2025년 06월 16일 기준</CardDescription>
+          </CardHeader>
+          <CardContent className="p-3 h-[500px]">
+            <FeedbackCategoryChart />
+          </CardContent>
+        </Card>
+
+        <Card className="h-[650px]">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">사용자 이탈 예측</CardTitle>
+            <CardDescription className="text-sm">머신러닝 기반 사용자 이탈 위험도 분석</CardDescription>
+          </CardHeader>
+          <CardContent className="p-3 h-[500px]">
+            <ChurnPredictionChart />
+          </CardContent>
+        </Card>
       </div>
-
-
     </div>
   )
+
 }

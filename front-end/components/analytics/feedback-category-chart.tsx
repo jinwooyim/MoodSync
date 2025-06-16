@@ -8,7 +8,7 @@ import { ko } from "date-fns/locale"
 import { DatePicker } from "@/components/ui/date-picker"
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from "recharts"
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart"
-import { Loader2 } from "lucide-react"
+import { Loader2, Calendar, BarChart3 } from "lucide-react"
 import { moodsyncTheme } from "@/lib/theme-config"
 
 export function FeedbackCategoryChart() {
@@ -24,7 +24,6 @@ export function FeedbackCategoryChart() {
       try {
         const response = await fetchFeedbackAnalytics(date)
 
-        // 카테고리명을 한글로 변환하는 함수
         const getCategoryName = (category: string) => {
           const categoryMap: Record<string, string> = {
             UI: "UI/UX",
@@ -36,7 +35,6 @@ export function FeedbackCategoryChart() {
           return categoryMap[category] || category
         }
 
-        // 응답 데이터를 차트에 맞게 변환
         const chartData = response.map((item: any) => ({
           category: getCategoryName(item.feedback_category),
           count: Number(item.count),
@@ -51,84 +49,177 @@ export function FeedbackCategoryChart() {
         setLoading(false)
       }
     }
-
     fetchData()
   }, [date])
 
-  // 현재 표시 중인 날짜 (date가 undefined면 오늘 날짜 사용)
   const displayDate = date || new Date()
 
+  const topCategories = data
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 4)
+
   return (
-    <Card className="w-full h-full overflow-hidden">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+    <Card className="overflow-hidden w-full">
+      <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle className="text-sm font-medium">카테고리별 피드백</CardTitle>
-          <CardDescription className="text-xs">
-            {format(displayDate, "yyyy년 MM월 dd일", { locale: ko })} 기준
+          <CardTitle className="text-xl font-bold flex items-center gap-3">
+            <div className="p-2 bg-gray-100 rounded-lg">
+              <BarChart3 className="w-5 h-5 text-gray-700" />
+            </div>
+            카테고리별 피드백
+          </CardTitle>
+          <CardDescription className="text-sm">
+            피드백 카테고리별 분포 현황 · {format(displayDate, "yyyy년 MM월 dd일", { locale: ko })} 기준
           </CardDescription>
         </div>
-        <DatePicker date={date} onDateChange={setDate} placeholder="날짜 선택 (기본: 오늘)" />
+        <div className="flex items-center space-x-2">
+          <DatePicker date={date} onDateChange={setDate} placeholder="날짜 선택" />
+        </div>
       </CardHeader>
-      <CardContent className="h-[300px] pt-4 px-2">
+
+      <CardContent className="p-6">
         {loading ? (
-          <div className="flex h-full items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <div className="flex items-center justify-center h-[350px]">
+            <div className="relative">
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-200"></div>
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-600 border-t-transparent absolute top-0"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-6 h-6 bg-indigo-600 rounded-full animate-pulse"></div>
+              </div>
+            </div>
+            <span className="ml-4 text-lg font-medium text-gray-600">피드백 데이터 분석 중...</span>
           </div>
         ) : error ? (
-          <div className="flex h-full flex-col items-center justify-center text-muted-foreground">
-            <p>{error}</p>
+          <div className="flex flex-col items-center justify-center h-[350px] text-gray-500">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <p className="text-lg font-medium">{error}</p>
+            <p className="text-sm mt-1">다른 날짜를 선택해 주세요</p>
           </div>
         ) : (
-          <ChartContainer
-            config={{
-              count: {
-                label: "피드백 수",
-                color: moodsyncTheme.chart.secondary,
-              },
-            }}
-          >
-            <ResponsiveContainer width="99%" height="99%">
-              <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
-                <CartesianGrid vertical={false} strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="category"
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={8}
-                  tick={{ fontSize: 10 }}
-                  interval={0}
-                />
-                <YAxis tickLine={false} axisLine={false} tickMargin={8} tick={{ fontSize: 10 }} />
-                <ChartTooltip
-                  cursor={false}
-                  content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
-                      return (
-                        <div className="rounded-lg border bg-background p-2 shadow-sm">
-                          <div className="grid grid-cols-2 gap-2">
-                            <div className="flex flex-col">
-                              <span className="text-[0.70rem] uppercase text-muted-foreground">카테고리</span>
-                              <span className="font-bold text-muted-foreground">{payload[0].payload.category}</span>
-                            </div>
-                            <div className="flex flex-col">
-                              <span className="text-[0.70rem] uppercase text-muted-foreground">피드백 수</span>
-                              <span className="font-bold">{payload[0].value}</span>
-                            </div>
-                            <div className="flex flex-col">
-                              <span className="text-[0.70rem] uppercase text-muted-foreground">평균 점수</span>
-                              <span className="font-bold">{payload[0].payload.score}/5</span>
-                            </div>
-                          </div>
-                        </div>
-                      )
-                    }
-                    return null
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              {topCategories.map((category) => (
+                <div
+                  key={category.category}
+                  className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">{category.category}</p>
+                      <p className="text-2xl font-bold text-blue-600">{category.count}</p>
+                      <p className="text-xs text-gray-500">평점 {category.score}/5</p>
+                    </div>
+                    <div className="w-3 h-3 rounded-full bg-blue-600"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="h-[350px] w-full">
+                <ChartContainer
+                  config={{
+                    count: {
+                      label: "피드백 수",
+                      color: moodsyncTheme.chart.secondary,
+                    },
                   }}
-                />
-                <Bar dataKey="count" fill={moodsyncTheme.chart.secondary} radius={[4, 4, 0, 0]} maxBarSize={30} />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartContainer>
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" />
+                      <XAxis
+                        dataKey="category"
+                        tickLine={false}
+                        axisLine={false}
+                        tickMargin={8}
+                        tick={{
+                          fontSize: 12,
+                          fontFamily: "'Pretendard', sans-serif",
+                          fontWeight: "bold"
+                        }}
+                        interval={0}
+                        angle={-45}
+                        textAnchor="end"
+                        height={80}
+                      />
+                      <YAxis
+                        tickLine={false}
+                        axisLine={false}
+                        tickMargin={8}
+                        tick={{
+                          fontSize: 12,
+                          fontFamily: "'Pretendard', sans-serif"
+                        }}
+                      />
+                      <ChartTooltip
+                        cursor={{ fill: 'rgba(0,0,0,0.05)' }}
+                        content={({ active, payload }) => {
+                          if (active && payload && payload.length) {
+                            return (
+                              <div className="rounded-xl border bg-white p-4 shadow-lg">
+                                <div className="grid grid-cols-1 gap-2">
+                                  <div className="flex flex-col">
+                                    <span className="text-sm font-semibold text-gray-800">{payload[0].payload.category}</span>
+                                  </div>
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-sm text-gray-600">피드백 수:</span>
+                                    <span className="font-bold text-blue-600">{payload[0].value}건</span>
+                                  </div>
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-sm text-gray-600">평균 점수:</span>
+                                    <span className="font-bold text-green-600">{payload[0].payload.score}/5</span>
+                                  </div>
+                                </div>
+                              </div>
+                            )
+                          }
+                          return null
+                        }}
+                      />
+                      <Bar 
+                        dataKey="count" 
+                        fill={moodsyncTheme.chart.secondary} 
+                        radius={[6, 6, 0, 0]} 
+                        maxBarSize={60}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+              <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                주요 인사이트
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-gray-700">{data.reduce((acc, item) => acc + item.count, 0)}</p>
+                  <p className="text-sm text-gray-600">총 피드백 수</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-gray-700">
+                    {data.length > 0 ? Math.max(...data.map(item => item.count)) : 0}
+                  </p>
+                  <p className="text-sm text-gray-600">최다 피드백</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-gray-700">
+                    {data.length > 0 ? (data.reduce((acc, item) => acc + parseFloat(item.score), 0) / data.length).toFixed(1) : '0.0'}
+                  </p>
+                  <p className="text-sm text-gray-600">전체 평균 점수</p>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </CardContent>
     </Card>

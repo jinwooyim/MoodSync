@@ -8,6 +8,7 @@ import { fetchFeedbackStats } from "@/lib/api/feedback"
 import { fetchCohesiveEmotionStats } from "@/lib/api/emotion"
 import { DatePicker } from "../ui/date-picker"
 import { format } from "date-fns"
+import { ko } from "date-fns/locale"
 
 import {
   Chart as ChartJS,
@@ -181,7 +182,7 @@ export function AdminStats() {
       },
       title: {
         display: true,
-        text: "감정별 응집도 분석 (꺾은 선)",
+        text: "감정별 응집도 분석",
         font: {
           family: "'Pretendard', sans-serif",
           size: 16,
@@ -258,7 +259,7 @@ export function AdminStats() {
       },
     },
   }
-
+  const displayDate = date || new Date()
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
@@ -307,17 +308,24 @@ export function AdminStats() {
           </CardContent>
         </Card>
       </div>
-      
-      {/* 감정 응집도 시각화 - 가로로 길게 */}
-      <Card className="overflow-hidden w-full">
 
+      {/* 감정 응집도 시각화 */}
+      <Card className="overflow-hidden w-full">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle>감정 응집도 시각화</CardTitle>
-            <CardDescription>각 감정별 가장 응집된 감정과 응집도 값 표시</CardDescription>
+            <CardTitle className="text-xl font-bold flex items-center gap-3">
+              <div className="p-2 bg-gray-100 rounded-lg">
+                <svg className="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                </svg>
+              </div>
+              감정 응집도 인사이트
+            </CardTitle>
+            <CardDescription className="text-sm">
+              감정 분석 · {format(displayDate, "yyyy년 MM월 dd일", { locale: ko })} 기준
+            </CardDescription>
           </div>
           <div className="flex items-center space-x-2">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
             <DatePicker
               date={date}
               onDateChange={setDate as (date: Date | undefined) => void}
@@ -325,35 +333,108 @@ export function AdminStats() {
             />
           </div>
         </CardHeader>
-        <CardContent>
+
+        <CardContent className="p-6">
           {emotionLoading ? (
-            <div className="flex items-center justify-center h-[300px]">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            <div className="flex items-center justify-center h-[350px]">
+              <div className="relative">
+                <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-200"></div>
+                <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-600 border-t-transparent absolute top-0"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-6 h-6 bg-indigo-600 rounded-full animate-pulse"></div>
+                </div>
+              </div>
+              <span className="ml-4 text-lg font-medium text-gray-600">감정 데이터 분석 중...</span>
             </div>
           ) : emotions.length > 0 ? (
-            <div className="h-[300px] w-full">
-              <Line data={data} options={options} />
+            <div className="space-y-6">
+              {/* 상단 메트릭스 카드들 - 6개 고정 */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+                {['happy', 'sad', 'tired', 'excited', 'calm', 'stress'].map((emotionName, index) => {
+                  const emotionIndex = emotions.findIndex(e => e === emotionName);
+                  const value = emotionIndex >= 0 ? Math.min(mostCohesiveValues[emotionIndex], 100) : 0;
+                  const color = emotionColors[emotionName] || '#6366f1';
+
+                  return (
+                    <div key={emotionName} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">{emotionName}</p>
+                          <p className="text-2xl font-bold" style={{ color: color.replace('0.7', '1') }}>
+                            {value.toFixed(1)}
+                          </p>
+                        </div>
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: color.replace('0.7', '1') }}
+                        ></div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* 메인 차트 */}
+              <div className="bg-white rounded-xl p-6 border border-gray-200">
+                <div className="h-[350px] w-full">
+                  <Line data={data} options={options} />
+                </div>
+              </div>
+
+              {/* 하단 인사이트 */}
+              <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  주요 인사이트
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-gray-700">{emotions.length}</p>
+                    <p className="text-sm text-gray-600">분석된 감정 유형</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-gray-700">
+                      {Math.min(Math.max(...mostCohesiveValues), 100).toFixed(1)}
+                    </p>
+                    <p className="text-sm text-gray-600">최고 응집도</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-gray-700">
+                      {Math.min((mostCohesiveValues.reduce((a, b) => a + b, 0) / mostCohesiveValues.length), 100).toFixed(1)}
+                    </p>
+                    <p className="text-sm text-gray-600">평균 응집도</p>
+                  </div>
+                </div>
+              </div>
             </div>
           ) : (
-            <div className="flex items-center justify-center h-[300px] text-muted-foreground">
-              <p>선택한 날짜에 대한 감정 데이터가 없습니다.</p>
+            <div className="flex flex-col items-center justify-center h-[350px] text-gray-500">
+              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <p className="text-lg font-medium">선택한 날짜에 대한 감정 데이터가 없습니다</p>
+              <p className="text-sm mt-1">다른 날짜를 선택해 주세요</p>
             </div>
           )}
         </CardContent>
       </Card>
 
       {/* 시간대별 문의 수 - 감정 응집도와 같은 폭으로 길게 */}
-      {/* <Card>
-        <CardHeader className="pb-2">
+      {/* <Card> */}
+      {/* <CardHeader className="pb-2">
           <CardTitle className="text-lg">시간대별 문의 수</CardTitle>
           <CardDescription className="text-sm">2025년 06월 13일 기준</CardDescription>
-        </CardHeader>
-        <CardContent className="p-3"> */}
-        <div className="h-[300px] w-full">
-          <ContactTimeChart />
-        </div>
-        {/* </CardContent>
-      </Card> */}
+        </CardHeader> */}
+      {/* <CardContent className="p-3"> */}
+      <div className="w-full">
+        <ContactTimeChart />
+      </div>
+      {/* </CardContent> */}
+      {/* </Card> */}
 
       {/* 하단 2개 카드: 좌/우 나란히 배치 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -363,19 +444,19 @@ export function AdminStats() {
             <CardDescription className="text-sm">2025년 06월 16일 기준</CardDescription>
           </CardHeader>
           <CardContent className="p-3 h-[500px]"> */}
-            <FeedbackCategoryChart />
-          {/* </CardContent>
-        </Card> */}
+        <FeedbackCategoryChart />
+        {/* </CardContent> */}
+        {/* </Card> */}
 
-        <Card className="h-[650px]">
+        {/* <Card className="h-[650px]">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg">사용자 이탈 예측</CardTitle>
             <CardDescription className="text-sm">머신러닝 기반 사용자 이탈 위험도 분석</CardDescription>
           </CardHeader>
-          <CardContent className="p-3 h-[500px]">
-            <ChurnPredictionChart />
-          </CardContent>
-        </Card>
+          <CardContent className="p-3 h-[500px]"> */}
+        <ChurnPredictionChart />
+        {/* </CardContent>
+        </Card> */}
       </div>
     </div>
   )

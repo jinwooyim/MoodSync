@@ -346,11 +346,7 @@ app.get('/train-churn-model', async (req, res) => {
     });
 
     await churnModel.fit(trainingData, targetData, {
-<<<<<<< HEAD
-      epochs: 120,
-=======
       epochs: 240,
->>>>>>> a97a1a88a85d23b36e2c1737f3452c8ce16063a0
       batchSize: 24,
       shuffle: true,
       callbacks: {
@@ -463,8 +459,8 @@ function normalizeFeatures(features) {
 // churn model 이탈가능성 예측
 app.post('/predict-churn-model', express.json(), async (req, res) => {
   try {
-    // const inputData = req.body;
-    const inputData = normalizeFeatures(features);
+    const inputData = req.body;
+    // const inputData = normalizeFeatures(features);
 
     console.log(req.body);
 

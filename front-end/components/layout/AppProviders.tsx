@@ -30,11 +30,18 @@ export default function AppProviders({ children }: { children: React.ReactNode }
   // 로딩 완료 후 (메인 앱 구조)
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-      <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300"> 
+      <div className="flex flex-col min-h-screen"> 
         <Header /> 
-        <main className="flex-1"> 
-          {children} 
-        </main>
+        <main className="flex-1 bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
+{loading ? ( // ⭐ 로딩 중일 때만 스피너와 메시지를 main 영역에 표시 ⭐
+            <div className="flex flex-col items-center justify-center h-full w-full"> {/* 스피너 컨테이너, main 영역 전체를 채우도록 */}
+              <Spinner />
+              <p className="mt-4 text-lg">인증 상태를 확인 중입니다...</p>
+            </div>
+          ) : (
+            children // ⭐ 로딩 완료 시에만 자식(페이지/레이아웃) 렌더링 ⭐
+          )}
+          </main>
         <Footer /> 
       </div>
     </ThemeProvider>

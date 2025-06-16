@@ -41,6 +41,7 @@ export function ChurnPredictionChart() {
       }
 
       const result = await response.json()
+      console.log(result);
 
       // 응답 데이터를 차트에 맞게 변환
       const chartData = [

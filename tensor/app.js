@@ -340,8 +340,8 @@ app.get('/train-churn-model', async (req, res) => {
     });
 
     await churnModel.fit(trainingData, targetData, {
-      epochs: 50,
-      batchSize: 4,
+      epochs: 120,
+      batchSize: 24,
       shuffle: true,
     });
 

@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Star, Calendar, User, Loader2, Trash2 } from "lucide-react"
+import { Star, Calendar, User, Loader2 } from "lucide-react"
 import { fetchAllFeedbacks } from "@/lib/api/feedback"
 import { useToast } from "@/hooks/use-toast"
 
@@ -89,43 +89,53 @@ export function FeedbackManagement() {
     return (
       <div className="flex">
         {[1, 2, 3, 4, 5].map((star) => (
-          <Star key={star} className={`w-4 h-4 ${star <= score ? "text-yellow-400 fill-current" : "text-gray-300"}`} />
+          <Star
+            key={star}
+            className={`w-4 h-4 ${star <= score ? "text-yellow-400 fill-current" : "text-gray-300 dark:text-gray-600"}`}
+          />
         ))}
       </div>
     )
   }
-// 날짜 포매팅 함수
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false
-  }).replace(/\./g, '-').replace(/\s/g, ' ');
-};
+
+  // 날짜 포매팅 함수
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date
+      .toLocaleString("ko-KR", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      })
+      .replace(/\./g, "-")
+      .replace(/\s/g, " ")
+  }
+
   return (
-    <div className="space-y-6">
-      <Card>
+    <div className="space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen p-6 transition-colors duration-300">
+      <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-900/20">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
             <Star className="w-5 h-5" />
             피드백 관리
           </CardTitle>
-          <CardDescription>사용자가 제출한 피드백을 확인하고 관리할 수 있습니다.</CardDescription>
+          <CardDescription className="text-gray-600 dark:text-gray-400">
+            사용자가 제출한 피드백을 확인하고 관리할 수 있습니다.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="w-6 h-6 animate-spin" />
-              <span className="ml-2">피드백 목록을 불러오는 중...</span>
+              <Loader2 className="w-6 h-6 animate-spin text-gray-600 dark:text-gray-400" />
+              <span className="ml-2 text-gray-600 dark:text-gray-400">피드백 목록을 불러오는 중...</span>
             </div>
           ) : feedbacks.length === 0 ? (
             <div className="text-center py-8">
-              <Star className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500">등록된 피드백이 없습니다.</p>
+              <Star className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+              <p className="text-gray-500 dark:text-gray-400">등록된 피드백이 없습니다.</p>
             </div>
           ) : (
             <>
@@ -134,19 +144,19 @@ const formatDate = (dateString: string) => {
                   {feedbacks.map((feedback) => (
                     <div
                       key={feedback.feedbackId}
-                      className="py-2 px-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                      className="py-2 px-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300 bg-white dark:bg-gray-800"
                     >
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center space-x-2">
-                          {/* <Badge variant="outline">{feedback.feedbackId}</Badge> */}
                           <Badge className={getCategoryColor(feedback.feedbackCategory)}>
                             {feedback.feedbackCategory}
                           </Badge>
-                          
                         </div>
                         <div className="flex items-center space-x-2">
                           {renderStars(feedback.feedbackScore)}
-                          <span className="text-sm text-gray-600">({feedback.feedbackScore} / 5)</span>
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                            ({feedback.feedbackScore} / 5)
+                          </span>
                         </div>
                       </div>
 
@@ -154,7 +164,7 @@ const formatDate = (dateString: string) => {
                         {feedback.feedbackContent}
                       </p>
 
-                      <div className="flex items-center justify-between text-xs text-gray-500">
+                      <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                         <div className="flex items-center space-x-4">
                           <span className="flex items-center">
                             <User className="w-3 h-3 mr-1" />
@@ -165,17 +175,6 @@ const formatDate = (dateString: string) => {
                             {feedback.createdDate}
                           </span>
                         </div>
-                        {/* <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                          onClick={() => {
-                            // 피드백 삭제 기능 안넣음음
-                            console.log("Delete feedback:", feedback.feedbackId)
-                          }}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button> */}
                       </div>
                     </div>
                   ))}
@@ -183,8 +182,8 @@ const formatDate = (dateString: string) => {
               </ScrollArea>
 
               {/* Pagination */}
-              <div className="flex items-center justify-between pt-4 border-t">
-                <div className="text-sm text-gray-600">
+              <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="text-sm text-gray-600 dark:text-gray-400">
                   페이지 {currentPage} / {pagination.totalPages}
                 </div>
                 <div className="flex space-x-2">
@@ -193,6 +192,7 @@ const formatDate = (dateString: string) => {
                     size="sm"
                     onClick={() => loadFeedbacks(currentPage - 1)}
                     disabled={!pagination.hasPrevious}
+                    className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     이전
                   </Button>
@@ -201,6 +201,7 @@ const formatDate = (dateString: string) => {
                     size="sm"
                     onClick={() => loadFeedbacks(currentPage + 1)}
                     disabled={!pagination.hasNext}
+                    className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     다음
                   </Button>

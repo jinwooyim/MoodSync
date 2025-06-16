@@ -8,7 +8,7 @@ import { ko } from "date-fns/locale"
 import { DatePicker } from "@/components/ui/date-picker"
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from "recharts"
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart"
-import { Loader2, Calendar, BarChart3 } from "lucide-react"
+import { BarChart3 } from "lucide-react"
 import { moodsyncTheme } from "@/lib/theme-config"
 
 export function FeedbackCategoryChart() {
@@ -54,21 +54,19 @@ export function FeedbackCategoryChart() {
 
   const displayDate = date || new Date()
 
-  const topCategories = data
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 4)
+  const topCategories = data.sort((a, b) => b.count - a.count).slice(0, 4)
 
   return (
-    <Card className="overflow-hidden w-full">
+    <Card className="overflow-hidden w-full bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-900/20">
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle className="text-xl font-bold flex items-center gap-3">
-            <div className="p-2 bg-gray-100 rounded-lg">
-              <BarChart3 className="w-5 h-5 text-gray-700" />
+          <CardTitle className="text-xl font-bold flex items-center gap-3 text-gray-900 dark:text-white">
+            <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+              <BarChart3 className="w-5 h-5 text-gray-700 dark:text-gray-300" />
             </div>
             카테고리별 피드백
           </CardTitle>
-          <CardDescription className="text-sm">
+          <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
             피드백 카테고리별 분포 현황 · {format(displayDate, "yyyy년 MM월 dd일", { locale: ko })} 기준
           </CardDescription>
         </div>
@@ -81,19 +79,29 @@ export function FeedbackCategoryChart() {
         {loading ? (
           <div className="flex items-center justify-center h-[350px]">
             <div className="relative">
-              <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-200"></div>
-              <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-600 border-t-transparent absolute top-0"></div>
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-200 dark:border-indigo-800"></div>
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-600 dark:border-indigo-400 border-t-transparent absolute top-0"></div>
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-6 h-6 bg-indigo-600 rounded-full animate-pulse"></div>
+                <div className="w-6 h-6 bg-indigo-600 dark:bg-indigo-400 rounded-full animate-pulse"></div>
               </div>
             </div>
-            <span className="ml-4 text-lg font-medium text-gray-600">피드백 데이터 분석 중...</span>
+            <span className="ml-4 text-lg font-medium text-gray-600 dark:text-gray-400">피드백 데이터 분석 중...</span>
           </div>
         ) : error ? (
-          <div className="flex flex-col items-center justify-center h-[350px] text-gray-500">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-              <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          <div className="flex flex-col items-center justify-center h-[350px] text-gray-500 dark:text-gray-400">
+            <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+              <svg
+                className="w-12 h-12 text-gray-400 dark:text-gray-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
               </svg>
             </div>
             <p className="text-lg font-medium">{error}</p>
@@ -105,21 +113,21 @@ export function FeedbackCategoryChart() {
               {topCategories.map((category) => (
                 <div
                   key={category.category}
-                  className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300"
+                  className="bg-white dark:bg-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-md dark:hover:shadow-gray-900/20 transition-all duration-300"
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">{category.category}</p>
-                      <p className="text-2xl font-bold text-blue-600">{category.count}</p>
-                      <p className="text-xs text-gray-500">평점 {category.score}/5</p>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{category.category}</p>
+                      <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{category.count}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">평점 {category.score}/5</p>
                     </div>
-                    <div className="w-3 h-3 rounded-full bg-blue-600"></div>
+                    <div className="w-3 h-3 rounded-full bg-blue-600 dark:bg-blue-400"></div>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
+            <div className="bg-white dark:bg-gray-700 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
               <div className="h-[350px] w-full">
                 <ChartContainer
                   config={{
@@ -131,7 +139,7 @@ export function FeedbackCategoryChart() {
                 >
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(156, 163, 175, 0.2)" />
                       <XAxis
                         dataKey="category"
                         tickLine={false}
@@ -140,7 +148,8 @@ export function FeedbackCategoryChart() {
                         tick={{
                           fontSize: 12,
                           fontFamily: "'Pretendard', sans-serif",
-                          fontWeight: "bold"
+                          fontWeight: "bold",
+                          fill: "currentColor",
                         }}
                         interval={0}
                         angle={-45}
@@ -153,26 +162,33 @@ export function FeedbackCategoryChart() {
                         tickMargin={8}
                         tick={{
                           fontSize: 12,
-                          fontFamily: "'Pretendard', sans-serif"
+                          fontFamily: "'Pretendard', sans-serif",
+                          fill: "currentColor",
                         }}
                       />
                       <ChartTooltip
-                        cursor={{ fill: 'rgba(0,0,0,0.05)' }}
+                        cursor={{ fill: "rgba(156, 163, 175, 0.1)" }}
                         content={({ active, payload }) => {
                           if (active && payload && payload.length) {
                             return (
-                              <div className="rounded-xl border bg-white p-4 shadow-lg">
+                              <div className="rounded-xl border bg-white dark:bg-gray-800 p-4 shadow-lg border-gray-200 dark:border-gray-600">
                                 <div className="grid grid-cols-1 gap-2">
                                   <div className="flex flex-col">
-                                    <span className="text-sm font-semibold text-gray-800">{payload[0].payload.category}</span>
+                                    <span className="text-sm font-semibold text-gray-800 dark:text-white">
+                                      {payload[0].payload.category}
+                                    </span>
                                   </div>
                                   <div className="flex justify-between items-center">
-                                    <span className="text-sm text-gray-600">피드백 수:</span>
-                                    <span className="font-bold text-blue-600">{payload[0].value}건</span>
+                                    <span className="text-sm text-gray-600 dark:text-gray-400">피드백 수:</span>
+                                    <span className="font-bold text-blue-600 dark:text-blue-400">
+                                      {payload[0].value}건
+                                    </span>
                                   </div>
                                   <div className="flex justify-between items-center">
-                                    <span className="text-sm text-gray-600">평균 점수:</span>
-                                    <span className="font-bold text-green-600">{payload[0].payload.score}/5</span>
+                                    <span className="text-sm text-gray-600 dark:text-gray-400">평균 점수:</span>
+                                    <span className="font-bold text-green-600 dark:text-green-400">
+                                      {payload[0].payload.score}/5
+                                    </span>
                                   </div>
                                 </div>
                               </div>
@@ -181,41 +197,40 @@ export function FeedbackCategoryChart() {
                           return null
                         }}
                       />
-                      <Bar 
-                        dataKey="count" 
-                        fill={moodsyncTheme.chart.secondary} 
-                        radius={[6, 6, 0, 0]} 
-                        maxBarSize={60}
-                      />
+                      <Bar dataKey="count" fill={moodsyncTheme.chart.secondary} radius={[6, 6, 0, 0]} maxBarSize={60} />
                     </BarChart>
                   </ResponsiveContainer>
                 </ChartContainer>
               </div>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-              <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
+              <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-3 flex items-center gap-2">
+                <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 주요 인사이트
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-700">{data.reduce((acc, item) => acc + item.count, 0)}</p>
-                  <p className="text-sm text-gray-600">총 피드백 수</p>
+                  <p className="text-2xl font-bold text-gray-700 dark:text-gray-300">
+                    {data.reduce((acc, item) => acc + item.count, 0)}
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">총 피드백 수</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-700">
-                    {data.length > 0 ? Math.max(...data.map(item => item.count)) : 0}
+                  <p className="text-2xl font-bold text-gray-700 dark:text-gray-300">
+                    {data.length > 0 ? Math.max(...data.map((item) => item.count)) : 0}
                   </p>
-                  <p className="text-sm text-gray-600">최다 피드백</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">최다 피드백</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-700">
-                    {data.length > 0 ? (data.reduce((acc, item) => acc + parseFloat(item.score), 0) / data.length).toFixed(1) : '0.0'}
+                  <p className="text-2xl font-bold text-gray-700 dark:text-gray-300">
+                    {data.length > 0
+                      ? (data.reduce((acc, item) => acc + Number.parseFloat(item.score), 0) / data.length).toFixed(1)
+                      : "0.0"}
                   </p>
-                  <p className="text-sm text-gray-600">전체 평균 점수</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">전체 평균 점수</p>
                 </div>
               </div>
             </div>

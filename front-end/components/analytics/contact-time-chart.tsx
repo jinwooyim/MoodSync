@@ -10,7 +10,7 @@ import {
   Title,
   Tooltip,
   Legend,
-  ChartOptions,
+  type ChartOptions,
 } from "chart.js"
 import { Line } from "react-chartjs-2"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -18,7 +18,7 @@ import { fetchContactAnalytics } from "@/lib/api/analytics"
 import { format } from "date-fns"
 import { ko } from "date-fns/locale"
 import { DatePicker } from "@/components/ui/date-picker"
-import { Loader2, Calendar, Clock } from "lucide-react"
+import { Clock } from "lucide-react"
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
@@ -51,6 +51,11 @@ export function ContactTimeChart() {
     fetchData()
   }, [date])
 
+  // Detect dark mode for chart styling
+  const isDarkMode = typeof window !== "undefined" && document.documentElement.classList.contains("dark")
+  const textColor = isDarkMode ? "#ffffff" : "#374151"
+  const gridColor = isDarkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.03)"
+
   const chartData = {
     labels,
     datasets: [
@@ -79,9 +84,9 @@ export function ContactTimeChart() {
         display: false,
       },
       tooltip: {
-        backgroundColor: "rgba(255, 255, 255, 0.95)",
-        titleColor: "#1f2937",
-        bodyColor: "#374151",
+        backgroundColor: isDarkMode ? "rgba(31, 41, 55, 0.95)" : "rgba(255, 255, 255, 0.95)",
+        titleColor: isDarkMode ? "#ffffff" : "#1f2937",
+        bodyColor: isDarkMode ? "#ffffff" : "#374151",
         titleFont: {
           family: "'Pretendard', sans-serif",
           size: 16,
@@ -94,7 +99,7 @@ export function ContactTimeChart() {
         padding: 16,
         cornerRadius: 12,
         boxPadding: 8,
-        borderColor: "rgba(0, 0, 0, 0.1)",
+        borderColor: isDarkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
         borderWidth: 1,
         displayColors: true,
         callbacks: {
@@ -111,9 +116,9 @@ export function ContactTimeChart() {
           font: {
             family: "'Pretendard', sans-serif",
             size: 12,
-            weight: "bold"
+            weight: "bold",
           },
-          color: "#374151",
+          color: textColor,
           padding: 8,
         },
         border: {
@@ -123,7 +128,7 @@ export function ContactTimeChart() {
       y: {
         beginAtZero: true,
         grid: {
-          color: "rgba(0, 0, 0, 0.03)",
+          color: gridColor,
         },
         ticks: {
           stepSize: 1,
@@ -131,7 +136,7 @@ export function ContactTimeChart() {
             family: "'Pretendard', sans-serif",
             size: 12,
           },
-          color: "#6b7280",
+          color: textColor,
           padding: 8,
         },
         border: {
@@ -168,16 +173,16 @@ export function ContactTimeChart() {
     .slice(0, 4)
 
   return (
-    <Card className="overflow-hidden w-full">
+    <Card className="overflow-hidden w-full bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-900/20">
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle className="text-xl font-bold flex items-center gap-3">
-            <div className="p-2 bg-gray-100 rounded-lg">
-              <Clock className="w-5 h-5 text-gray-700" />
+          <CardTitle className="text-xl font-bold flex items-center gap-3 text-gray-900 dark:text-white">
+            <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+              <Clock className="w-5 h-5 text-gray-700 dark:text-gray-300" />
             </div>
             시간대별 문의 수
           </CardTitle>
-          <CardDescription className="text-sm">
+          <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
             24시간 기준 문의 접수 현황 · {format(displayDate, "yyyy년 MM월 dd일", { locale: ko })} 기준
           </CardDescription>
         </div>
@@ -189,19 +194,31 @@ export function ContactTimeChart() {
         {loading ? (
           <div className="flex items-center justify-center h-[350px]">
             <div className="relative">
-              <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-200"></div>
-              <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-600 border-t-transparent absolute top-0"></div>
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-200 dark:border-indigo-800"></div>
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-600 dark:border-indigo-400 border-t-transparent absolute top-0"></div>
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-6 h-6 bg-indigo-600 rounded-full animate-pulse"></div>
+                <div className="w-6 h-6 bg-indigo-600 dark:bg-indigo-400 rounded-full animate-pulse"></div>
               </div>
             </div>
-            <span className="ml-4 text-lg font-medium text-gray-600">시간대별 데이터 분석 중...</span>
+            <span className="ml-4 text-lg font-medium text-gray-600 dark:text-gray-400">
+              시간대별 데이터 분석 중...
+            </span>
           </div>
         ) : error ? (
-          <div className="flex flex-col items-center justify-center h-[350px] text-gray-500">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-              <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          <div className="flex flex-col items-center justify-center h-[350px] text-gray-500 dark:text-gray-400">
+            <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+              <svg
+                className="w-12 h-12 text-gray-400 dark:text-gray-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
               </svg>
             </div>
             <p className="text-lg font-medium">{error}</p>
@@ -214,48 +231,50 @@ export function ContactTimeChart() {
               {topHours.map((hour) => (
                 <div
                   key={hour.label}
-                  className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300"
+                  className="bg-white dark:bg-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-md dark:hover:shadow-gray-900/20 transition-all duration-300"
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">{hour.label}</p>
-                      <p className="text-2xl font-bold text-indigo-600">{hour.value}</p>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{hour.label}</p>
+                      <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{hour.value}</p>
                     </div>
-                    <div className="w-3 h-3 rounded-full bg-indigo-600"></div>
+                    <div className="w-3 h-3 rounded-full bg-indigo-600 dark:bg-indigo-400"></div>
                   </div>
                 </div>
               ))}
             </div>
 
             {/* 메인 차트 */}
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
+            <div className="bg-white dark:bg-gray-700 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
               <div className="h-[350px] w-full">
                 <Line data={chartData} options={chartOptions} />
               </div>
             </div>
 
             {/* 하단 인사이트 */}
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-              <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
+              <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-3 flex items-center gap-2">
+                <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 주요 인사이트
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-700">{data.reduce((a, b) => a + b, 0)}</p>
-                  <p className="text-sm text-gray-600">총 문의 수</p>
+                  <p className="text-2xl font-bold text-gray-700 dark:text-gray-300">
+                    {data.reduce((a, b) => a + b, 0)}
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">총 문의 수</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-700">{Math.max(...data)}</p>
-                  <p className="text-sm text-gray-600">최대 문의 수</p>
+                  <p className="text-2xl font-bold text-gray-700 dark:text-gray-300">{Math.max(...data)}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">최대 문의 수</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-700">
+                  <p className="text-2xl font-bold text-gray-700 dark:text-gray-300">
                     {data.length > 0 ? (data.reduce((a, b) => a + b, 0) / data.length).toFixed(1) : "0.0"}
                   </p>
-                  <p className="text-sm text-gray-600">시간당 평균</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">시간당 평균</p>
                 </div>
               </div>
             </div>

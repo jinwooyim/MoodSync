@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { ChartContainer } from "@/components/ui/chart"
-import { Loader2, AlertTriangle, TrendingDown } from 'lucide-react'
+import { Loader2, AlertTriangle, TrendingDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { moodsyncTheme } from "@/lib/theme-config"
 
@@ -71,7 +71,7 @@ export function ChurnPredictionChart({ onAnalysisClick }: ChurnPredictionChartPr
     midAngle,
     innerRadius,
     outerRadius,
-    percent
+    percent,
   }: {
     cx: number
     cy: number
@@ -85,31 +85,23 @@ export function ChurnPredictionChart({ onAnalysisClick }: ChurnPredictionChartPr
     const y = cy + radius * Math.sin((-midAngle * Math.PI) / 180)
 
     return (
-      <text 
-        x={x} 
-        y={y} 
-        fill="white" 
-        textAnchor="middle" 
-        dominantBaseline="central" 
-        fontSize={14} 
-        fontWeight="bold"
-      >
+      <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" fontSize={14} fontWeight="bold">
         {`${(percent * 100).toFixed(0)}%`}
       </text>
     )
   }
 
   return (
-    <Card className="overflow-hidden w-full">
+    <Card className="overflow-hidden w-full bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-900/20">
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle className="text-xl font-bold flex items-center gap-3">
-            <div className="p-2 bg-gray-100 rounded-lg">
-              <TrendingDown className="w-5 h-5 text-gray-700" />
+          <CardTitle className="text-xl font-bold flex items-center gap-3 text-gray-900 dark:text-white">
+            <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+              <TrendingDown className="w-5 h-5 text-gray-700 dark:text-gray-300" />
             </div>
             사용자 이탈 예측
           </CardTitle>
-          <CardDescription className="text-sm">
+          <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
             머신러닝 기반 사용자 이탈 위험도 분석 · AI 예측 모델
           </CardDescription>
         </div>
@@ -117,11 +109,11 @@ export function ChurnPredictionChart({ onAnalysisClick }: ChurnPredictionChartPr
           variant="outline"
           size="sm"
           onClick={() => {
-            if(onAnalysisClick) onAnalysisClick()
+            if (onAnalysisClick) onAnalysisClick()
             loadChurnData()
           }}
           disabled={loading}
-          className="bg-white hover:bg-gray-100 text-gray-800 border-gray-300"
+          className="bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-white border-gray-300 dark:border-gray-600"
         >
           {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
           분석 실행
@@ -132,28 +124,33 @@ export function ChurnPredictionChart({ onAnalysisClick }: ChurnPredictionChartPr
         {loading ? (
           <div className="flex items-center justify-center h-[350px]">
             <div className="relative">
-              <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-200"></div>
-              <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-600 border-t-transparent absolute top-0"></div>
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-200 dark:border-indigo-800"></div>
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-600 dark:border-indigo-400 border-t-transparent absolute top-0"></div>
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-6 h-6 bg-indigo-600 rounded-full animate-pulse"></div>
+                <div className="w-6 h-6 bg-indigo-600 dark:bg-indigo-400 rounded-full animate-pulse"></div>
               </div>
             </div>
-            <span className="ml-4 text-lg font-medium text-gray-600">이탈 예측 분석 중...</span>
+            <span className="ml-4 text-lg font-medium text-gray-600 dark:text-gray-400">이탈 예측 분석 중...</span>
           </div>
         ) : error ? (
-          <div className="flex flex-col items-center justify-center h-[350px] text-gray-500">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-              <AlertTriangle className="w-12 h-12 text-gray-400" />
+          <div className="flex flex-col items-center justify-center h-[350px] text-gray-500 dark:text-gray-400">
+            <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+              <AlertTriangle className="w-12 h-12 text-gray-400 dark:text-gray-500" />
             </div>
             <p className="text-lg font-medium">{error}</p>
-            <Button variant="outline" size="sm" onClick={loadChurnData} className="mt-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={loadChurnData}
+              className="mt-3 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700"
+            >
               다시 시도
             </Button>
           </div>
         ) : data.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-[350px] text-gray-500">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-              <AlertTriangle className="w-12 h-12 text-gray-400" />
+          <div className="flex flex-col items-center justify-center h-[350px] text-gray-500 dark:text-gray-400">
+            <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+              <AlertTriangle className="w-12 h-12 text-gray-400 dark:text-gray-500" />
             </div>
             <p className="text-lg font-medium">이탈 예측 데이터가 없습니다</p>
             <p className="text-sm mt-1">분석을 실행해 주세요</p>
@@ -162,27 +159,24 @@ export function ChurnPredictionChart({ onAnalysisClick }: ChurnPredictionChartPr
           <div className="space-y-6">
             <div className="grid grid-cols-2 gap-4 mb-6">
               {data.map((item, index) => (
-                <div 
-                  key={item.name} 
-                  className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300"
+                <div
+                  key={item.name}
+                  className="bg-white dark:bg-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-md dark:hover:shadow-gray-900/20 transition-all duration-300"
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">{item.name}</p>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{item.name}</p>
                       <p className="text-2xl font-bold" style={{ color: COLORS[index] }}>
                         {item.value.toFixed(1)}%
                       </p>
                     </div>
-                    <div 
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: COLORS[index] }}
-                    />
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index] }} />
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
+            <div className="bg-white dark:bg-gray-700 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
               <div className="h-[350px] w-full">
                 <ChartContainer
                   config={{
@@ -207,28 +201,27 @@ export function ChurnPredictionChart({ onAnalysisClick }: ChurnPredictionChartPr
                         strokeWidth={3}
                       >
                         {data.map((entry, index) => (
-                          <Cell 
-                            key={`cell-${index}`} 
-                            fill={COLORS[index % COLORS.length]} 
-                          />
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
-                      <Tooltip 
+                      <Tooltip
                         formatter={(value: number) => [`${value.toFixed(1)}%`, ""]}
                         contentStyle={{
-                          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                          border: '1px solid rgba(0, 0, 0, 0.1)',
-                          borderRadius: '12px',
-                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                          fontFamily: "'Pretendard', sans-serif"
+                          backgroundColor: "rgba(31, 41, 55, 0.95)",
+                          border: "1px solid rgba(255, 255, 255, 0.1)",
+                          borderRadius: "12px",
+                          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                          fontFamily: "'Pretendard', sans-serif",
+                          color: "#ffffff",
                         }}
                       />
-                      <Legend 
-                        verticalAlign="bottom" 
+                      <Legend
+                        verticalAlign="bottom"
                         height={36}
                         wrapperStyle={{
                           fontFamily: "'Pretendard', sans-serif",
-                          fontSize: '14px'
+                          fontSize: "14px",
+                          color: "inherit",
                         }}
                       />
                     </PieChart>

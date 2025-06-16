@@ -469,7 +469,6 @@ app.post('/predict-churn-model', express.json(), async (req, res) => {
     // const inputData = req.body;
     const inputData = normalizeSingleInput(req.body);
 
-
     console.log(req.body);
 
     // 입력 데이터가 배열인지, 필수 키가 있는지 체크

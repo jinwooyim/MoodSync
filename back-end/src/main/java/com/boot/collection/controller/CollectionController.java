@@ -118,8 +118,8 @@ public class CollectionController {
 //        log.info("사용자 (ID: {}) 가 컬렉션 (ID: {}) 에 아이템 추가 요청.", userId, itemPayload.getCollectionId());
 
         try {
-            // 컬렉션 서비스 호출하여 아이템 추가
-            int result = collectionService.insertCollectionItem(itemPayload);
+            // 컬렉션 서비스 호출하여 아이템 추가(순서는0으로)
+            int result = collectionService.insertCollectionItemOrderZero(itemPayload);
 
             if (result > 0) {
                 return ResponseEntity.status(HttpStatus.CREATED).body("아이템이 컬렉션에 성공적으로 추가되었습니다.");
@@ -230,6 +230,7 @@ public class CollectionController {
     	
 //    	log.info("컬렉션 복사 요청 수신: originalCollectionId={}, 사용자={}", originalCollectionId, principalDetails != null ? principalDetails.getUsername() : "비인증");
         if (principalDetails == null) {
+//        	log.info("로그인노노");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 인증되지 않은 사용자
         }
         BasicUserDTO user = (BasicUserDTO) request.getAttribute("user");

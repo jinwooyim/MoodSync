@@ -1,4 +1,3 @@
-// components/Collection/CollectionCard.tsx
 import React, { useState, useEffect } from 'react';
 import type { Collection } from '@/types/collection';
 import { Music, Activity, Book, Share2 } from "lucide-react"
@@ -9,12 +8,15 @@ interface CollectionCardProps {
     onViewDetails: (collectionId: string) => void;
     onEdit?: (collection: Collection) => void;
     onDelete?: (collectionId: string) => void;
-    // ⭐ 새 props 추가: 수정 완료 메시지 트리거 ⭐
+    // ⭐ 기존 props 유지: 수정 완료 메시지 트리거 ⭐
     showEditSuccessMessage: boolean;
     onEditMessageShown: () => void;
-    // ⭐ 새 props 추가: 아이템 순서 변경 완료 메시지 트리거 ⭐
-    showReorderSuccessMessage: boolean; // 추가된 prop
-    onReorderMessageShown: () => void;  // 추가된 prop
+    // ⭐ 기존 props 유지: 아이템 순서 변경 완료 메시지 트리거 ⭐
+    showReorderSuccessMessage: boolean;
+    onReorderMessageShown: () => void;
+    // ⭐ 새 props 추가: 복사 완료 메시지 트리거 ⭐
+    showCopySuccessMessage: boolean;
+    onCopyMessageShown: () => void;
 }
 
 const CollectionCard: React.FC<CollectionCardProps> = ({
@@ -24,10 +26,12 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
     onDelete,
     showEditSuccessMessage,
     onEditMessageShown,
-    showReorderSuccessMessage, // props로 받도록 추가
-    onReorderMessageShown      // props로 받도록 추가
+    showReorderSuccessMessage,
+    onReorderMessageShown,
+    showCopySuccessMessage, // props로 받도록 추가
+    onCopyMessageShown // props로 받도록 추가
 }) => {
-    const [showCopiedMessage, setShowCopiedMessage] = useState(false);
+    // showCopiedMessage는 이제 showMessage에 통합되므로 제거
     const [showMessage, setShowMessage] = useState(false); // 단일 메시지 상태로 통합
     const [messageText, setMessageText] = useState(""); // 표시할 메시지 텍스트 상태
 
@@ -45,7 +49,7 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
         return () => clearTimeout(timer);
     };
 
-    // ⭐ useEffect를 사용하여 showEditSuccessMessage 및 showReorderSuccessMessage props 변화 감지 ⭐
+    // ⭐ useEffect를 사용하여 모든 메시지 props 변화 감지 및 처리 ⭐
     useEffect(() => {
         if (showEditSuccessMessage) {
             setMessageText("컬렉션이 성공적으로 수정되었습니다!");
@@ -56,7 +60,7 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
                 onEditMessageShown(); // 메시지가 사라진 후 부모에게 알림
             }, 1500);
             return () => clearTimeout(timer);
-        } else if (showReorderSuccessMessage) { // 아이템 순서 변경 메시지 로직 추가
+        } else if (showReorderSuccessMessage) {
             setMessageText("아이템 순서가 성공적으로 저장되었습니다!");
             setShowMessage(true);
             const timer = setTimeout(() => {
@@ -65,12 +69,21 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
                 onReorderMessageShown(); // 메시지가 사라진 후 부모에게 알림
             }, 1500);
             return () => clearTimeout(timer);
+        } else if (showCopySuccessMessage) { // ⭐ 복사 성공 메시지 로직 추가 ⭐
+            setMessageText("컬렉션이 나의 컬렉션으로 복사되었습니다!");
+            setShowMessage(true);
+            const timer = setTimeout(() => {
+                setShowMessage(false);
+                setMessageText("");
+                onCopyMessageShown(); // 메시지가 사라진 후 부모에게 알림
+            }, 1500);
+            return () => clearTimeout(timer);
         }
-    }, [showEditSuccessMessage, onEditMessageShown, showReorderSuccessMessage, onReorderMessageShown]); // 의존성 배열에 추가
+    }, [showEditSuccessMessage, onEditMessageShown, showReorderSuccessMessage, onReorderMessageShown, showCopySuccessMessage, onCopyMessageShown]); // 의존성 배열에 추가
 
     return (
         <motion.div
-            className="bg-white rounded-xl shadow p-6 flex flex-col relative" // relative 추가
+            className="bg-white rounded-xl shadow p-6 flex flex-col relative"
             whileHover={{ scale: 1.02 }}
             transition={{ type: "spring", stiffness: 400, damping: 20 }}
         >
@@ -136,13 +149,14 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
                     )}
                 </div>
             </div>
-            <div className="flex gap-2 mt-4"> {/* relative 클래스는 motion.div로 옮김 */}
+            <div className="flex gap-2 mt-4">
                 <button
                     className="text-indigo-600 hover:underline text-sm"
                     onClick={() => onViewDetails(String(collection.collectionId))}
                 >
                     상세보기
                 </button>
+                {/* Conditionally render the Edit button */}
                 {onEdit && (
                     <button
                         className="text-gray-500 hover:underline text-sm"
@@ -161,7 +175,7 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
                     </button>
                 )}
                 {collection.isPublic && (
-                    <div className="ml-auto"> {/* relative 클래스는 motion.div로 옮김 */}
+                    <div className="ml-auto">
                         <button
                             className="text-blue-500 hover:underline text-sm"
                             onClick={handleCopyShareLink}

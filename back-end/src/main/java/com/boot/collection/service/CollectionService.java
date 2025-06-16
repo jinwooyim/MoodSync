@@ -35,4 +35,7 @@ public interface CollectionService {
     //컬렉션 복사
     CollectionDTO copyCollection(int originalCollectionId, int userId);
     
+    //0넣기용
+    public int insertCollectionItemOrderZero(CollectionItemDTO collectionItem);
+    
 }

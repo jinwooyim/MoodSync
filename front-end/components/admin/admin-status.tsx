@@ -343,29 +343,29 @@ export function AdminStats() {
       </Card>
 
       {/* 시간대별 문의 수 - 감정 응집도와 같은 폭으로 길게 */}
-      <Card>
+      {/* <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-lg">시간대별 문의 수</CardTitle>
           <CardDescription className="text-sm">2025년 06월 13일 기준</CardDescription>
         </CardHeader>
-        <CardContent className="p-3">
-          <div className="h-[300px] w-full">
-            <ContactTimeChart />
-          </div>
-        </CardContent>
-      </Card>
+        <CardContent className="p-3"> */}
+        <div className="h-[300px] w-full">
+          <ContactTimeChart />
+        </div>
+        {/* </CardContent>
+      </Card> */}
 
       {/* 하단 2개 카드: 좌/우 나란히 배치 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="h-[650px]">
+        {/* <Card className="h-[650px]">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg">카테고리별 피드백</CardTitle>
             <CardDescription className="text-sm">2025년 06월 16일 기준</CardDescription>
           </CardHeader>
-          <CardContent className="p-3 h-[500px]">
+          <CardContent className="p-3 h-[500px]"> */}
             <FeedbackCategoryChart />
-          </CardContent>
-        </Card>
+          {/* </CardContent>
+        </Card> */}
 
         <Card className="h-[650px]">
           <CardHeader className="pb-2">

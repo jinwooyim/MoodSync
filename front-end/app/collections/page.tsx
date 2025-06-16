@@ -6,6 +6,7 @@ import type { Collection, CollectionItem } from "@/types/collection";
 import { fetchCollections, createCollection, updateCollection, deleteCollection, deleteCollectionItem, updateCollectionItemsFull } from "@/lib/api/collections";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTheme } from "next-themes"
 
 import {
     containerVariants,
@@ -19,6 +20,9 @@ import CollectionFormModal from "@/components/Collection/CollectionFormModal";
 import CollectionDetailModal from "@/components/Collection/CollectionDetailModal";
 
 export default function CollectionPage() {
+    const { theme, setTheme } = useTheme()
+      const [mounted, setMounted] = useState(false)
+    
     const [collections, setCollections] = useState<Collection[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -38,6 +42,7 @@ export default function CollectionPage() {
 
     const [collectionIdToShowCopyMessage, setCollectionIdToShowCopyMessage] = useState<string | null>(null);
     useEffect(() => {
+        setMounted(true);
         const loadCollections = async () => {
             setLoading(true);
             try {
@@ -239,13 +244,14 @@ export default function CollectionPage() {
     };
 
     return (
+        
         <motion.div
-            className="container mx-auto px-4 py-8"
+            className="container mx-auto px-4 py-8 "
             variants={containerVariants}
             initial="hidden"
             animate="visible"
         >
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-8 ">
                 <h1 className="text-3xl font-bold">나의 컬렉션</h1>
                 <div className="flex space-x-4">
                     <button

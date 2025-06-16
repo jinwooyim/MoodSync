@@ -19,11 +19,7 @@ export function DailyEmotionView({ allRecords }: DailyEmotionViewProps) {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    const adjustedDate = new Date(
-      selectedDate.getFullYear(),
-      selectedDate.getMonth(),
-      selectedDate.getDate()
-    )
+    const adjustedDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate())
 
     const selectedDateStr = format(adjustedDate, "yyyy-MM-dd")
 
@@ -45,20 +41,20 @@ export function DailyEmotionView({ allRecords }: DailyEmotionViewProps) {
   }, [selectedDate, allRecords])
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
       <div className="max-w-xs">
         <DateSelector selectedDate={selectedDate} onDateChange={setSelectedDate} />
       </div>
 
       {loading ? (
-        <div className="p-6 text-center text-muted-foreground">로딩 중...</div>
+        <div className="p-6 text-center text-gray-600 dark:text-gray-400">로딩 중...</div>
       ) : !selectedRecord ? (
-        <div className="p-6 text-center text-muted-foreground">해당 날짜의 데이터를 찾을 수 없습니다.</div>
+        <div className="p-6 text-center text-gray-600 dark:text-gray-400">해당 날짜의 데이터를 찾을 수 없습니다.</div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-6">
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <h2 className="text-xl font-semibold mb-4">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-200 dark:border-gray-700">
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
                 {format(selectedDate, "yyyy년 MM월 dd일", { locale: ko })}의 감정 상태
               </h2>
               <EmotionRadarChart record={selectedRecord} />
@@ -120,4 +116,3 @@ export function DailyEmotionView({ allRecords }: DailyEmotionViewProps) {
 //     </div>
 //   )
 // }
-

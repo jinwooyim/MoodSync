@@ -56,7 +56,8 @@ export default function CollectionPage() {
                 }
             } catch (e) {
                 if (e instanceof Error && e.message === 'Unauthorized') {
-                    window.alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+                    // alert가 두번 떠서 일단 주석 
+                    // window.alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
                     router.push('/user/login');
                     return;
                 }

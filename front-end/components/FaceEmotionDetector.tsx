@@ -140,9 +140,12 @@ export default function FaceEmotionDetector({ onEmotionDetected }: FaceEmotionDe
     // selectedEmotionData가 없으면 항상 Call to Action 카드 표시
     return (
       <div className="w-full h-full flex items-center justify-center text-center">
-        <Card className="shadow-none border-none cursor-pointer w-full h-full" onClick={() => setShowUpload(true)}>
+        <Card
+          className="shadow-none border-none cursor-pointer w-full h-full bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300"
+          onClick={() => setShowUpload(true)}
+        >
           <CardContent className="p-8 flex flex-col items-center justify-center h-full">
-            <ScanFace className="w-12 h-12 mx-auto mb-4 text-purple-500" />
+            <ScanFace className="w-12 h-12 mx-auto mb-4 text-purple-500 dark:text-purple-400" />
             <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white transition-colors duration-300">
               얼굴 감정 분석
             </h3>
@@ -156,8 +159,8 @@ export default function FaceEmotionDetector({ onEmotionDetected }: FaceEmotionDe
   }
 
   return (
-    <div>
-      <Card className="border-none shadow-none p-6">
+    <div className="bg-white dark:bg-gray-900 transition-colors duration-300">
+      <Card className="border-none shadow-none p-6 bg-white dark:bg-gray-900">
         <CardContent className="flex flex-col items-center justify-center p-0">
           <div className="w-full flex justify-start mb-4">
             <button
@@ -172,7 +175,7 @@ export default function FaceEmotionDetector({ onEmotionDetected }: FaceEmotionDe
 
           <>
             {/* 얼굴 감정 분석 UI */}
-            <ScanFace className="w-12 h-12 mx-auto mb-4 text-purple-500" />
+            <ScanFace className="w-12 h-12 mx-auto mb-4 text-purple-500 dark:text-purple-400" />
             <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-4 transition-colors duration-300">
               얼굴 감정 분석
             </h3>
@@ -243,7 +246,7 @@ export default function FaceEmotionDetector({ onEmotionDetected }: FaceEmotionDe
                   </p>
                 </div>
               ) : (
-                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md dark:shadow-gray-900/20 transition-colors duration-300">
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md dark:shadow-gray-900/20 border border-gray-200 dark:border-gray-700 transition-colors duration-300">
                   <div className="w-full flex justify-start mb-2">
                     <Button
                       variant="ghost"
@@ -262,7 +265,7 @@ export default function FaceEmotionDetector({ onEmotionDetected }: FaceEmotionDe
                     {Object.entries(mappedMoods).map(([mood, score]) => (
                       <div
                         key={mood}
-                        className="flex justify-between items-center bg-gray-50 dark:bg-gray-700 p-2 rounded-md shadow-sm transition-colors duration-300"
+                        className="flex justify-between items-center bg-gray-50 dark:bg-gray-700 p-2 rounded-md shadow-sm border border-gray-200 dark:border-gray-600 transition-colors duration-300"
                       >
                         <span className="font-medium text-gray-700 dark:text-gray-300 transition-colors duration-300">
                           {mood}:

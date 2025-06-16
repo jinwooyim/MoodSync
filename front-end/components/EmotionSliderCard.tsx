@@ -20,9 +20,11 @@ export default function EmotionSliderCard({
   // 슬라이더 표시 여부 상태 (초기에는 Call to Action 카드 상태)
   const [showSlider, setShowSlider] = useState<boolean>(false)
   const [emotionValue, setEmotionValue] = useState<number>(initialEmotionValue)
+
   useEffect(() => {
     setEmotionValue(initialEmotionValue)
   }, [initialEmotionValue]) // initialEmotionValue가 변경될 때마다 실행
+
   // 선택된 감정이 변경될 때 슬라이더 값을 초기화하거나 특정 값으로 설정합니다.
   useEffect(() => {
     if (selectedEmotionData) {
@@ -66,11 +68,11 @@ export default function EmotionSliderCard({
     return (
       <div className="w-full h-full flex items-center justify-center text-center">
         <Card
-          className="w-full h-full shadow-none border-none cursor-pointer transition-shadow duration-200"
+          className="w-full h-full shadow-none border-none cursor-pointer transition-all duration-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
           onClick={handleCardClick} // 클릭 이벤트 추가
         >
           <CardContent className="p-8 flex flex-col items-center justify-center h-full">
-            <Sparkles className="w-12 h-12 mx-auto mb-4 text-purple-500" />
+            <Sparkles className="w-12 h-12 mx-auto mb-4 text-purple-500 dark:text-purple-400" />
             <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white transition-colors duration-300">
               맞춤형 추천을 받아보세요
             </h3>
@@ -86,7 +88,7 @@ export default function EmotionSliderCard({
   // 슬라이더 UI
   return (
     <div className="w-full h-full flex items-center justify-center text-center">
-      <Card className="border-none shadow-none w-full h-full">
+      <Card className="border-none shadow-none w-full h-full bg-white dark:bg-gray-800 transition-colors duration-300">
         <CardContent className="p-8 flex flex-col items-center justify-center h-full">
           {/* 뒤로가기 버튼의 필요성을 못느껴서 주석 */}
           {/* <div className="w-full flex justify-start mb-4">
@@ -103,7 +105,7 @@ export default function EmotionSliderCard({
           {/* 감정 아이콘 또는 기본 슬라이더 아이콘 */}
           <CurrentEmotionIcon
             className={`w-12 h-12 mb-4 transition-colors duration-300
-              ${selectedEmotionData ? selectedEmotionData.color.split(" ")[1].replace("text-", "") : "text-blue-500"}
+              ${selectedEmotionData ? selectedEmotionData.color.split(" ")[1].replace("text-", "") : "text-blue-500 dark:text-blue-400"}
             `}
           />
 
@@ -116,7 +118,7 @@ export default function EmotionSliderCard({
             max={100}
             step={1}
             onValueChange={handleSliderChange}
-            className="w-full max-w-xs mb-4"
+            className="w-full max-w-xs mb-4 [&_[role=slider]]:bg-white [&_[role=slider]]:dark:bg-gray-700 [&_[role=slider]]:border-2 [&_[role=slider]]:border-purple-500 [&_[role=slider]]:dark:border-purple-400"
             disabled={!selectedEmotionData} // 감정이 선택되지 않으면 슬라이더 비활성화
           />
           <p className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-6 transition-colors duration-300">

@@ -106,7 +106,7 @@ export default function Footer() {
             </div>
           </div>
           <div className="border-t border-gray-200 dark:border-gray-700 mt-8 pt-8 text-center text-sm text-gray-600 dark:text-gray-400 transition-colors duration-300">
-            <p>&copy; 2024 MoodSync. All rights reserved.</p>
+            <p>&copy; 2025 MoodSync. All rights reserved.</p>
           </div>
         </div>
       </footer>

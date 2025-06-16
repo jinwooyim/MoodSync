@@ -24,19 +24,22 @@ import { fetchCohesiveEmotionStats } from "@/lib/api/emotion"
 import { DatePicker } from "../ui/date-picker"
 import { format } from "date-fns"
 
-import { Bar } from "react-chartjs-2"
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
+  PointElement,
+  LineElement, // <-- 추가
   BarElement,
   Title,
   Tooltip,
   Legend,
   ChartOptions,
 } from "chart.js"
+import { Line } from "react-chartjs-2"
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
+// ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
 interface Stats {
   totalContacts: number
@@ -152,22 +155,40 @@ export function AdminStats() {
     (emotion) => emotionColors[emotion] ?? emotionColors.default,
   )
 
-  const data = {
-    labels: emotions,
-    datasets: [
-      {
-        label: "응집도 값",
-        data: mostCohesiveValues,
-        backgroundColor: backgroundColors,
-        borderColor: backgroundColors.map((color) => color.replace("0.7", "1")),
-        borderWidth: 1,
-        borderRadius: 6,
-        maxBarThickness: 50,
-      },
-    ],
-  }
+  // const data = {
+  //   labels: emotions,
+  //   datasets: [
+  //     {
+  //       label: "응집도 값",
+  //       data: mostCohesiveValues,
+  //       backgroundColor: backgroundColors,
+  //       borderColor: backgroundColors.map((color) => color.replace("0.7", "1")),
+  //       borderWidth: 1,
+  //       borderRadius: 6,
+  //       maxBarThickness: 50,
+  //     },
+  //   ],
+  // }
+const data = {
+  labels: emotions,
+  datasets: [
+    {
+      label: "응집도 값",
+      data: mostCohesiveValues,
+      backgroundColor: backgroundColors,
+      borderColor: backgroundColors.map((color) => color.replace("0.7", "1")),
+      borderWidth: 2,
+      tension: 0.2, // 곡선 표현 강도
+      pointRadius: 8, // 포인트 크기
+      pointHoverRadius: 10, // 마우스 올렸을 때 더 크게
+      pointBackgroundColor: backgroundColors,
+      pointBorderColor: "#fff",
+    },
+  ],
+}
 
-  const options: ChartOptions<"bar"> = {
+
+  const options: ChartOptions<"line"> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -176,13 +197,13 @@ export function AdminStats() {
         labels: {
           font: {
             family: "'Pretendard', sans-serif",
-            size: 12,
+            size: 14,
           },
         },
       },
       title: {
         display: true,
-        text: "감정별 응집도 분석",
+        text: "감정별 응집도 분석 (꺾은 선)",
         font: {
           family: "'Pretendard', sans-serif",
           size: 16,
@@ -195,7 +216,7 @@ export function AdminStats() {
         bodyColor: "#333",
         titleFont: {
           family: "'Pretendard', sans-serif",
-          size: 14,
+          size: 20,
         },
         bodyFont: {
           family: "'Pretendard', sans-serif",
@@ -226,7 +247,6 @@ export function AdminStats() {
         beginAtZero: true,
         grid: {
           color: "rgba(0, 0, 0, 0.05)",
-          // drawBorder: false,
         },
         ticks: {
           font: {
@@ -248,8 +268,6 @@ export function AdminStats() {
       },
     },
     animation: {
-      // animateRotate: true,
-      // animateScale: true,
       duration: 1000,
       easing: "easeOutQuart",
     },
@@ -262,6 +280,7 @@ export function AdminStats() {
       },
     },
   }
+
 
   return (
     <div className="space-y-6">
@@ -320,7 +339,7 @@ export function AdminStats() {
           </div>
           <div className="flex items-center space-x-2">
             <Calendar className="h-4 w-4 text-muted-foreground" />
-            <DatePicker date={date} onDateChange={setDate as (date: Date | undefined) => void} placeholder="날짜 선택" /> 
+            <DatePicker date={date} onDateChange={setDate as (date: Date | undefined) => void} placeholder="날짜 선택" />
           </div>
         </CardHeader>
         <CardContent>
@@ -330,7 +349,9 @@ export function AdminStats() {
             </div>
           ) : emotions.length > 0 ? (
             <div className="h-[300px] w-full">
-              <Bar data={data} options={options} />
+              {/* <Bar data={data} options={options} /> */}
+              <Line data={data} options={options} />
+
             </div>
           ) : (
             <div className="flex items-center justify-center h-[300px] text-muted-foreground">
@@ -355,7 +376,7 @@ export function AdminStats() {
         </div>
       </div>
 
-      
+
     </div>
   )
 }

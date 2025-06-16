@@ -104,7 +104,7 @@ public class CollectionServiceImpl implements CollectionService {
 	public int insertCollectionItemOrderZero(CollectionItemDTO collectionItem) {
 		CollectionDAO dao = sqlSession.getMapper(CollectionDAO.class);
 		log.info("서비스: 컬렉션 아이템 추가 시도 - 컬렉션ID: {}, 제목: {}", collectionItem.getCollectionId(), collectionItem.getContentTitle());
-		collectionItem.setItemOrder(0);
+//		collectionItem.setItemOrder(0);
 		int result = dao.insertCollectionItem(collectionItem);
 		log.info("서비스: 컬렉션 아이템 추가 결과: {} rows", result);
 		return result;

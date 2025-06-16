@@ -83,7 +83,7 @@ export default function Header() {
                 홈
               </Link>
               <Link
-                href="/collections"
+                href="/collections/share"
                 className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
               >
                 컬렉션
@@ -156,7 +156,7 @@ export default function Header() {
               홈
             </Link>
             <Link
-              href="/collections"
+              href="/collections/share"
               className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               컬렉션

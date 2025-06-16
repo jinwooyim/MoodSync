@@ -35,6 +35,8 @@ export default function CollectionPage() {
     //수정/정렬 메시지를 보여줄 컬렉션 ID 상태 
     const [collectionIdToShowEditMessage, setCollectionIdToShowEditMessage] = useState<string | null>(null);
     const [collectionIdToShowReorderMessage, setCollectionIdToShowReorderMessage] = useState<string | null>(null);
+
+    const [collectionIdToShowCopyMessage, setCollectionIdToShowCopyMessage] = useState<string | null>(null);
     useEffect(() => {
         const loadCollections = async () => {
             setLoading(true);
@@ -67,6 +69,9 @@ export default function CollectionPage() {
         setEditingCollection(collection);
         setShowFormModal(true);
     };
+    const handleCopyMessageShown = useCallback(() => {
+        setCollectionIdToShowCopyMessage(null);
+    }, []);
 
     const handleFormSubmit = async (
         name: string,
@@ -298,6 +303,8 @@ export default function CollectionPage() {
                                     // ⭐ 이 부분 추가: 아이템 순서 변경 메시지 관련 prop 추가 ⭐
                                     showReorderSuccessMessage={collectionIdToShowReorderMessage === String(col.collectionId)}
                                     onReorderMessageShown={handleReorderMessageShown} // 이 부분이 누락되었을 수 있습니다.
+                                    showCopySuccessMessage={collectionIdToShowCopyMessage === String(col.collectionId)}
+                                    onCopyMessageShown={handleCopyMessageShown}
                                 />
                             </motion.div>
                         ))}

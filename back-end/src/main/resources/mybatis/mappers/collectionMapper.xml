@@ -91,7 +91,7 @@
             #{collectionId},
             #{contentTitle},
             #{contentType},
-            0
+            #{itemOrder}
         )
     </insert>
 

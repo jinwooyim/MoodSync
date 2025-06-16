@@ -88,7 +88,7 @@ const CollectionDetailModal: React.FC<CollectionDetailModalProps> = ({
             setIsCopying(true); // 복사 중 상태 활성화
             try {
                 await onCopyCollection(collection);
-                window.alert(`'${collection.name}' 컬렉션이 나의 컬렉션으로 복사되었습니다.`);
+                // window.alert(`'${collection.name}' 컬렉션이 나의 컬렉션으로 복사되었습니다.`);
                 onClose(); // 복사 성공 후 모달 닫기
             } catch (error) {
                 console.error("컬렉션 복사 중 오류 발생:", error);

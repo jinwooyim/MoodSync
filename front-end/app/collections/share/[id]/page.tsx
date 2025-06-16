@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState ,useCallback} from 'react';
 import { notFound } from 'next/navigation';
 import { fetchCollection, copyCollectionToMyCollections } from '@/lib/api/collections'; // ⭐ copyCollectionToMyCollections 임포트 ⭐
 import type { Collection } from '@/types/collection';
@@ -21,6 +21,8 @@ export default function CollectionSharePage({ params }: CollectionSharePageProps
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const router = useRouter(); // useRouter 훅 초기화
+    // ⭐ 새 상태 추가: 복사 완료 메시지 트리거용 ⭐
+    const [collectionIdToShowCopyMessage, setCollectionIdToShowCopyMessage] = useState<string | null>(null);
 
     useEffect(() => {
         const loadCollection = async () => {
@@ -62,14 +64,22 @@ export default function CollectionSharePage({ params }: CollectionSharePageProps
     const handleCopyCollection = async (collectionToCopy: Collection) => {
         try {
             await copyCollectionToMyCollections(String(collectionToCopy.collectionId));
-            // window.alert(`'${collectionToCopy.name}' 컬렉션이 나의 컬렉션으로 복사되었습니다.`);
-            handleCloseModal(); // 복사 성공 후 모달 닫기
-            router.push('/collections'); // ⭐ 복사 후 나의 컬렉션 페이지로 이동 (선택 사항) ⭐
+            // window.alert(`'${collectionToCopy.name}' 컬렉션이 나의 컬렉션으로 복사되었습니다.`); // alert 대신 메시지 상태 설정
+            setCollectionIdToShowCopyMessage(String(collectionToCopy.collectionId)); // 복사 완료 메시지 트리거
+            // handleCloseModal(); // 메시지 표시 후 자동으로 모달이 닫히도록 CollectionDetailModal에서 처리
+            // router.push('/collections'); // 복사 후 나의 컬렉션 페이지로 이동 (필요하다면)
         } catch (error) {
             console.error("컬렉션 복사 중 오류 발생:", error);
             window.alert('컬렉션 복사에 실패했습니다. 다시 로그인하거나 나중에 시도해주세요.');
         }
     };
+    // ⭐ 새 콜백 추가: 복사 메시지 표시 완료 후 호출될 함수 ⭐
+        const handleCopyMessageShown = useCallback(() => {
+            setCollectionIdToShowCopyMessage(null); // 메시지 표시 완료 후 ID 초기화
+            setIsModalOpen(false); // 모달 닫기 (메시지 표시 완료 후)
+            // setSelectedCollection(null); // 선택된 컬렉션 초기화
+            router.push('/collections'); // 나의 컬렉션 페이지로 이동 (복사 성공 시)
+        }, [router]);
 
     if (loading) {
         return <div className="flex justify-center items-center h-screen text-gray-600">로딩 중...</div>;

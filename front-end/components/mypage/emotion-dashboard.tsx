@@ -27,6 +27,7 @@ import { DailyEmotionView } from "@/components/mypage/daily-emotion-view"
 import { WeeklyTrendView } from "@/components/mypage/weekly-trend-view"
 import { WeeklyRecommendationsView } from "@/components/mypage/weekly-recommendations-view"
 
+import { useRouter } from "next/navigation"
 const menuItems = [
   {
     title: "일별 감정 차트",
@@ -43,6 +44,11 @@ const menuItems = [
     icon: BookOpen,
     id: "weekly-recommendations",
   },
+  {
+    title: "내 컬렉션으로 이동",
+    icon: BookOpen,
+    id: "collections",
+  },
 ]
 
 export function EmotionDashboard() {
@@ -51,7 +57,7 @@ export function EmotionDashboard() {
   const [allRecords, setAllRecords] = useState<UserRecord[]>([])
   const [loading, setLoading] = useState(true)
   const hasFetched = useRef(false)
-
+  const router = useRouter()
   useEffect(() => {
     // 1번만 실행되도록
     if (hasFetched.current) return
@@ -77,6 +83,13 @@ export function EmotionDashboard() {
     fetchData()
   }, [])
 
+  const handleMenuItemClick = (id: string) => {
+    if (id === "collections") {
+      router.push("/collections") // ⭐ '/collections' 경로로 이동 ⭐
+    } else {
+      setActiveView(id) // 다른 메뉴 아이템은 기존대로 activeView 상태 변경
+    }
+  }
   const renderContent = () => {
     if (loading) {
       return (
@@ -137,8 +150,8 @@ export function EmotionDashboard() {
                       <SidebarMenuItem key={item.id}>
                         <SidebarMenuButton
                           asChild
-                          isActive={activeView === item.id}
-                          onClick={() => setActiveView(item.id)}
+                          isActive={item.id !== "collections" && activeView === item.id} 
+                          onClick={() => handleMenuItemClick(item.id)}
                           className="hover:bg-gray-100 dark:hover:bg-gray-700 data-[active=true]:bg-pink-100 dark:data-[active=true]:bg-pink-900/30 data-[active=true]:text-pink-700 dark:data-[active=true]:text-pink-300 transition-colors duration-300"
                         >
                           <button className="flex items-center gap-2 text-gray-700 dark:text-gray-300 transition-colors duration-300">

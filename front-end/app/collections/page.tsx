@@ -98,12 +98,10 @@ export default function CollectionPage() {
                     description,
                     isPublic,
                 });
-                // ⭐ 수정 성공 시 메시지 표시 트리거 ⭐
                 setCollectionIdToShowEditMessage(collectionId);
-                // window.alert("컬렉션이 성공적으로 수정되었습니다."); // 기존 alert 제거
             } else {
                 await createCollection({ name, description, isPublic });
-                window.alert("컬렉션이 성공적으로 생성되었습니다."); // 생성 시에는 alert 유지
+                window.alert("컬렉션이 성공적으로 생성되었습니다."); 
             }
 
             setShowFormModal(false);

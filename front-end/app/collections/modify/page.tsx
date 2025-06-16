@@ -58,7 +58,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     ) => {
         try {
             if (collectionId) {
-                // 기존 컬렉션 수정
                 const collectionIdAsNumber = Number(collectionId);
                 if (isNaN(collectionIdAsNumber)) {
                     window.alert("수정할 컬렉션 ID가 유효하지 않습니다. 다시 시도해주세요.");
@@ -72,14 +71,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 });
                 window.alert("컬렉션이 성공적으로 수정되었습니다.");
             } else {
-                // 새 컬렉션 생성
                 await createCollection({ name, description, isPublic });
-                // window.alert("컬렉션이 성공적으로 생성되었습니다.");
             }
 
-            setShowFormModal(false); // 모달 닫기
-            setEditingCollection(null); // 수정 중인 컬렉션 초기화
-            // ⭐ 생성 또는 수정 후 항상 전체 컬렉션을 새로고침하여 안정적인 ID를 확보 ⭐
+            setShowFormModal(false); 
+            setEditingCollection(null); 
+            //수정하고 다시 불러옴
             await refetchCollections();
         } catch (e: any) {
             console.error("API 호출 중 오류 발생:", e);

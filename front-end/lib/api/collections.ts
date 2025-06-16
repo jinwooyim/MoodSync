@@ -111,7 +111,7 @@ export async function addCollectionItemToExisting(collectionId: number, itemDto:
     // collectionId는 이제 URL 경로가 아닌, itemDto 내부에 포함됩니다.
     // 기존 itemDto에 collectionId가 이미 있거나, 없으면 새로 추가합니다.
     const payload = { ...itemDto, collectionId: collectionId };
-    const res = await api.post(`/api/collections/add-item`, payload); // ⭐ 엔드포인트 변경 ⭐
+    const res = await api.post(`/api/collections/add-item`, payload); 
     return res.data;
 }
 

@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Music, CheckSquare, Book } from 'lucide-react'
+import { Music, CheckSquare, Book } from "lucide-react"
 
 import { useState, useEffect } from "react"
 import type { MusicRecommendation, ActivityRecommendation, BookRecommendation } from "@/types"
@@ -50,7 +50,7 @@ export default function RecommendationList({
 
   // 추천 결과가 변경될 때마다 애니메이션을 다시 트리거
   useEffect(() => {
-    setAnimationKey(prev => prev + 1)
+    setAnimationKey((prev) => prev + 1)
   }, [musicRecommendations, activityRecommendations, bookRecommendations])
 
   const [recommendationType, setRecommendationType] = useState<"music" | "activity" | "book">("music")
@@ -147,7 +147,7 @@ export default function RecommendationList({
           </Badge>
         ) : (
           <Badge
-            className={`${emotionUsedForDisplay.color} transition-colors duration-300 dark:bg-gray-600 dark:text-gray-200`}
+            className={`${emotionUsedForDisplay.color} transition-colors duration-300 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600`}
           >
             추천 기준 감정: {emotionUsedForDisplay.name}
           </Badge>
@@ -159,24 +159,24 @@ export default function RecommendationList({
         onValueChange={(value) => setRecommendationType(value as "music" | "activity" | "book")}
         className="w-full"
       >
-        <TabsList className="grid w-full grid-cols-3 max-w-md mx-auto bg-muted dark:bg-gray-700 transition-colors duration-300">
+        <TabsList className="grid w-full grid-cols-3 max-w-md mx-auto bg-gray-100 dark:bg-gray-800 border dark:border-gray-700 transition-colors duration-300">
           <TabsTrigger
             value="music"
-            className="flex items-center gap-2 data-[state=active]:bg-background dark:data-[state=active]:bg-gray-600 transition-colors duration-300"
+            className="flex items-center gap-2 text-gray-600 dark:text-gray-300 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-gray-900 dark:data-[state=active]:text-gray-100 transition-colors duration-300"
           >
             <Music className="w-4 h-4" />
             음악 추천
           </TabsTrigger>
           <TabsTrigger
             value="activity"
-            className="flex items-center gap-2 data-[state=active]:bg-background dark:data-[state=active]:bg-gray-600 transition-colors duration-300"
+            className="flex items-center gap-2 text-gray-600 dark:text-gray-300 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-gray-900 dark:data-[state=active]:text-gray-100 transition-colors duration-300"
           >
             <CheckSquare className="w-4 h-4" />
             활동 추천
           </TabsTrigger>
           <TabsTrigger
             value="book"
-            className="flex items-center gap-2 data-[state=active]:bg-background dark:data-[state=active]:bg-gray-600 transition-colors duration-300"
+            className="flex items-center gap-2 text-gray-600 dark:text-gray-300 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-gray-900 dark:data-[state=active]:text-gray-100 transition-colors duration-300"
           >
             <Book className="w-4 h-4" />
             도서 추천

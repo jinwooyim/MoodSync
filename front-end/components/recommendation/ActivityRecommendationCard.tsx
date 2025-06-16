@@ -34,7 +34,7 @@ export default function ActivityRecommendationCard({
     <Card
       className={`
         hover:shadow-lg dark:hover:shadow-gray-900/20 transition-all duration-500 
-        bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600
+        bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600
         transform transition-all duration-700 ease-out
         ${isVisible ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-75 translate-y-8"}
       `}
@@ -51,11 +51,18 @@ export default function ActivityRecommendationCard({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Badge variant="secondary" className="dark:bg-gray-600 dark:text-gray-200 transition-colors duration-300">
+        <Badge
+          variant="secondary"
+          className="bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200 transition-colors duration-300"
+        >
           {activity.type}
         </Badge>
         <div className="flex space-x-2 mt-4">
-          <Button className="w-full" variant="outline" onClick={() => onAddToCollection(activity, "activity")}>
+          <Button
+            className="w-full border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300"
+            variant="outline"
+            onClick={() => onAddToCollection(activity, "activity")}
+          >
             <Inbox className="w-4 h-4 mr-2" />
             컬렉션에 추가
           </Button>

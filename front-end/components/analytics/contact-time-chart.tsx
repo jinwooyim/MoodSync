@@ -56,7 +56,7 @@ export function ContactTimeChart() {
         </div>
         <DatePicker date={date} onDateChange={setDate} placeholder="날짜 선택 (기본: 오늘)" />
       </CardHeader>
-      <CardContent className="h-[300px] pt-4 px-2">
+      <CardContent className="h-[800px] pt-4 px-2">
         {loading ? (
           <div className="flex h-full items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -74,7 +74,7 @@ export function ContactTimeChart() {
               },
             }}
           >
-            <ResponsiveContainer width="99%" height="99%">
+            <ResponsiveContainer width="99%" height={280}>
               <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
                 <CartesianGrid vertical={false} strokeDasharray="3 3" />
                 <XAxis
@@ -87,7 +87,7 @@ export function ContactTimeChart() {
                 />
                 <YAxis tickLine={false} axisLine={false} tickMargin={8} tick={{ fontSize: 10 }} />
                 <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                <Bar dataKey="count" fill={moodsyncTheme.chart.primary} radius={[4, 4, 0, 0]} maxBarSize={30} />
+                <Bar dataKey="count" fill={moodsyncTheme.chart.primary} radius={[4, 4, 0, 0]} maxBarSize={40} />
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>

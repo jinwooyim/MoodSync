@@ -125,6 +125,7 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
             {/* 핵심 가치 */}
             <section>
               <h3 className="text-xl font-semibold mb-4">핵심 가치</h3>
+              
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center flex-shrink-0">

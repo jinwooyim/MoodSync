@@ -178,7 +178,7 @@ const data = {
       backgroundColor: backgroundColors,
       borderColor: backgroundColors.map((color) => color.replace("0.7", "1")),
       borderWidth: 2,
-      tension: 0.2, // 곡선 표현 강도
+      tension: 0.3, // 곡선 표현 강도
       pointRadius: 8, // 포인트 크기
       pointHoverRadius: 10, // 마우스 올렸을 때 더 크게
       pointBackgroundColor: backgroundColors,

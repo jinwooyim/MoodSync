@@ -442,18 +442,6 @@ app.post('/predict', express.json(), async (req, res) => {
   }
 });
 
-
-// 정규화 함수 추가 (기존 코드 위쪽에 선언)
-// function normalizeFeatures(features) {
-//   return features.map(row => {
-//     const [score, recommend, recent] = row;
-//     return [
-//       score / 5,         // FEEDBACK_SCORE: 0 ~ 5 → 0 ~ 1
-//       recommend / 10,    // RECOMMEND_COUNT: 0 ~ 10 → 0 ~ 1
-//       recent / 5         // RECENT_ACTIVITY_COUNT: 0 ~ 5 → 0 ~ 1
-//     ];
-//   });
-// }
 function normalizeSingleInput(input) {
   return {
     feedbackScore: input.feedbackScore / 5,

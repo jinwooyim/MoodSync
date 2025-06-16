@@ -34,4 +34,6 @@ public interface CollectionDAO {
 
     // CollectionItem의 itemOrder를 업데이트 (개별 업데이트)
     int updateCollectionItemOrder(@Param("collectionItemId") Long collectionItemId, @Param("itemOrder") Integer itemOrder);
+    
+    List<CollectionDTO> shareCollectionsIsPublic();
 }

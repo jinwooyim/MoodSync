@@ -13,6 +13,7 @@ interface CollectionDetailModalProps {
     onDeleteItem?: (collectionId: string, itemId: string) => Promise<void>;
     // 변경: onReorderItems는 여전히 Promise<void>를 반환합니다.
     onReorderItems?: (collectionId: string, newItems: CollectionItem[]) => Promise<void>; 
+    onCopyCollection?: (collection: Collection) => Promise<void>; 
 }
 
 const CollectionDetailModal: React.FC<CollectionDetailModalProps> = ({
@@ -21,11 +22,11 @@ const CollectionDetailModal: React.FC<CollectionDetailModalProps> = ({
     collection,
     onDeleteItem,
     onReorderItems, 
+    onCopyCollection, 
 }) => {
-    // 모달 내부에서 아이템 순서 변경을 관리할 상태
     const [items, setItems] = useState<CollectionItem[]>([]);
-    // 변경 사항이 있는지 추적하는 상태 (저장 버튼 활성화/비활성화용)
     const [isChanged, setIsChanged] = useState(false);
+    const [isCopying, setIsCopying] = useState(false); 
 
     // collection prop이 변경될 때마다 items 상태를 초기화하고 정렬합니다.
     useEffect(() => {
@@ -79,6 +80,24 @@ const CollectionDetailModal: React.FC<CollectionDetailModalProps> = ({
             }
         } else {
             console.warn("onDeleteItem prop이 제공되지 않아 아이템 삭제 기능을 사용할 수 없습니다.");
+        }
+    };
+    
+        const handleCopyMyCollection = async () => {
+        if (onCopyCollection && collection) {
+            setIsCopying(true); // 복사 중 상태 활성화
+            try {
+                await onCopyCollection(collection);
+                window.alert(`'${collection.name}' 컬렉션이 나의 컬렉션으로 복사되었습니다.`);
+                onClose(); // 복사 성공 후 모달 닫기
+            } catch (error) {
+                console.error("컬렉션 복사 중 오류 발생:", error);
+                window.alert('컬렉션 복사에 실패했습니다.');
+            } finally {
+                setIsCopying(false); // 복사 중 상태 비활성화
+            }
+        } else {
+            console.warn("onCopyCollection prop이 제공되지 않았거나 collection이 유효하지 않습니다.");
         }
     };
 
@@ -270,27 +289,24 @@ const CollectionDetailModal: React.FC<CollectionDetailModalProps> = ({
                             이 컬렉션은 {collection.userName || ''}님의 컬렉션입니다.
                         </p>
                         <div className="flex space-x-2">
-                            {/* <button
-                                className="px-5 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                onClick={() => {
-                                    // onReorderItems가 있고 변경 사항이 있을 때만 경고 메시지 표시
-                                    if (onReorderItems && isChanged && !window.confirm("저장되지 않은 변경 사항이 있습니다. 정말 취소하고 닫으시겠습니까?")) {
-                                        return;
-                                    }
-                                    onClose(); // 모달 닫기
-                                }}
-                            >
-                                취소
-                            </button> */}
-                            {/* 저장 버튼은 onReorderItems prop이 있을 때만 렌더링하고, 변경 사항이 있을 때만 활성화 */}
-                            {onReorderItems && (
+                            {onReorderItems && (onDeleteItem) ? ( // onReorderItems와 onDeleteItem이 모두 있을 때 (내 컬렉션 관리 모드)
                                 <button
                                     className={`px-5 py-2 rounded-lg ${isChanged ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
                                     onClick={handleSave}
-                                    disabled={!isChanged} 
+                                    disabled={!isChanged}
                                 >
                                     저장
                                 </button>
+                            ) : ( 
+                                onCopyCollection && ( // onCopyCollection prop이 있을 때만 버튼 렌더링
+                                    <button
+                                        className="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white"
+                                        onClick={handleCopyMyCollection}
+                                        disabled={isCopying} // 복사 중일 때 버튼 비활성화
+                                    >
+                                        {isCopying ? '복사 중...' : '내 컬렉션으로 복사'}
+                                    </button>
+                                )
                             )}
                         </div>
                     </div>

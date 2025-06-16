@@ -4,6 +4,9 @@
     
 <mapper namespace="com.boot.collection.dao.CollectionDAO">
     <insert id="insertCollection" parameterType="com.boot.collection.dto.CollectionDTO">
+    <selectKey keyProperty="collectionId" resultType="int" order="AFTER">
+        SELECT MAX(collectionId) FROM collections WHERE userId = #{userId} AND name = #{name}
+    </selectKey>
         INSERT INTO collections (collectionId, userId, name, description, isPublic) 
         VALUES (
             (SELECT NVL(MAX(collectionId), 0) + 1 FROM collections),
@@ -145,5 +148,21 @@
         SET itemOrder = #{itemOrder}
         WHERE collectionItemId = #{collectionItemId}
     </update>
+    
+    <select id="shareCollectionsIsPublic" resultType="com.boot.collection.dto.CollectionDTO">
+	    SELECT
+            c.collectionId,
+            c.userId,
+            c.name,
+            c.description,
+            c.isPublic,
+            c.createdAt,
+            c.updatedAt,
+            ui.userName 
+        FROM collections c
+        LEFT JOIN user_info ui ON c.userId = ui.userNumber
+        WHERE ISPUBLIC=1
+        ORDER BY updatedAt DESC
+	</select>
 	
 </mapper>

@@ -130,8 +130,24 @@ export function AdminStats() {
     default: "rgba(99, 102, 241, 0.7)",
   }
 
-  const backgroundColors = emotions.map((emotion) => emotionColors[emotion] ?? emotionColors.default)
+  const backgroundColors = emotions.map(
+    (emotion) => emotionColors[emotion] ?? emotionColors.default,
+  )
 
+  // const data = {
+  //   labels: emotions,
+  //   datasets: [
+  //     {
+  //       label: "응집도 값",
+  //       data: mostCohesiveValues,
+  //       backgroundColor: backgroundColors,
+  //       borderColor: backgroundColors.map((color) => color.replace("0.7", "1")),
+  //       borderWidth: 1,
+  //       borderRadius: 6,
+  //       maxBarThickness: 50,
+  //     },
+  //   ],
+  // }
   const data = {
     labels: emotions,
     datasets: [
@@ -141,14 +157,15 @@ export function AdminStats() {
         backgroundColor: backgroundColors,
         borderColor: backgroundColors.map((color) => color.replace("0.7", "1")),
         borderWidth: 2,
-        tension: 0.2,
-        pointRadius: 8,
-        pointHoverRadius: 10,
+        tension: 0.3, // 곡선 표현 강도
+        pointRadius: 8, // 포인트 크기
+        pointHoverRadius: 10, // 마우스 올렸을 때 더 크게
         pointBackgroundColor: backgroundColors,
         pointBorderColor: "#fff",
       },
     ],
   }
+
 
   const options: ChartOptions<"line"> = {
     responsive: true,
@@ -244,81 +261,81 @@ export function AdminStats() {
   }
 
   return (
-  <div className="space-y-6">
-    {/* Stats Cards */}
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-      {/* 기존 카드 4개 그대로 유지 */}
-    </div>
+    <div className="space-y-6">
+      {/* Stats Cards */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {/* 기존 카드 4개 그대로 유지 */}
+      </div>
 
-    {/* 감정 응집도 시각화 - 가로로 길게 */}
-    <Card className="overflow-hidden w-full">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>감정 응집도 시각화</CardTitle>
-          <CardDescription>각 감정별 가장 응집된 감정과 응집도 값 표시</CardDescription>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Calendar className="h-4 w-4 text-muted-foreground" />
-          <DatePicker
-            date={date}
-            onDateChange={setDate as (date: Date | undefined) => void}
-            placeholder="날짜 선택"
-          />
-        </div>
-      </CardHeader>
-      <CardContent>
-        {emotionLoading ? (
-          <div className="flex items-center justify-center h-[300px]">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      {/* 감정 응집도 시각화 - 가로로 길게 */}
+      <Card className="overflow-hidden w-full">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>감정 응집도 시각화</CardTitle>
+            <CardDescription>각 감정별 가장 응집된 감정과 응집도 값 표시</CardDescription>
           </div>
-        ) : emotions.length > 0 ? (
+          <div className="flex items-center space-x-2">
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <DatePicker
+              date={date}
+              onDateChange={setDate as (date: Date | undefined) => void}
+              placeholder="날짜 선택"
+            />
+          </div>
+        </CardHeader>
+        <CardContent>
+          {emotionLoading ? (
+            <div className="flex items-center justify-center h-[300px]">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+          ) : emotions.length > 0 ? (
+            <div className="h-[300px] w-full">
+              <Line data={data} options={options} />
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+              <p>선택한 날짜에 대한 감정 데이터가 없습니다.</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* 시간대별 문의 수 - 감정 응집도와 같은 폭으로 길게 */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg">시간대별 문의 수</CardTitle>
+          <CardDescription className="text-sm">2025년 06월 13일 기준</CardDescription>
+        </CardHeader>
+        <CardContent className="p-3">
           <div className="h-[300px] w-full">
-            <Line data={data} options={options} />
+            <ContactTimeChart />
           </div>
-        ) : (
-          <div className="flex items-center justify-center h-[300px] text-muted-foreground">
-            <p>선택한 날짜에 대한 감정 데이터가 없습니다.</p>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-
-    {/* 시간대별 문의 수 - 감정 응집도와 같은 폭으로 길게 */}
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg">시간대별 문의 수</CardTitle>
-        <CardDescription className="text-sm">2025년 06월 13일 기준</CardDescription>
-      </CardHeader>
-      <CardContent className="p-3">
-        <div className="h-[300px] w-full">
-          <ContactTimeChart />
-        </div>
-      </CardContent>
-    </Card>
-
-    {/* 하단 2개 카드: 좌/우 나란히 배치 */}
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <Card className="h-[650px]">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg">카테고리별 피드백</CardTitle>
-          <CardDescription className="text-sm">2025년 06월 16일 기준</CardDescription>
-        </CardHeader>
-        <CardContent className="p-3 h-[500px]">
-          <FeedbackCategoryChart />
         </CardContent>
       </Card>
 
-      <Card className="h-[650px]">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg">사용자 이탈 예측</CardTitle>
-          <CardDescription className="text-sm">머신러닝 기반 사용자 이탈 위험도 분석</CardDescription>
-        </CardHeader>
-        <CardContent className="p-3 h-[500px]">
-          <ChurnPredictionChart />
-        </CardContent>
-      </Card>
+      {/* 하단 2개 카드: 좌/우 나란히 배치 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="h-[650px]">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">카테고리별 피드백</CardTitle>
+            <CardDescription className="text-sm">2025년 06월 16일 기준</CardDescription>
+          </CardHeader>
+          <CardContent className="p-3 h-[500px]">
+            <FeedbackCategoryChart />
+          </CardContent>
+        </Card>
+
+        <Card className="h-[650px]">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">사용자 이탈 예측</CardTitle>
+            <CardDescription className="text-sm">머신러닝 기반 사용자 이탈 위험도 분석</CardDescription>
+          </CardHeader>
+          <CardContent className="p-3 h-[500px]">
+            <ChurnPredictionChart />
+          </CardContent>
+        </Card>
+      </div>
     </div>
-  </div>
-)
+  )
 
 }

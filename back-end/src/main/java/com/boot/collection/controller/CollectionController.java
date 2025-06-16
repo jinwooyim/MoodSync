@@ -210,11 +210,45 @@ public class CollectionController {
     @PutMapping("/{collectionId}/items/full-update")
     public ResponseEntity<Void> updateCollectionItems(@PathVariable Long collectionId,
                                                       @RequestBody List<ItemIdsInOrderRequest> updatedItems) {
-    	log.info("collectionId 는 옴=>"+collectionId);
-    	log.info("updatedItems 가 안 옴=>"+updatedItems);
+//    	log.info("collectionId 는 옴=>"+collectionId);
+//    	log.info("updatedItems 가 안 옴=>"+updatedItems);
         collectionService.updateAllItemsOrder(collectionId, updatedItems); // 서비스 메서드 이름 변경 고려
         return ResponseEntity.ok().build();
     }
     
+    //isPublic =1 인(공개상태인) 컬렉션 가져옴
+    @GetMapping("/public") 
+    public List<CollectionDTO> shareCollectionsIsPublic() {
+        return collectionService.shareCollectionsIsPublic();
+    }
+        
+    @PostMapping("/copy/{originalCollectionId}")
+    public ResponseEntity<CollectionDTO> copyCollectionAndItems(
+    		@PathVariable("originalCollectionId") int originalCollectionId,
+            @AuthenticationPrincipal PrincipalDetails principalDetails// 경로 변수로 originalCollectionId 받음
+            , HttpServletRequest request) { // 로그인 정보
+    	
+//    	log.info("컬렉션 복사 요청 수신: originalCollectionId={}, 사용자={}", originalCollectionId, principalDetails != null ? principalDetails.getUsername() : "비인증");
+        if (principalDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 인증되지 않은 사용자
+        }
+        BasicUserDTO user = (BasicUserDTO) request.getAttribute("user");
+        
+        int currentUserId = user.getUserNumber();
+
+        try {
+            // 서비스 호출: 기존 컬렉션을 복사하여 새 컬렉션 생성
+            CollectionDTO newCollection = collectionService.copyCollection(originalCollectionId, currentUserId);
+            log.info("컬렉션 복사 성공: originalCollectionId={} -> newCollectionId={}", originalCollectionId, newCollection.getCollectionId());
+            return ResponseEntity.ok(newCollection); // 성공 시 200 OK와 함께 새 컬렉션 반환
+        } catch (IllegalArgumentException e) {
+            // 컬렉션을 찾을 수 없거나 다른 유효성 검사 오류
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        } catch (Exception e) {
+            // 기타 서버 오류
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
     
 }

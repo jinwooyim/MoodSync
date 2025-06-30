@@ -1,4 +1,5 @@
-# 🧠 MoodSync - Emotion-based Recommendation System
+# 🧠 MoodSync
+## Emotion-based Recommendation System
 
 **MoodSync**는 사용자의 감정 데이터를 기반으로 맞춤형 활동, 책, 음악을 추천하는 통합 감정 분석 플랫폼입니다.  
 사용자의 감정 상태를 정량화하고, AI 모델을 통해 분석하며, 정서적 웰빙을 위한 맞춤형 콘텐츠를 제공합니다.

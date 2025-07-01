@@ -65,7 +65,7 @@
 
 <details>
   <summary>전체적인 UI/UX 보기</summary>
-  <iframe width="560" height="315" src="https://www.youtube.com/embed/영상ID" frameborder="0" allowfullscreen></iframe>
+  <iframe width="560" height="315" src="https://www.youtube.com/watch?v=yigIkC7Lgto" frameborder="0" allowfullscreen></iframe>
 </details>
 
 <details>

@@ -6,7 +6,7 @@
 
 ---
 ## 📁 프로젝트 구조 (요약)
-
+<img src="images/MoodSync_desc.png" alt="포스터" width="500"/>
 ---
 
 ## 🌟 프로젝트 개요

@@ -27,7 +27,7 @@
 ---
 
 <details>
-<summary>🛠️ 기술 스택</summary>
+<summary><h2>🛠️ 기술 스택</h2></summary>
 
 ### 📌 Frontend
 - **Next.js**
@@ -51,7 +51,7 @@
 ---
 
 <details>
-<summary>📊 핵심 기능 설명</summary>
+<summary><h2>📊 핵심 기능 설명</h2></summary>
 
 ### ✅ 감정 기반 추천 시스템
 - 6가지 감정에 따라 콘텐츠 추천

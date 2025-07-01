@@ -11,7 +11,7 @@
 ---
 
 <details>
-<summary>🌟 프로젝트 개요</summary>
+<summary><h2>🌟 프로젝트 개요</h2></summary>
 
 - **프로젝트명**: MoodSync  
 - **목표**: 감정 데이터 기반의 맞춤형 콘텐츠 추천 및 사용자 감정 분석  

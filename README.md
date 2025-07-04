@@ -74,7 +74,17 @@
 
 <details>
   <summary>전체적인 UI/UX 보기</summary>
-  <iframe width="560" height="315" src="https://www.youtube.com/watch?v=yigIkC7Lgto" frameborder="0" allowfullscreen></iframe>
+  <p>메인 페이지 구성</p>
+  (images/mainpage.gif)
+
+  <p>계정 설정</p>
+  (images/account.gif)
+
+  <p>Footer</p>
+  (images/footer.gif)
+
+  <p>다크 모드</p>
+  (images/darkmode.gif)
 </details>
 
 <details>

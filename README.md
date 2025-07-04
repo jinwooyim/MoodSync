@@ -75,16 +75,16 @@
 <details>
   <summary>전체적인 UI/UX 보기</summary>
   <p>메인 페이지 구성</p>
-  (images/mainpage.gif)
+  ![](images/mainpage.gif)
 
   <p>계정 설정</p>
-  (images/account.gif)
+  ![](images/account.gif)
 
   <p>Footer</p>
-  (images/footer.gif)
+  ![](images/footer.gif)
 
   <p>다크 모드</p>
-  (images/darkmode.gif)
+  ![](images/darkmode.gif)
 </details>
 
 <details>

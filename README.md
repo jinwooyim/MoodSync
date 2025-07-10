@@ -65,7 +65,7 @@
 
 ## 🎬 시연 영상
 
-
+<details>
   <summary>전체적인 UI/UX 보기</summary>
   <p>메인 페이지 구성</p>
   

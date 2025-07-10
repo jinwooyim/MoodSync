@@ -1,7 +1,4 @@
 # 🧠 MoodSync
-
-![visitors](https://visitor-badge.glitch.me/badge?page_id=jinwooyim.MoodSync)
-
 ## Emotion-based Recommendation System
 
 **MoodSync**는 사용자의 감정 데이터를 기반으로 맞춤형 활동, 책, 음악을 추천하는 통합 감정 분석 플랫폼입니다.  

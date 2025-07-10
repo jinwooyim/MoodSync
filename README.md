@@ -155,7 +155,29 @@
 
 <details>
   <summary>✨마이페이지 보기</summary>
-  <iframe width="560" height="315" src="https://www.youtube.com/embed/영상ID" frameborder="0" allowfullscreen></iframe>
+  <h3>◈ 마이페이지 UI</h3>
+  <img src="images/mypage/mypage_UI2.png" alt="mypage_UI2" width="100%"/>
+  <img src="images/mypage/mypage_UI1.png" alt="mypage_UI1" width="100%"/>
+  
+  <h3>◈ 일자별 감정 차트 및 컨텐트 목록</h3>
+  <details>
+    <summary><h4>감정 분포 차트</h4></summary>
+    <img src="images/mypage/mypage_daily1.png" alt="mypage_daily1" width="100%"/>
+  </details>
+  <details>
+    <summary><h4>RecommendationList : Music</h4></summary>
+    <img src="images/mypage/mypage_daily2.png" alt="mypage_daily2" width="100%"/>
+  </details>
+  <details>
+    <summary><h4>RecommendationList : Activity & Book</h4></summary>
+    <img src="images/mypage/mypage_daily3.png" alt="mypage_daily3" width="100%"/>
+  </details>
+  
+  <h3>◈ 주간 감정 추세</h3>
+  <img src="images/mypage/mypage_week.png" alt="mypage_week" width="100%"/>
+
+  <h3>◈ 주간 추천 기록</h3>
+  <img src="images/mypage/mypage_week_using.png" alt="mypage_week_using" width="100%"/>  
 </details>
 
 <details>

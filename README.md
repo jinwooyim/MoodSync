@@ -116,6 +116,7 @@
 <img src="images/ERD.png" alt="ERD" width="100%"/>
 <details>
   <summary><h4> **테이블 세부 명세서** </h4></summary>
+  <img src="images/ERD_desc1.webp" alt="ERD" width="100%"/>
 </details>
 ---
 

@@ -88,10 +88,6 @@
   <h3>◈ 메인 페이지 구성</h3>
   <img src="images/total/main_page.png" alt="main_page" width="100%"/>
 
-  
-  <h3>◈ 메인 기능 UI</h3>
-  <img src="images/total/main_func.png" alt="main_func" width="100%"/>
-
 
   <h3>◈ 로그인/회원가입 UI</h3>
   <img src="images/total/main_join.png" alt="main_join" width="100%"/>
@@ -123,35 +119,38 @@
 <details>
   <summary>✨추천 요청하기 보기</summary>
   <h3>◈ 사용자 감정 입력 UI</h3>
+  <h4>감정 컨텐트</h4>
   <img src="images/recommendation/emotion_select_UI.png" alt="emotion_select_UI" width="100%"/>
+  <h4>입력 결과 사이드 탭</h4>
+  <img src="images/recommendation/emotion_selected_tab.png" alt="emotion_selected_tab" width="100%"/>
 
   
-  <h3>◈ 메인 기능 UI</h3>
-  <img src="images/total/main_func.png" alt="main_func" width="100%"/>
+  <h3>◈ 감정 입력 : SliderCard</h3>
+  <img src="images/recommendation/emotion_select_slider.png" alt="emotion_select_slider" width="100%"/>
+
+  <h3>◈ 감정 입력 : Face-API</h3>
+  <img src="images/recommendation/emotion_face2.png" alt="emotion_face2" width="100%"/>
+  <img src="images/recommendation/emotion_face1.png" alt="emotion_face1" width="100%"/>
 
 
-  <h3>◈ 로그인/회원가입 UI</h3>
-  <img src="images/total/main_join.png" alt="main_join" width="100%"/>
-
-
-  <h3>◈ Footer</h3>
+  <h3>◈ Recommendation</h3>
   <img src="images/total/footer_info.png" alt="footer_info" width="100%"/>
-    <details>
-      <summary><h4>개인정보 처리방침</h4></summary>
-      <img src="images/total/footer_info_rule.png" alt="footer_info_rule" width="100%"/>
-    </details>
-    <details>
-      <summary><h4>이용약관</h4></summary>
-      <img src="images/total/footer_info_using.png" alt="footer_info_using" width="100%"/>
-    </details>
-    <details>
-      <summary><h4>회사소개</h4></summary>
-      <img src="images/total/footer_info_company.png" alt="footer_info_company" width="100%"/>
-    </details>
-
-  
-  <h3>◈ 다크 모드</h3>
-  <img src="images/total/main_dark.png" alt="main_dark" width="100%"/>
+  <details>
+    <summary><h4>Music</h4></summary>
+    <img src="images/recommendation/recom_music.png" alt="recom_music" width="100%"/>
+    <img src="images/recommendation/music_content.png" alt="music_content" width="100%"/>
+    <img src="images/recommendation/music_content2.png" alt="music_content2" width="100%"/>
+  </details>
+  <details>
+    <summary><h4>Activity</h4></summary>
+    <img src="images/recommendation/recom_act.png" alt="recom_act" width="100%"/>
+  </details>
+  <details>
+    <summary><h4>Book</h4></summary>
+    <img src="images/recommendation/recom_book.png" alt="recom_book" width="100%"/>
+    <img src="images/recommendation/book_content.png" alt="book_content" width="100%"/>
+    <img src="images/recommendation/book_content2.png" alt="book_content2" width="100%"/>
+  </details>
 </details>
 
 <details>

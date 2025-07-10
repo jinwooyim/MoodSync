@@ -10,8 +10,7 @@
 
 ---
 
-<details>
-<summary><h2>🌟 프로젝트 개요</h2></summary>
+<h2>🌟 프로젝트 개요</h2>
 
 - **프로젝트명**: MoodSync   
 - **목표**: 감정 데이터 기반의 맞춤형 콘텐츠 추천 및 사용자 감정 분석  
@@ -22,7 +21,6 @@
   - 감정 기반 사용자 군집화 (Clustering)  
   - 사용자 이탈 가능성 예측 (Churn Prediction)  
 
-</details>
 
 ---
 

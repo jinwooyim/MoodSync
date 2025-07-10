@@ -149,7 +149,7 @@
 
 ---
 
-## 🗂️ 세부 설계서
+## 🗂️ 시스템 구조도
  <img src="images/system_structure.webp" alt="system_structure" width="100%"/>
 
 

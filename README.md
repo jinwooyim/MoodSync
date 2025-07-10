@@ -192,7 +192,19 @@
 
   <h4>나의 컬렉션</h4>
   <img src="images/collection/collection_my_UI.png" alt="collection_my_UI" width="100%"/>
+  
+  <h3>◈ 컬렉션 CRUD</h3>
+  <h4>컬렉션 content</h4>
+  <img src="images/collection/collection_content.png" alt="collection_content" width="100%"/>
 
+  <h4>새 컬렉션 생성</h4>
+  <img src="images/collection/collection_new.png" alt="collection_new" width="100%"/>
+
+  <h4>컬렉션 상세보기/h4>
+  <img src="images/collection/collection_desc.png" alt="collection_desc" width="100%"/>
+
+  <h4>컬렉션 수정모드</h4>
+  <img src="images/collection/collection_modify.png" alt="collection_modify" width="100%"/>
   
 </details>
 

@@ -6,7 +6,7 @@
 
 ---
 
-<img src="images/MoodSync_desc.png" alt="포스터" width="100%"/>
+<img src="images/MoodSync_desc.png" alt="포스터" width="100%"/> 
 
 ---
 

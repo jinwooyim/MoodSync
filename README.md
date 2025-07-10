@@ -85,12 +85,18 @@
 <details>
   <summary>전체적인 UI/UX 보기</summary>
   <p>메인 페이지 구성</p>
+  <img src="images/total/main_page.png" alt="main_page" width="100%"/>
   
-  <p>계정 설정</p>
+  <p>메인 기능 UI</p>
+  <img src="images/total/main_func.png" alt="main_func" width="100%"/>
+
+  <p>로그인/회원가입 UI</p>
+  <img src="images/total/main_join.png" alt="main_join" width="100%"/>
 
   <p>Footer</p>
 
   <p>다크 모드</p>
+  <img src="images/total/main_dark.png" alt="main_dark" width="100%"/>
 </details>
 
 <details>

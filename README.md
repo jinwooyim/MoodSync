@@ -122,7 +122,36 @@
 
 <details>
   <summary>✨추천 요청하기 보기</summary>
-  <iframe width="560" height="315" src="https://www.youtube.com/embed/영상ID" frameborder="0" allowfullscreen></iframe>
+  <h3>◈ 사용자 감정 입력 UI</h3>
+  <img src="images/recommendation/emotion_select_UI.png" alt="emotion_select_UI" width="100%"/>
+
+  
+  <h3>◈ 메인 기능 UI</h3>
+  <img src="images/total/main_func.png" alt="main_func" width="100%"/>
+
+
+  <h3>◈ 로그인/회원가입 UI</h3>
+  <img src="images/total/main_join.png" alt="main_join" width="100%"/>
+
+
+  <h3>◈ Footer</h3>
+  <img src="images/total/footer_info.png" alt="footer_info" width="100%"/>
+    <details>
+      <summary><h4>개인정보 처리방침</h4></summary>
+      <img src="images/total/footer_info_rule.png" alt="footer_info_rule" width="100%"/>
+    </details>
+    <details>
+      <summary><h4>이용약관</h4></summary>
+      <img src="images/total/footer_info_using.png" alt="footer_info_using" width="100%"/>
+    </details>
+    <details>
+      <summary><h4>회사소개</h4></summary>
+      <img src="images/total/footer_info_company.png" alt="footer_info_company" width="100%"/>
+    </details>
+
+  
+  <h3>◈ 다크 모드</h3>
+  <img src="images/total/main_dark.png" alt="main_dark" width="100%"/>
 </details>
 
 <details>

@@ -107,3 +107,10 @@
   <summary>피드백 보기</summary>
   <iframe width="560" height="315" src="https://www.youtube.com/embed/영상ID" frameborder="0" allowfullscreen></iframe>
 </details>
+
+---
+
+## 🗂️ 세부 설계서
+
+<h2>🧬 테이블 명세서 및 ERD </h2>
+

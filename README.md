@@ -200,7 +200,7 @@
   <h4>새 컬렉션 생성</h4>
   <img src="images/collection/collection_new.png" alt="collection_new" width="100%"/>
 
-  <h4>컬렉션 상세보기/h4>
+  <h4>컬렉션 상세보기</h4>
   <img src="images/collection/collection_desc.png" alt="collection_desc" width="100%"/>
 
   <h4>컬렉션 수정모드</h4>

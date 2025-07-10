@@ -83,7 +83,7 @@
 ## 🎬 전체 보기(자세히)
 
 <details>
-  <summary>✨전체적인 UI/UX 보기</summary>
+  <summary>✨테마 UI/UX 보기</summary>
 
   <h3>◈ 메인 페이지 구성</h3>
   <img src="images/total/main_page.png" alt="main_page" width="100%"/>

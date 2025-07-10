@@ -114,8 +114,8 @@
   </details>
 
   
-    <h3>◎ 다크 모드</h3>
-    <img src="images/total/main_dark.png" alt="main_dark" width="100%"/>
+  <h3>◎ 다크 모드</h3>
+  <img src="images/total/main_dark.png" alt="main_dark" width="100%"/>
 
   <p>이 이외의 UI/UX에 대해서는 다른 기능설명에서 제공하도록 하겠습니다!</p>
   

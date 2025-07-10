@@ -83,7 +83,7 @@
 ## 🎬 전체 기능 보기(자세히)
 
 <details>
-  <summary>전체적인 UI/UX 보기</summary>
+  <summary>✨전체적인 UI/UX 보기</summary>
 
   <h3>◈ 메인 페이지 구성</h3>
   <img src="images/total/main_page.png" alt="main_page" width="100%"/>
@@ -122,32 +122,32 @@
 </details>
 
 <details>
-  <summary>추천 요청하기 보기</summary>
+  <summary>✨추천 요청하기 보기</summary>
   <iframe width="560" height="315" src="https://www.youtube.com/embed/영상ID" frameborder="0" allowfullscreen></iframe>
 </details>
 
 <details>
-  <summary>마이페이지 보기</summary>
+  <summary>✨마이페이지 보기</summary>
   <iframe width="560" height="315" src="https://www.youtube.com/embed/영상ID" frameborder="0" allowfullscreen></iframe>
 </details>
 
 <details>
-  <summary>컬렉션 보기</summary>
+  <summary>✨컬렉션 보기</summary>
   <iframe width="560" height="315" src="https://www.youtube.com/embed/영상ID" frameborder="0" allowfullscreen></iframe>
 </details>
 
 <details>
-  <summary>관리자페이지 보기</summary>
+  <summary>✨관리자페이지 보기</summary>
   <iframe width="560" height="315" src="https://www.youtube.com/embed/영상ID" frameborder="0" allowfullscreen></iframe>
 </details>
 
 <details>
-  <summary>문의하기 보기</summary>
+  <summary>✨문의하기 보기</summary>
   <iframe width="560" height="315" src="https://www.youtube.com/embed/영상ID" frameborder="0" allowfullscreen></iframe>
 </details>
 
 <details>
-  <summary>피드백 보기</summary>
+  <summary>✨피드백 보기</summary>
   <iframe width="560" height="315" src="https://www.youtube.com/embed/영상ID" frameborder="0" allowfullscreen></iframe>
 </details>
 

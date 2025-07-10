@@ -99,19 +99,18 @@
 
   <h3>◈ Footer</h3>
   <img src="images/total/footer_info.png" alt="footer_info" width="100%"/>
-  <details>
-    <summary><h4>개인정보 처리방침</h4></summary>
-    <img src="images/total/footer_info_rule.png" alt="footer_info_rule" width="100%"/>
-  </details>
-  
-  <details>
-    <summary><h4>이용약관</h4></summary>
-    <img src="images/total/footer_info_using.png" alt="footer_info_using" width="100%"/>
-  </details>
-  <details>
-    <summary><h4>회사소개</h4></summary>
-    <img src="images/total/footer_info_company.png" alt="footer_info_company" width="100%"/>
-  </details>
+    <details>
+      <summary><h4>개인정보 처리방침</h4></summary>
+      <img src="images/total/footer_info_rule.png" alt="footer_info_rule" width="100%"/>
+    </details>
+    <details>
+      <summary><h4>이용약관</h4></summary>
+      <img src="images/total/footer_info_using.png" alt="footer_info_using" width="100%"/>
+    </details>
+    <details>
+      <summary><h4>회사소개</h4></summary>
+      <img src="images/total/footer_info_company.png" alt="footer_info_company" width="100%"/>
+    </details>
 
   
   <h3>◈ 다크 모드</h3>

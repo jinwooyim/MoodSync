@@ -117,6 +117,18 @@
 <details>
   <summary><h4> **테이블 세부 명세서** </h4></summary>
   <img src="images/ERD_desc1.webp" alt="ERD" width="100%"/>
+  <img src="images/ERD_desc2.webp" alt="ERD" width="100%"/>
+  <img src="images/ERD_desc3.webp" alt="ERD" width="100%"/>
+  <img src="images/ERD_desc4.webp" alt="ERD" width="100%"/>
+  <img src="images/ERD_desc5.webp" alt="ERD" width="100%"/>
+  <img src="images/ERD_desc6.webp" alt="ERD" width="100%"/>
+  <img src="images/ERD_desc7.webp" alt="ERD" width="100%"/>
+  <img src="images/ERD_desc8.webp" alt="ERD" width="100%"/>
+  <img src="images/ERD_desc9.webp" alt="ERD" width="100%"/>
+  <img src="images/ERD_desc10.webp" alt="ERD" width="100%"/>
+  <img src="images/ERD_desc11.webp" alt="ERD" width="100%"/>
+  <img src="images/ERD_desc12.webp" alt="ERD" width="100%"/>
+  <img src="images/ERD_desc13.webp" alt="ERD" width="100%"/>
 </details>
 ---
 

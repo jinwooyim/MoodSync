@@ -113,7 +113,7 @@
 <h2>🧬 테이블 명세서 및 ERD </h2>
 
 <h3> Entity-Relationship Diagram </h3>
-
+<img src="images/ERD.png" alt="ERD" width="100%"/>
 <details>
   <summary><h4> **테이블 세부 명세서** </h4></summary>
 </details>

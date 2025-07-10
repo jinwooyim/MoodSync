@@ -146,9 +146,10 @@
   <img src="images/ERD_desc12.webp" alt="ERD" width="100%"/>
   <img src="images/ERD_desc13.webp" alt="ERD" width="100%"/>
 </details>
+
 ---
 
 ## 🗂️ 세부 설계서
-
+ <img src="images/system_structure.webp" alt="system_structure" width="100%"/>
 
 

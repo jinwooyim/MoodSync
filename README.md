@@ -85,19 +85,19 @@
 <details>
   <summary>전체적인 UI/UX 보기</summary>
 
-  <h3>◎ 메인 페이지 구성</h3>
+  <h3>◈ 메인 페이지 구성</h3>
   <img src="images/total/main_page.png" alt="main_page" width="100%"/>
 
   
-  <h3>◎ 메인 기능 UI</h3>
+  <h3>◈ 메인 기능 UI</h3>
   <img src="images/total/main_func.png" alt="main_func" width="100%"/>
 
 
-  <h3>◎ 로그인/회원가입 UI</h3>
+  <h3>◈ 로그인/회원가입 UI</h3>
   <img src="images/total/main_join.png" alt="main_join" width="100%"/>
 
 
-  <h3>◎ Footer</h3>
+  <h3>◈ Footer</h3>
   <img src="images/total/footer_info.png" alt="footer_info" width="100%"/>
   <details>
     <summary><h4>개인정보 처리방침</h4></summary>
@@ -114,7 +114,7 @@
   </details>
 
   
-  <h3>◎ 다크 모드</h3>
+  <h3>◈ 다크 모드</h3>
   <img src="images/total/main_dark.png" alt="main_dark" width="100%"/>
 
   <p>이 이외의 UI/UX에 대해서는 다른 기능설명에서 제공하도록 하겠습니다!</p>

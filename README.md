@@ -186,7 +186,14 @@
 
 <details>
   <summary>✨컬렉션 보기</summary>
-  <iframe width="560" height="315" src="https://www.youtube.com/embed/영상ID" frameborder="0" allowfullscreen></iframe>
+  <h3>◈ 컬렉션페이지 UI</h3>
+  <h4>공개 컬렉션</h4>
+  <img src="images/collection/collection_open_UI.png" alt="collection_open_UI" width="100%"/>
+
+  <h4>나의 컬렉션</h4>
+  <img src="images/collection/collection_my_UI.png" alt="collection_my_UI" width="100%"/>
+
+  
 </details>
 
 <details>
